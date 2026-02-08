@@ -1,8 +1,7 @@
 import { prisma } from "@/lib/prisma"
 import Link from "next/link"
-import { formatDate } from "@/lib/utils"
-import DeleteButton from "@/components/admin/penduduk/DeleteButton"
 import ExcelActions from "@/components/admin/ExcelActions"
+import PendudukTable from "@/components/admin/penduduk/PendudukTable"
 
 export default async function PendudukPage({
   searchParams,
@@ -46,7 +45,6 @@ export default async function PendudukPage({
             // @ts-ignore
             dusun: true,
             alamat: true,
-            // rt/rw removed from view but still available if needed
           },
         },
       },
@@ -61,8 +59,17 @@ export default async function PendudukPage({
   const totalPenduduk = totalCount > 0 ? await prisma.penduduk.count() : 0
   const kkCount = totalCount > 0 ? await prisma.kartuKeluarga.count() : 0
 
-
-  const totalPages = Math.ceil(totalCount / perPage)
+  // Serialize data for client component
+  const serializedPenduduk = penduduk.map((p) => ({
+    ...p,
+    tanggalLahir: p.tanggalLahir.toISOString(),
+    createdAt: p.createdAt.toISOString(),
+    updatedAt: p.updatedAt.toISOString(),
+    kk: {
+      ...p.kk,
+      dusun: (p.kk as any).dusun || undefined,
+    },
+  }))
 
   return (
     <div className="space-y-6">
@@ -176,113 +183,14 @@ export default async function PendudukPage({
         </form>
       </div>
 
-      {/* Table */}
-      <div className="overflow-hidden rounded-lg border border-gray-200 bg-white">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                  NIK
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                  Nama
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                  TTL
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                  L/P
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                  Dusun / Alamat
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                  Pekerjaan
-                </th>
-                <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">
-                  Aksi
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200 bg-white">
-              {penduduk.length === 0 ? (
-                <tr>
-                  <td colSpan={7} className="px-6 py-12 text-center text-sm text-gray-500">
-                    Tidak ada data penduduk
-                  </td>
-                </tr>
-              ) : (
-                penduduk.map((p) => (
-                  <tr key={p.id} className="hover:bg-gray-50">
-                    <td className="whitespace-nowrap px-6 py-4 text-sm font-mono text-gray-900">
-                      {p.nik}
-                    </td>
-                    <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                      {p.nama}
-                    </td>
-                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-600">
-                      {p.tempatLahir}, {formatDate(p.tanggalLahir, "dd/MM/yyyy")}
-                    </td>
-                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-600">
-                      {p.jenisKelamin === "LAKI_LAKI" ? "L" : "P"}
-                    </td>
-                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-600">
-                      {/* @ts-ignore */}
-                      {p.kk.dusun || p.kk.alamat || "-"}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">
-                      {p.pekerjaan}
-                    </td>
-                    <td className="whitespace-nowrap px-6 py-4 text-right text-sm space-x-3">
-                      <Link
-                        href={`/admin/penduduk/${p.id}/edit`}
-                        className="text-blue-600 hover:text-blue-900"
-                      >
-                        Edit
-                      </Link>
-                      <DeleteButton 
-                        id={p.id} 
-                        name={p.nama} 
-                        type="penduduk" 
-                      />
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="flex items-center justify-between border-t border-gray-200 bg-white px-6 py-3">
-            <div className="text-sm text-gray-700">
-              Menampilkan <span className="font-medium">{skip + 1}</span> -{" "}
-              <span className="font-medium">{Math.min(skip + perPage, totalCount)}</span> dari{" "}
-              <span className="font-medium">{totalCount}</span> data
-            </div>
-            <div className="flex space-x-2">
-              {page > 1 && (
-                <Link
-                  href={`?${new URLSearchParams({ ...params, page: String(page - 1) })}`}
-                  className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-                >
-                  Previous
-                </Link>
-              )}
-              {page < totalPages && (
-                <Link
-                  href={`?${new URLSearchParams({ ...params, page: String(page + 1) })}`}
-                  className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-                >
-                  Next
-                </Link>
-              )}
-            </div>
-          </div>
-        )}
-      </div>
+      {/* Table with bulk delete */}
+      <PendudukTable
+        penduduk={serializedPenduduk as any}
+        totalCount={totalCount}
+        currentPage={page}
+        perPage={perPage}
+        searchParams={params}
+      />
     </div>
   )
 }
