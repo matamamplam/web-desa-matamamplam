@@ -195,8 +195,8 @@ export default async function LandingPage() {
   return (
     <div className="min-h-screen">
       <DisasterAlert disaster={disaster} />
-      <HeroSection settings={settings} />
       <InfoBar weather={weather} earthquake={earthquake} />
+      <HeroSection settings={settings} />
       {stats && <QuickStats stats={stats} />}
       {news.length > 0 && <LatestNews news={news} />}
       <OnlineServices />
