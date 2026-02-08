@@ -1,7 +1,5 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import WeatherWidget from '../weather/WeatherWidget';
-import EarthquakeWidget from '../earthquake/EarthquakeWidget';
 
 interface Settings {
   general?: {
@@ -76,12 +74,6 @@ export default function HeroSection({ settings }: { settings: Settings }) {
           >
             Jelajahi Layanan
           </Link>
-        </div>
-
-        {/* Widgets Area */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto animate-fade-in-up animation-delay-800 text-left">
-           <WeatherWidget />
-           <EarthquakeWidget />
         </div>
 
         {/* Scroll Indicator */}

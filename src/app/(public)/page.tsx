@@ -10,6 +10,7 @@ import StructurePreview from '@/components/landing/StructurePreview';
 import VillageMap from '@/components/landing/VillageMap';
 import DisasterAlert from '@/components/landing/DisasterAlert';
 import FAQSection from '@/components/landing/FAQSection';
+import InfoBar from '@/components/landing/InfoBar';
 
 import { 
   getPublicStats, 
@@ -20,14 +21,29 @@ import {
   getPublicStructure, 
   getPublicDisaster 
 } from '@/lib/data-public';
+import { prisma } from '@/lib/prisma';
+
+export const dynamic = 'force-dynamic';
+
+// Helper function to get weather description from code
+function getWeatherDesc(code: number) {
+  if (code === 0) return { label: "Cerah", icon: "☀️" }
+  if (code >= 1 && code <= 3) return { label: "Berawan", icon: "⛅" }
+  if (code >= 45 && code <= 48) return { label: "Kabut", icon: "🌫️" }
+  if (code >= 51 && code <= 55) return { label: "Gerimis", icon: "🌦️" }
+  if (code >= 61 && code <= 65) return { label: "Hujan", icon: "🌧️" }
+  if (code >= 80 && code <= 82) return { label: "Hujan Lebat", icon: "⛈️" }
+  if (code >= 95) return { label: "Badai Petir", icon: "⚡" }
+  return { label: "Cerah", icon: "☀️" }
+}
 
 async function getData() {
   try {
-    const [stats, newsData, umkmData, projectsData, settingsData, structureData, disaster] = await Promise.all([
+    const [stats, newsData, umkmData, projectsData, settingsData, structureData, disasterData] = await Promise.all([
       getPublicStats(),
-      getPublicNews(3),
-      getPublicUMKM(6),
-      getPublicProjects(3, 'IN_PROGRESS'),
+      getPublicNews(),
+      getPublicUMKM(),
+      getPublicProjects(),
       getPublicSettings(),
       getPublicStructure(),
       getPublicDisaster(),
@@ -82,6 +98,47 @@ async function getData() {
       photoAfter: item.photoAfter || null
     }));
 
+    // Fetch Weather Data from Open-Meteo
+    const OPEN_METEO_URL = "https://api.open-meteo.com/v1/forecast?latitude=5.1667&longitude=96.8333&current=temperature_2m,weather_code&timezone=Asia%2FBangkok";
+    let weather = null;
+    try {
+      const weatherRes = await fetch(OPEN_METEO_URL, { cache: 'no-store', next: { revalidate: 3600 } });
+      if (weatherRes.ok) {
+        const weatherData = await weatherRes.json();
+        const weatherDesc = getWeatherDesc(weatherData.current.weather_code);
+        weather = {
+          city: 'Peusangan',
+          temperature: Math.round(weatherData.current.temperature_2m),
+          condition: weatherDesc.label,
+          icon: weatherDesc.icon,
+        };
+      }
+    } catch (error) {
+      console.error('Error fetching weather:', error);
+    }
+
+    // Fetch Latest Earthquake
+    let earthquake = null;
+    try {
+      const gempa = await prisma.earthquake.findFirst({
+        orderBy: { datetime: 'desc' }
+      });
+      if (gempa) {
+        earthquake = {
+          magnitude: gempa.magnitude,
+          location: gempa.location,
+          date: gempa.date,
+          time: gempa.time,
+          depth: gempa.depth,
+          shakemap: gempa.shakemap || undefined,
+          coordinates: gempa.coordinates,
+          potential: gempa.potential,
+        };
+      }
+    } catch (error) {
+      console.error('Error fetching earthquake:', error);
+    }
+
     return {
       stats,
       news,
@@ -89,7 +146,9 @@ async function getData() {
       projects,
       settings,
       structure: structureData?.structure || { level1: [], level4: [] },
-      disaster
+      disaster: disasterData,
+      weather,
+      earthquake,
     };
   } catch (error) {
     console.error('Error fetching landing page data:', error);
@@ -111,18 +170,21 @@ async function getData() {
         faq: [],
       },
       structure: { level1: [], level4: [] },
-      disaster: null
+      disaster: null,
+      weather: null,
+      earthquake: null,
     };
   }
 }
 
 export default async function LandingPage() {
-  const { stats, news, umkm, projects, settings, structure, disaster } = await getData();
+  const { stats, news, umkm, projects, settings, structure, disaster, weather, earthquake } = await getData();
 
   return (
     <div className="min-h-screen">
       <DisasterAlert disaster={disaster} />
       <HeroSection settings={settings} />
+      <InfoBar weather={weather} earthquake={earthquake} />
       {stats && <QuickStats stats={stats} />}
       {news.length > 0 && <LatestNews news={news} />}
       <OnlineServices />
