@@ -356,6 +356,7 @@ export default function PengaturanPage() {
                       const srcMatch = value.match(/src=["']([^"']+)["']/);
                       if (srcMatch) {
                         value = srcMatch[1];
+                        toast.success('✅ URL berhasil diekstrak dari iframe!');
                       }
                       updateSettings(['contact', 'mapUrl'], value);
                     }}
@@ -366,6 +367,11 @@ export default function PengaturanPage() {
                   <p className="text-xs text-gray-500 mt-1">
                     📍 Buka Google Maps → klik &quot;Share&quot; → &quot;Embed a map&quot; → Copy HTML dan paste di sini (URL akan otomatis diekstrak)
                   </p>
+                  {settings.contact.mapUrl && (
+                    <p className="text-xs text-green-600 mt-1">
+                      ✅ URL tersimpan: {settings.contact.mapUrl.substring(0, 60)}...
+                    </p>
+                  )}
                 </div>
 
                 <div className="pt-4 border-t border-gray-200 dark:border-gray-700">

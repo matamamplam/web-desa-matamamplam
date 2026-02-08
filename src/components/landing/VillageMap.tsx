@@ -9,6 +9,10 @@ interface Settings {
 
 export default function VillageMap({ settings }: { settings: Settings }) {
   const mapUrl = settings.contactInfo?.mapEmbedUrl;
+  
+  console.log('🗺️ VillageMap received settings:', settings);
+  console.log('🗺️ VillageMap mapUrl:', mapUrl);
+
 
   return (
     <section className="py-20 bg-white">

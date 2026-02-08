@@ -33,8 +33,13 @@ async function getData() {
       getPublicDisaster(),
     ]);
 
+
     // Extract settings with type safety
     const rawSettings = (settingsData as any)?.settings || settingsData || {};
+    
+    // Debug logging
+    console.log('🔍 Raw Settings:', JSON.stringify(rawSettings, null, 2));
+    console.log('🗺️ Map URL from DB:', rawSettings.contact?.mapUrl);
     
     // Transform settings to expected format
     const settings = {
@@ -49,6 +54,9 @@ async function getData() {
       footer: rawSettings.footer || {},
       faq: rawSettings.faq || [],
     } as any; // Cast to satisfy component prop types if needed
+
+    console.log('✅ Transformed settings.contactInfo:', settings.contactInfo);
+
 
     // Transform News (handle null excerpt)
     const news = (newsData?.news || []).map((item: any) => ({
