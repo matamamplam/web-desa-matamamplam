@@ -33,8 +33,8 @@ async function getData() {
       getPublicDisaster(),
     ]);
 
-    // Extract settings
-    const rawSettings = settingsData?.settings || settingsData || {};
+    // Extract settings with type safety
+    const rawSettings = (settingsData as any)?.settings || settingsData || {};
     
     // Transform settings to expected format
     const settings = {
@@ -48,13 +48,37 @@ async function getData() {
       },
       footer: rawSettings.footer || {},
       faq: rawSettings.faq || [],
-    };
+    } as any; // Cast to satisfy component prop types if needed
+
+    // Transform News (handle null excerpt)
+    const news = (newsData?.news || []).map((item: any) => ({
+      ...item,
+      excerpt: item.excerpt || '',
+      thumbnail: item.thumbnail || null
+    }));
+
+    // Transform UMKM (map ownerPhone -> phone)
+    const umkm = (umkmData?.umkm || []).map((item: any) => ({
+      ...item,
+      phone: item.ownerPhone || '',
+      logo: item.logo || null,
+      address: item.address || null
+    }));
+
+    // Transform Projects (add missing slug)
+    const projects = (projectsData?.projects || []).map((item: any) => ({
+      ...item,
+      slug: item.title.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, ''),
+      endDate: item.endDate || null,
+      photoBefore: item.photoBefore || null,
+      photoAfter: item.photoAfter || null
+    }));
 
     return {
       stats,
-      news: newsData?.news || [],
-      umkm: umkmData?.umkm || [],
-      projects: projectsData?.projects || [],
+      news,
+      umkm,
+      projects,
       settings,
       structure: structureData?.structure || { level1: [], level4: [] },
       disaster

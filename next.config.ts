@@ -17,6 +17,11 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  // Limit concurrency to prevent DB connection timeout during build
+  experimental: {
+    workerThreads: false,
+    cpus: 1,
+  },
   webpack(config) {
     config.module.rules.push({
       test: /\.svg$/,
