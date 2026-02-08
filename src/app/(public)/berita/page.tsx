@@ -1,7 +1,8 @@
 import { prisma } from '@/lib/prisma';
 import NewsCard from '@/components/landing/NewsCard';
 
-export const revalidate = 300; // Cache for 5 minutes
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 async function getNews() {
   try {

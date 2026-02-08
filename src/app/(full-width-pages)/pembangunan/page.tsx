@@ -4,6 +4,9 @@ import { formatDate, formatRupiah } from "@/lib/utils"
 import Link from "next/link"
 import Image from "next/image"
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export const metadata = {
   title: "Pembangunan Desa - Web Desa Mata Mamplam",
   description: "Informasi kegiatan pembangunan dan infrastruktur Desa Mata Mamplam",

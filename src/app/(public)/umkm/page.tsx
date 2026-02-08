@@ -2,7 +2,8 @@ import { prisma } from '@/lib/prisma';
 import UMKMCard from '@/components/landing/UMKMCard';
 import Link from 'next/link';
 
-export const revalidate = 600; // Cache for 10 minutes
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 async function getUMKM(categorySlug?: string) {
   try {

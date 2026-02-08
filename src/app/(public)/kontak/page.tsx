@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma"
 
-export const revalidate = 60
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 async function getSettings() {
   const settings = await prisma.siteSettings.findFirst()

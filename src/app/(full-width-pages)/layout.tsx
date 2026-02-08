@@ -3,6 +3,9 @@ import PublicFooter from '@/components/PublicFooter';
 
 import { getPublicSettings } from '@/lib/data-public';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 async function getSettings() {
   try {
     const settingsData = await getPublicSettings();

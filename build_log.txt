@@ -1,0 +1,372 @@
+10:40:48.330 Running build in Washington, D.C., USA (East) – iad1
+10:40:48.334 Build machine configuration: 2 cores, 8 GB
+10:40:48.555 Cloning github.com/matamamplam/web-desa-matamamplam (Branch: main, Commit: fdaa580)
+10:40:48.556 Previous build caches not available.
+10:40:49.260 Cloning completed: 704.000ms
+10:40:50.214 Running "vercel build"
+10:40:52.780 Vercel CLI 50.11.0
+10:40:53.242 Installing dependencies...
+10:41:14.574 npm warn deprecated next@15.1.7: This version has a security vulnerability. Please upgrade to a patched version. See https://nextjs.org/blog/CVE-2025-66478 for more details.
+10:41:20.322 
+10:41:20.322 > sid-mata-mamplam@1.0.0 postinstall
+10:41:20.322 > prisma generate
+10:41:20.322 
+10:41:21.292 Environment variables loaded from .env
+10:41:21.293 Prisma schema loaded from prisma/schema.prisma
+10:41:21.856 ┌─────────────────────────────────────────────────────────┐
+10:41:21.857 │  Update available 6.19.2 -> 7.3.0                       │
+10:41:21.857 │                                                         │
+10:41:21.857 │  This is a major update - please follow the guide at    │
+10:41:21.857 │  https://pris.ly/d/major-version-upgrade                │
+10:41:21.857 │                                                         │
+10:41:21.858 │  Run the following to update                            │
+10:41:21.858 │    npm i --save-dev prisma@latest                       │
+10:41:21.858 │    npm i @prisma/client@latest                          │
+10:41:21.858 └─────────────────────────────────────────────────────────┘
+10:41:21.859 
+10:41:21.859 ✔ Generated Prisma Client (v6.19.2) to ./node_modules/@prisma/client in 231ms
+10:41:21.859 
+10:41:21.859 Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+10:41:21.859 
+10:41:21.859 Tip: Need your database queries to be 1000x faster? Accelerate offers you that and more: https://pris.ly/tip-2-accelerate
+10:41:21.860 
+10:41:21.893 
+10:41:21.893 added 750 packages in 28s
+10:41:21.894 
+10:41:21.894 228 packages are looking for funding
+10:41:21.894   run `npm fund` for details
+10:41:21.941 Detected Next.js version: 15.1.7
+10:41:21.948 Running "npm run build"
+10:41:22.207 
+10:41:22.208 > sid-mata-mamplam@1.0.0 build
+10:41:22.212 > next build
+10:41:22.212 
+10:41:22.783 Attention: Next.js now collects completely anonymous telemetry regarding usage.
+10:41:22.784 This information is used to shape Next.js' roadmap and prioritize features.
+10:41:22.784 You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+10:41:22.784 https://nextjs.org/telemetry
+10:41:22.784 
+10:41:22.847    ▲ Next.js 15.1.7
+10:41:22.848    - Environments: .env
+10:41:22.848 
+10:41:22.877    Creating an optimized production build ...
+10:42:02.168  ✓ Compiled successfully
+10:42:02.172    Linting and checking validity of types ...
+10:42:02.595  ⨯ ESLint: Cannot find module '/vercel/path0/node_modules/eslint-config-next/core-web-vitals' imported from /vercel/path0/eslint.config.mjs Did you mean to import "eslint-config-next/core-web-vitals.js"?
+10:42:17.068    Collecting page data ...
+10:42:23.544    Generating static pages (0/101) ...
+10:42:24.774    Generating static pages (25/101) 
+10:42:42.691    Generating static pages (50/101) 
+10:42:58.781 prisma:error 
+10:42:58.781 Invalid `prisma.siteSettings.findFirst()` invocation:
+10:42:58.781 
+10:42:58.781 
+10:42:58.781 Timed out fetching a new connection from the connection pool. More info: http://pris.ly/d/connection-pool (Current connection pool timeout: 10, connection limit: 1)
+10:42:58.786 Error fetching public settings: Error [PrismaClientKnownRequestError]: 
+10:42:58.786 Invalid `prisma.siteSettings.findFirst()` invocation:
+10:42:58.786 
+10:42:58.786 
+10:42:58.786 Timed out fetching a new connection from the connection pool. More info: http://pris.ly/d/connection-pool (Current connection pool timeout: 10, connection limit: 1)
+10:42:58.786     at async l (.next/server/chunks/3227.js:1:22897)
+10:42:58.786     at async i (.next/server/app/(full-width-pages)/(error-pages)/error-404/page.js:1:6321)
+10:42:58.786     at async l (.next/server/app/(full-width-pages)/(error-pages)/error-404/page.js:1:6687) {
+10:42:58.786   code: 'P2024',
+10:42:58.786   meta: [Object],
+10:42:58.787   clientVersion: '6.19.2'
+10:42:58.787 }
+10:42:58.787 prisma:error 
+10:42:58.787 Invalid `prisma.siteSettings.findFirst()` invocation:
+10:42:58.787 
+10:42:58.787 
+10:42:58.787 Timed out fetching a new connection from the connection pool. More info: http://pris.ly/d/connection-pool (Current connection pool timeout: 10, connection limit: 1)
+10:42:58.789 Failed to fetch settings for metadata: Error [PrismaClientKnownRequestError]: 
+10:42:58.789 Invalid `prisma.siteSettings.findFirst()` invocation:
+10:42:58.789 
+10:42:58.789 
+10:42:58.790 Timed out fetching a new connection from the connection pool. More info: http://pris.ly/d/connection-pool (Current connection pool timeout: 10, connection limit: 1)
+10:42:58.791     at async Module.u (.next/server/app/_not-found/page.js:1:8547) {
+10:42:58.791   code: 'P2024',
+10:42:58.792   meta: [Object],
+10:42:58.792   clientVersion: '6.19.2'
+10:42:58.792 }
+10:43:08.981 prisma:error 
+10:43:08.981 Invalid `prisma.siteSettings.findFirst()` invocation:
+10:43:08.982 
+10:43:08.982 
+10:43:08.982 Timed out fetching a new connection from the connection pool. More info: http://pris.ly/d/connection-pool (Current connection pool timeout: 10, connection limit: 1)
+10:43:08.982 Error fetching public settings: Error [PrismaClientKnownRequestError]: 
+10:43:08.985 Invalid `prisma.siteSettings.findFirst()` invocation:
+10:43:08.985 
+10:43:08.986 
+10:43:08.986 Timed out fetching a new connection from the connection pool. More info: http://pris.ly/d/connection-pool (Current connection pool timeout: 10, connection limit: 1)
+10:43:08.987     at async l (.next/server/chunks/3227.js:1:22897)
+10:43:08.987     at async i (.next/server/app/(public)/bencana/page.js:1:15973)
+10:43:08.987     at async o (.next/server/app/(public)/bencana/page.js:1:16339) {
+10:43:08.987   code: 'P2024',
+10:43:08.987   meta: [Object],
+10:43:08.988   clientVersion: '6.19.2'
+10:43:08.988 }
+10:43:08.988 Error fetching news: Error [PrismaClientKnownRequestError]: 
+10:43:08.989 Invalid `prisma.news.findMany()` invocation:
+10:43:08.990 
+10:43:08.990 
+10:43:08.990 Timed out fetching a new connection from the connection pool. More info: http://pris.ly/d/connection-pool (Current connection pool timeout: 10, connection limit: 1)
+10:43:08.990     at async l (.next/server/app/(public)/berita/page.js:1:8593)
+10:43:08.990     at async o (.next/server/app/(public)/berita/page.js:1:8890) {
+10:43:08.991   code: 'P2024',
+10:43:08.991   meta: [Object],
+10:43:08.991   clientVersion: '6.19.2'
+10:43:08.991 }
+10:43:08.991 Failed to fetch settings for metadata: Error [PrismaClientKnownRequestError]: 
+10:43:08.991 Invalid `prisma.siteSettings.findFirst()` invocation:
+10:43:08.992 
+10:43:08.992 
+10:43:08.992 Timed out fetching a new connection from the connection pool. More info: http://pris.ly/d/connection-pool (Current connection pool timeout: 10, connection limit: 1)
+10:43:08.992     at async Module.u (.next/server/app/_not-found/page.js:1:8547) {
+10:43:08.993   code: 'P2024',
+10:43:08.993   meta: [Object],
+10:43:08.993   clientVersion: '6.19.2'
+10:43:08.994 }
+10:43:08.994 Error fetching public settings: Error [PrismaClientKnownRequestError]: 
+10:43:08.994 Invalid `prisma.siteSettings.findFirst()` invocation:
+10:43:08.995 
+10:43:08.995 
+10:43:08.995 Timed out fetching a new connection from the connection pool. More info: http://pris.ly/d/connection-pool (Current connection pool timeout: 10, connection limit: 1)
+10:43:08.995     at async l (.next/server/chunks/3227.js:1:22897)
+10:43:08.996     at async i (.next/server/app/(public)/bencana/page.js:1:15973)
+10:43:08.997     at async o (.next/server/app/(public)/bencana/page.js:1:16339) {
+10:43:08.997   code: 'P2024',
+10:43:08.997   meta: [Object],
+10:43:08.997   clientVersion: '6.19.2'
+10:43:08.997 }
+10:43:08.998 prisma:error 
+10:43:08.998 Invalid `prisma.news.findMany()` invocation:
+10:43:08.998 
+10:43:08.998 
+10:43:08.998 Timed out fetching a new connection from the connection pool. More info: http://pris.ly/d/connection-pool (Current connection pool timeout: 10, connection limit: 1)
+10:43:08.999 prisma:error 
+10:43:08.999 Invalid `prisma.siteSettings.findFirst()` invocation:
+10:43:08.999 
+10:43:08.999 
+10:43:08.999 Timed out fetching a new connection from the connection pool. More info: http://pris.ly/d/connection-pool (Current connection pool timeout: 10, connection limit: 1)
+10:43:08.999 prisma:error 
+10:43:09.000 Invalid `prisma.siteSettings.findFirst()` invocation:
+10:43:09.000 
+10:43:09.000 
+10:43:09.000 Timed out fetching a new connection from the connection pool. More info: http://pris.ly/d/connection-pool (Current connection pool timeout: 10, connection limit: 1)
+10:43:09.000 prisma:error 
+10:43:09.001 Invalid `prisma.siteSettings.findFirst()` invocation:
+10:43:09.001 
+10:43:09.001 
+10:43:09.001 Timed out fetching a new connection from the connection pool. More info: http://pris.ly/d/connection-pool (Current connection pool timeout: 10, connection limit: 1)
+10:43:09.001 prisma:error 
+10:43:09.002 Invalid `prisma.siteSettings.findFirst()` invocation:
+10:43:09.002 
+10:43:09.002 
+10:43:09.002 Timed out fetching a new connection from the connection pool. More info: http://pris.ly/d/connection-pool (Current connection pool timeout: 10, connection limit: 1)
+10:43:09.005 Failed to fetch settings for metadata: Error [PrismaClientKnownRequestError]: 
+10:43:09.005 Invalid `prisma.siteSettings.findFirst()` invocation:
+10:43:09.005 
+10:43:09.006 
+10:43:09.006 Timed out fetching a new connection from the connection pool. More info: http://pris.ly/d/connection-pool (Current connection pool timeout: 10, connection limit: 1)
+10:43:09.006     at async Module.u (.next/server/app/_not-found/page.js:1:8547) {
+10:43:09.006   code: 'P2024',
+10:43:09.006   meta: [Object],
+10:43:09.007   clientVersion: '6.19.2'
+10:43:09.007 }
+10:43:09.009 Error fetching public settings: Error [PrismaClientKnownRequestError]: 
+10:43:09.009 Invalid `prisma.siteSettings.findFirst()` invocation:
+10:43:09.010 
+10:43:09.010 
+10:43:09.010 Timed out fetching a new connection from the connection pool. More info: http://pris.ly/d/connection-pool (Current connection pool timeout: 10, connection limit: 1)
+10:43:09.010     at async l (.next/server/chunks/3227.js:1:22897)
+10:43:09.011     at async i (.next/server/app/(public)/bencana/page.js:1:15973)
+10:43:09.017     at async o (.next/server/app/(public)/bencana/page.js:1:16339) {
+10:43:09.017   code: 'P2024',
+10:43:09.017   meta: [Object],
+10:43:09.017   clientVersion: '6.19.2'
+10:43:09.018 }
+10:43:09.018 Error fetching stats: Error [PrismaClientKnownRequestError]: 
+10:43:09.018 Invalid `prisma.penduduk.count()` invocation:
+10:43:09.018 
+10:43:09.018 
+10:43:09.019 Timed out fetching a new connection from the connection pool. More info: http://pris.ly/d/connection-pool (Current connection pool timeout: 10, connection limit: 1)
+10:43:09.019     at async n (.next/server/chunks/3227.js:1:21310)
+10:43:09.019     at async w (.next/server/app/(public)/page.js:1:41952)
+10:43:09.019     at async k (.next/server/app/(public)/page.js:1:43143) {
+10:43:09.020   code: 'P2024',
+10:43:09.020   meta: [Object],
+10:43:09.020   clientVersion: '6.19.2'
+10:43:09.020 }
+10:43:09.020 prisma:error 
+10:43:09.021 Invalid `prisma.siteSettings.findFirst()` invocation:
+10:43:09.021 
+10:43:09.021 
+10:43:09.021 Timed out fetching a new connection from the connection pool. More info: http://pris.ly/d/connection-pool (Current connection pool timeout: 10, connection limit: 1)
+10:43:09.021 prisma:error 
+10:43:09.022 Invalid `prisma.penduduk.count()` invocation:
+10:43:09.022 
+10:43:09.022 
+10:43:09.022 Timed out fetching a new connection from the connection pool. More info: http://pris.ly/d/connection-pool (Current connection pool timeout: 10, connection limit: 1)
+10:43:09.022 prisma:error 
+10:43:09.023 Invalid `prisma.penduduk.count()` invocation:
+10:43:09.023 
+10:43:09.023 
+10:43:09.023 Timed out fetching a new connection from the connection pool. More info: http://pris.ly/d/connection-pool (Current connection pool timeout: 10, connection limit: 1)
+10:43:09.023 prisma:error 
+10:43:09.023 Invalid `prisma.penduduk.count()` invocation:
+10:43:09.024 
+10:43:09.024 
+10:43:09.024 Timed out fetching a new connection from the connection pool. More info: http://pris.ly/d/connection-pool (Current connection pool timeout: 10, connection limit: 1)
+10:43:09.024 prisma:error 
+10:43:09.024 Invalid `prisma.kartuKeluarga.count()` invocation:
+10:43:09.025 
+10:43:09.025 
+10:43:09.025 Timed out fetching a new connection from the connection pool. More info: http://pris.ly/d/connection-pool (Current connection pool timeout: 10, connection limit: 1)
+10:43:09.025 prisma:error 
+10:43:09.025 Invalid `prisma.uMKM.count()` invocation:
+10:43:09.025 
+10:43:09.026 
+10:43:09.026 Timed out fetching a new connection from the connection pool. More info: http://pris.ly/d/connection-pool (Current connection pool timeout: 10, connection limit: 1)
+10:43:09.026 prisma:error 
+10:43:09.026 Invalid `prisma.project.count()` invocation:
+10:43:09.026 
+10:43:09.027 
+10:43:09.027 Timed out fetching a new connection from the connection pool. More info: http://pris.ly/d/connection-pool (Current connection pool timeout: 10, connection limit: 1)
+10:43:09.027 prisma:error 
+10:43:09.027 Invalid `prisma.project.count()` invocation:
+10:43:09.027 
+10:43:09.027 
+10:43:09.027 Timed out fetching a new connection from the connection pool. More info: http://pris.ly/d/connection-pool (Current connection pool timeout: 10, connection limit: 1)
+10:43:09.027 prisma:error 
+10:43:09.027 Invalid `prisma.news.findMany()` invocation:
+10:43:09.027 
+10:43:09.027 
+10:43:09.027 Timed out fetching a new connection from the connection pool. More info: http://pris.ly/d/connection-pool (Current connection pool timeout: 10, connection limit: 1)
+10:43:09.028 prisma:error 
+10:43:09.028 Invalid `prisma.uMKM.findMany()` invocation:
+10:43:09.028 
+10:43:09.028 
+10:43:09.028 Timed out fetching a new connection from the connection pool. More info: http://pris.ly/d/connection-pool (Current connection pool timeout: 10, connection limit: 1)
+10:43:09.028 prisma:error 
+10:43:09.028 Invalid `prisma.project.findMany()` invocation:
+10:43:09.028 
+10:43:09.028 
+10:43:09.028 Timed out fetching a new connection from the connection pool. More info: http://pris.ly/d/connection-pool (Current connection pool timeout: 10, connection limit: 1)
+10:43:09.028 prisma:error 
+10:43:09.028 Invalid `prisma.siteSettings.findFirst()` invocation:
+10:43:09.028 
+10:43:09.028 
+10:43:09.028 Timed out fetching a new connection from the connection pool. More info: http://pris.ly/d/connection-pool (Current connection pool timeout: 10, connection limit: 1)
+10:43:09.028 prisma:error 
+10:43:09.028 Invalid `prisma.villageOfficialPosition.findMany()` invocation:
+10:43:09.028 
+10:43:09.028 
+10:43:09.028 Timed out fetching a new connection from the connection pool. More info: http://pris.ly/d/connection-pool (Current connection pool timeout: 10, connection limit: 1)
+10:43:09.029 prisma:error 
+10:43:09.029 Invalid `prisma.disasterEvent.findFirst()` invocation:
+10:43:09.029 
+10:43:09.029 
+10:43:09.029 Timed out fetching a new connection from the connection pool. More info: http://pris.ly/d/connection-pool (Current connection pool timeout: 10, connection limit: 1)
+10:43:09.029 prisma:error 
+10:43:09.029 Invalid `prisma.siteSettings.findFirst()` invocation:
+10:43:09.029 
+10:43:09.029 
+10:43:09.029 Timed out fetching a new connection from the connection pool. More info: http://pris.ly/d/connection-pool (Current connection pool timeout: 10, connection limit: 1)
+10:43:09.030 Error fetching public news: Error [PrismaClientKnownRequestError]: 
+10:43:09.030 Invalid `prisma.news.findMany()` invocation:
+10:43:09.030 
+10:43:09.030 
+10:43:09.030 Timed out fetching a new connection from the connection pool. More info: http://pris.ly/d/connection-pool (Current connection pool timeout: 10, connection limit: 1)
+10:43:09.030     at async a (.next/server/chunks/3227.js:1:21886)
+10:43:09.030     at async w (.next/server/app/(public)/page.js:1:41952)
+10:43:09.030     at async k (.next/server/app/(public)/page.js:1:43143) {
+10:43:09.030   code: 'P2024',
+10:43:09.030   meta: [Object],
+10:43:09.030   clientVersion: '6.19.2'
+10:43:09.030 }
+10:43:09.030 Error fetching public UMKM: Error [PrismaClientKnownRequestError]: 
+10:43:09.030 Invalid `prisma.uMKM.findMany()` invocation:
+10:43:09.030 
+10:43:09.030 
+10:43:09.030 Timed out fetching a new connection from the connection pool. More info: http://pris.ly/d/connection-pool (Current connection pool timeout: 10, connection limit: 1)
+10:43:09.030     at async o (.next/server/chunks/3227.js:1:22240)
+10:43:09.030     at async w (.next/server/app/(public)/page.js:1:41952)
+10:43:09.030     at async k (.next/server/app/(public)/page.js:1:43143) {
+10:43:09.030   code: 'P2024',
+10:43:09.030   meta: [Object],
+10:43:09.030   clientVersion: '6.19.2'
+10:43:09.031 }
+10:43:09.031 Error fetching public projects: Error [PrismaClientKnownRequestError]: 
+10:43:09.031 Invalid `prisma.project.findMany()` invocation:
+10:43:09.031 
+10:43:09.031 
+10:43:09.031 Timed out fetching a new connection from the connection pool. More info: http://pris.ly/d/connection-pool (Current connection pool timeout: 10, connection limit: 1)
+10:43:09.031     at async i (.next/server/chunks/3227.js:1:22561)
+10:43:09.031     at async w (.next/server/app/(public)/page.js:1:41952)
+10:43:09.031     at async k (.next/server/app/(public)/page.js:1:43143) {
+10:43:09.031   code: 'P2024',
+10:43:09.031   meta: [Object],
+10:43:09.031   clientVersion: '6.19.2'
+10:43:09.031 }
+10:43:09.031 Error fetching public settings: Error [PrismaClientKnownRequestError]: 
+10:43:09.031 Invalid `prisma.siteSettings.findFirst()` invocation:
+10:43:09.031 
+10:43:09.031 
+10:43:09.031 Timed out fetching a new connection from the connection pool. More info: http://pris.ly/d/connection-pool (Current connection pool timeout: 10, connection limit: 1)
+10:43:09.031     at async l (.next/server/chunks/3227.js:1:22897)
+10:43:09.031     at async w (.next/server/app/(public)/page.js:1:41952)
+10:43:09.031     at async k (.next/server/app/(public)/page.js:1:43143) {
+10:43:09.031   code: 'P2024',
+10:43:09.031   meta: [Object],
+10:43:09.031   clientVersion: '6.19.2'
+10:43:09.031 }
+10:43:09.031 Error fetching public structure: Error [PrismaClientKnownRequestError]: 
+10:43:09.031 Invalid `prisma.villageOfficialPosition.findMany()` invocation:
+10:43:09.031 
+10:43:09.031 
+10:43:09.031 Timed out fetching a new connection from the connection pool. More info: http://pris.ly/d/connection-pool (Current connection pool timeout: 10, connection limit: 1)
+10:43:09.031     at async c (.next/server/chunks/3227.js:1:23482)
+10:43:09.031     at async w (.next/server/app/(public)/page.js:1:41952)
+10:43:09.031     at async k (.next/server/app/(public)/page.js:1:43143) {
+10:43:09.031   code: 'P2024',
+10:43:09.032   meta: [Object],
+10:43:09.032   clientVersion: '6.19.2'
+10:43:09.032 }
+10:43:09.032 API Error (Public Disaster): Error [PrismaClientKnownRequestError]: 
+10:43:09.032 Invalid `prisma.disasterEvent.findFirst()` invocation:
+10:43:09.032 
+10:43:09.032 
+10:43:09.032 Timed out fetching a new connection from the connection pool. More info: http://pris.ly/d/connection-pool (Current connection pool timeout: 10, connection limit: 1)
+10:43:09.032     at async d (.next/server/chunks/3227.js:1:24029)
+10:43:09.032     at async w (.next/server/app/(public)/page.js:1:41952)
+10:43:09.032     at async k (.next/server/app/(public)/page.js:1:43143) {
+10:43:09.032   code: 'P2024',
+10:43:09.032   meta: [Object],
+10:43:09.032   clientVersion: '6.19.2'
+10:43:09.032 }
+10:43:09.032 Failed to fetch settings for metadata: Error [PrismaClientKnownRequestError]: 
+10:43:09.032 Invalid `prisma.siteSettings.findFirst()` invocation:
+10:43:09.032 
+10:43:09.032 
+10:43:09.032 Timed out fetching a new connection from the connection pool. More info: http://pris.ly/d/connection-pool (Current connection pool timeout: 10, connection limit: 1)
+10:43:09.032     at async Module.u (.next/server/app/_not-found/page.js:1:8547) {
+10:43:09.032   code: 'P2024',
+10:43:09.032   meta: [Object],
+10:43:09.032   clientVersion: '6.19.2'
+10:43:09.032 }
+10:43:10.965 Error occurred prerendering page "/kontak". Read more: https://nextjs.org/docs/messages/prerender-error
+10:43:10.965 PrismaClientKnownRequestError: 
+10:43:10.965 Invalid `prisma.siteSettings.findFirst()` invocation:
+10:43:10.965 
+10:43:10.965 
+10:43:10.965 Timed out fetching a new connection from the connection pool. More info: http://pris.ly/d/connection-pool (Current connection pool timeout: 10, connection limit: 1)
+10:43:10.965     at ei.handleRequestError (/vercel/path0/node_modules/@prisma/client/runtime/library.js:121:7268)
+10:43:10.965     at ei.handleAndLogRequestError (/vercel/path0/node_modules/@prisma/client/runtime/library.js:121:6593)
+10:43:10.965     at ei.request (/vercel/path0/node_modules/@prisma/client/runtime/library.js:121:6300)
+10:43:10.965     at async a (/vercel/path0/node_modules/@prisma/client/runtime/library.js:130:9551)
+10:43:10.966     at async l (/vercel/path0/.next/server/app/(public)/kontak/page.js:1:4714)
+10:43:10.966     at async i (/vercel/path0/.next/server/app/(public)/kontak/page.js:1:4798)
+10:43:10.966 Export encountered an error on /(public)/kontak/page: /kontak, exiting the build.
+10:43:10.986  ⨯ Next.js build worker exited with code: 1 and signal: null
+10:43:11.044 Error: Command "npm run build" exited with 1
