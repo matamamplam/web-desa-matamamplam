@@ -98,19 +98,31 @@ async function getData() {
       photoAfter: item.photoAfter || null
     }));
 
-    // Fetch Weather Data from Open-Meteo
-    const OPEN_METEO_URL = "https://api.open-meteo.com/v1/forecast?latitude=5.1667&longitude=96.8333&current=temperature_2m,weather_code&timezone=Asia%2FBangkok";
+    // Fetch Weather Data from Open-Meteo with daily forecast
+    const OPEN_METEO_URL = "https://api.open-meteo.com/v1/forecast?latitude=5.1667&longitude=96.8333&current=temperature_2m,weather_code,relative_humidity_2m,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=Asia%2FBangkok&forecast_days=7";
     let weather = null;
     try {
       const weatherRes = await fetch(OPEN_METEO_URL, { cache: 'no-store', next: { revalidate: 3600 } });
       if (weatherRes.ok) {
         const weatherData = await weatherRes.json();
         const weatherDesc = getWeatherDesc(weatherData.current.weather_code);
+        
+        // Transform daily forecast
+        const dailyForecast = weatherData.daily.time.map((date: string, index: number) => ({
+          date,
+          code: weatherData.daily.weather_code[index],
+          maxTemp: Math.round(weatherData.daily.temperature_2m_max[index]),
+          minTemp: Math.round(weatherData.daily.temperature_2m_min[index]),
+        }));
+
         weather = {
           city: 'Peusangan',
           temperature: Math.round(weatherData.current.temperature_2m),
           condition: weatherDesc.label,
           icon: weatherDesc.icon,
+          humidity: weatherData.current.relative_humidity_2m,
+          windSpeed: weatherData.current.wind_speed_10m,
+          daily: dailyForecast,
         };
       }
     } catch (error) {
