@@ -50,8 +50,8 @@ async function getData() {
     ]);
 
 
-    // Extract settings with type safety
-    const rawSettings = (settingsData as any)?.settings || settingsData || {};
+    // getPublicSettings now returns the JSON settings content directly
+    const rawSettings = settingsData || {};
     
     // Debug logging
     console.log('🔍 Raw Settings:', JSON.stringify(rawSettings, null, 2));
@@ -74,6 +74,7 @@ async function getData() {
 
     console.log('✅ Transformed settings.general:', settings.general);
     console.log('✅ Transformed settings.contactInfo:', settings.contactInfo);
+
 
 
 

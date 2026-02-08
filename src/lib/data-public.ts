@@ -146,27 +146,26 @@ export async function getPublicProjects(limit: number = 6, status?: 'PLANNING' |
 
 export async function getPublicSettings() {
   try {
-    const settings = await prisma.siteSettings.findFirst();
+    const settingsRecord = await prisma.siteSettings.findFirst();
 
-    if (!settings) {
+    if (!settingsRecord) {
       return {
-        settings: {
-          general: { siteName: 'Website Desa', tagline: '', description: '' },
-          branding: { logo: '/images/logo.png', favicon: '/images/favicon.ico' },
-          contact: { email: '', phone: '', whatsapp: '', address: '', mapUrl: '' },
-          about: { title: '', content: '', vision: '', mission: [] },
-          faq: [],
-          footer: {
-            description: '',
-            socialMedia: { facebook: '', instagram: '', twitter: '', youtube: '' },
-            copyright: '© 2024 Website Desa. All rights reserved.',
-          },
-          navigation: { externalLinks: [] },
-        }
+        general: { siteName: 'Website Desa', tagline: '', description: '' },
+        branding: { logo: '/images/logo.png', favicon: '/images/favicon.ico' },
+        contact: { email: '', phone: '', whatsapp: '', address: '', mapUrl: '' },
+        about: { title: '', content: '', vision: '', mission: [] },
+        faq: [],
+        footer: {
+          description: '',
+          socialMedia: { facebook: '', instagram: '', twitter: '', youtube: '' },
+          copyright: '© 2024 Website Desa. All rights reserved.',
+        },
+        navigation: { externalLinks: [] },
       };
     }
 
-    return settings; // Returns the full object including 'settings' JSON field
+    // Return the JSON settings content, not the whole record
+    return settingsRecord.settings as any;
   } catch (error) {
     console.error('Error fetching public settings:', error);
     return null;
