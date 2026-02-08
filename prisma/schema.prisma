@@ -1,0 +1,774 @@
+// This is your Prisma schema file
+// Learn more: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ============================================
+// USER & AUTHENTICATION
+// ============================================
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(OPERATOR)
+  nik       String?  @unique
+  phone     String?
+  avatar    String? // Cloudinary URL
+  isActive  Boolean  @default(true)
+  permissions Json?    // Granular access control e.g. { "news": true, "letters": false }
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  createdNews        News[]             @relation("NewsAuthor")
+  letterApprovals    LetterRequest[]    @relation("LetterApprover")
+  complaintResponses Complaint[]        @relation("ComplaintResponder")
+  reportedResidents  AffectedResident[] @relation("ReportedBy")
+  logisticsReports   LogisticsTransaction[] @relation("LogisticsReporter")
+
+  @@map("users")
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  email     String
+  token     String   @unique
+  expires   DateTime
+  createdAt DateTime @default(now())
+  
+  @@unique([email, token])
+  @@map("password_reset_tokens")
+}
+
+enum Role {
+  SUPERADMIN
+  KEPALA_DESA
+  SEKRETARIS
+  OPERATOR
+  BENDAHARA
+  WARGA
+}
+
+// ============================================
+// POPULATION DATA
+// ============================================
+
+model KartuKeluarga {
+  id             String   @id @default(cuid())
+  noKK           String   @unique
+  kepalaKeluarga String
+  alamat         String   @db.Text
+  rt             String
+  rw             String
+  kelurahan      String   @default("Mata Mamplam")
+  kecamatan      String
+  kabupaten      String
+  provinsi       String
+  kodePos        String?
+  dusun          String? // Added for easy filtering
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // Relations
+  anggota Penduduk[]
+
+  @@map("kartu_keluarga")
+}
+
+model Penduduk {
+  id                    String           @id @default(cuid())
+  nik                   String           @unique
+  nama                  String
+  tempatLahir           String
+  tanggalLahir          DateTime
+  jenisKelamin          JenisKelamin
+  agama                 Agama
+  pendidikan            Pendidikan
+  pekerjaan             String
+  statusPerkawinan      StatusPerkawinan
+  kewarganegaraan       String           @default("WNI")
+  nomorPaspor           String?
+  nomorKITAS            String?
+  golonganDarah         String?
+  hubunganDalamKeluarga HubunganKeluarga
+  namaAyah              String?
+  namaIbu               String?
+  createdAt             DateTime         @default(now())
+  updatedAt             DateTime         @updatedAt
+
+  // Relations
+  kkId            String
+  kk              KartuKeluarga      @relation(fields: [kkId], references: [id], onDelete: Cascade)
+  letterRequests  LetterRequest[]
+  complaints      Complaint[]
+  affectedRecords AffectedResident[]
+
+  @@map("penduduk")
+}
+
+enum JenisKelamin {
+  LAKI_LAKI
+  PEREMPUAN
+}
+
+enum Agama {
+  ISLAM
+  KRISTEN
+  KATOLIK
+  HINDU
+  BUDDHA
+  KONGHUCU
+}
+
+enum Pendidikan {
+  TIDAK_SEKOLAH
+  SD
+  SMP
+  SMA
+  DIPLOMA
+  S1
+  S2
+  S3
+}
+
+enum StatusPerkawinan {
+  BELUM_KAWIN
+  KAWIN
+  CERAI_HIDUP
+  CERAI_MATI
+}
+
+enum HubunganKeluarga {
+  KEPALA_KELUARGA
+  SUAMI
+  ISTRI
+  ANAK
+  MENANTU
+  CUCU
+  ORANG_TUA
+  MERTUA
+  FAMILI_LAIN
+  PEMBANTU
+  LAINNYA
+}
+
+// ============================================
+// LETTER SERVICE
+// ============================================
+
+model LetterTemplate {
+  id          String   @id @default(cuid())
+  code        String   @unique // e.g., "SKDU", "SKTM"
+  name        String
+  description String?  @db.Text
+  template    String   @db.Text // HTML template with placeholders
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  requests LetterRequest[]
+
+  @@map("letter_templates")
+}
+
+model LetterRequest {
+  id               String       @id @default(cuid())
+  nomorSurat       String       @unique
+  templateId       String
+  pendudukId       String
+  purpose          String       @db.Text
+  phoneNumber      String? // WA number for notifications
+  formData         Json? // Additional form fields specific to letter type
+  attachments      Json? // Array of Cloudinary URLs {filename, url}
+  status           LetterStatus @default(PENDING)
+  notes            String?      @db.Text
+  approverId       String?
+  approvedAt       DateTime?
+  pdfUrl           String? // Generated PDF URL
+  qrCode           String? // QR code data for verification
+  verificationCode String?      @unique // Unique code for public verification
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  // Relations
+  template LetterTemplate @relation(fields: [templateId], references: [id])
+  penduduk Penduduk       @relation(fields: [pendudukId], references: [id])
+  approver User?          @relation("LetterApprover", fields: [approverId], references: [id])
+
+  @@map("letter_requests")
+}
+
+enum LetterStatus {
+  PENDING
+  PROCESSING
+  APPROVED
+  REJECTED
+  COMPLETED
+}
+
+// ============================================
+// NEWS & CONTENT MANAGEMENT
+// ============================================
+
+model NewsCategory {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  slug      String   @unique
+  createdAt DateTime @default(now())
+
+  // Relations
+  news News[]
+
+  @@map("news_categories")
+}
+
+model News {
+  id          String     @id @default(cuid())
+  title       String
+  slug        String     @unique
+  excerpt     String?    @db.Text
+  content     String     @db.Text
+  thumbnail   String? // Cloudinary URL
+  categoryId  String
+  authorId    String
+  status      NewsStatus @default(DRAFT)
+  viewCount   Int        @default(0)
+  publishedAt DateTime?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  // Relations
+  category NewsCategory  @relation(fields: [categoryId], references: [id])
+  author   User          @relation("NewsAuthor", fields: [authorId], references: [id])
+  comments NewsComment[]
+
+  @@map("news")
+}
+
+enum NewsStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+model NewsComment {
+  id         String   @id @default(cuid())
+  newsId     String
+  name       String
+  email      String
+  comment    String   @db.Text
+  isApproved Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  // Relations
+  news News @relation(fields: [newsId], references: [id], onDelete: Cascade)
+
+  @@map("news_comments")
+}
+
+// ============================================
+// VILLAGE DEVELOPMENT
+// ============================================
+
+model Project {
+  id           String        @id @default(cuid())
+  title        String
+  description  String        @db.Text
+  budget       BigInt // in Rupiah
+  progress     Int           @default(0) // 0-100
+  startDate    DateTime
+  endDate      DateTime?
+  location     String
+  photoBefore  String? // Cloudinary URL
+  photoAfter   String? // Cloudinary URL
+  photoGallery Json? // Array of Cloudinary URLs
+  status       ProjectStatus @default(PLANNING)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@map("projects")
+}
+
+enum ProjectStatus {
+  PLANNING
+  IN_PROGRESS
+  COMPLETED
+  ON_HOLD
+}
+
+// ============================================
+// UMKM (Micro Business)
+// ============================================
+
+model UMKMCategory {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  slug      String   @unique
+  createdAt DateTime @default(now())
+
+  // Relations
+  umkm UMKM[]
+
+  @@map("umkm_categories")
+}
+
+model UMKM {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String   @db.Text
+  categoryId  String
+  ownerName   String
+  ownerPhone  String
+  ownerEmail  String?
+  address     String   @db.Text
+  mapsUrl     String?  @db.Text // Google Maps Link
+  logo        String? // Cloudinary URL
+  photos      Json? // Array of Cloudinary URLs
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  category UMKMCategory @relation(fields: [categoryId], references: [id])
+  products Product[]
+
+  @@map("umkm")
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  umkmId      String
+  name        String
+  description String?  @db.Text
+  price       BigInt? // in Rupiah (optional)
+  images      Json? // Array of Cloudinary URLs
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  umkm UMKM @relation(fields: [umkmId], references: [id], onDelete: Cascade)
+
+  @@map("products")
+}
+
+// ============================================
+// PUBLIC COMPLAINTS
+// ============================================
+
+model ComplaintCategory {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  slug      String   @unique
+  createdAt DateTime @default(now())
+
+  // Relations
+  complaints Complaint[]
+
+  @@map("complaint_categories")
+}
+
+model Complaint {
+  id          String          @id @default(cuid())
+  categoryId  String
+  pendudukId  String? // Optional for anonymous
+  title       String
+  description String          @db.Text
+  location    String?
+  photos      Json? // Array of Cloudinary URLs
+  status      ComplaintStatus @default(SUBMITTED)
+  response    String?         @db.Text
+  respondedBy String?
+  respondedAt DateTime?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  // Relations
+  category  ComplaintCategory @relation(fields: [categoryId], references: [id])
+  penduduk  Penduduk?         @relation(fields: [pendudukId], references: [id])
+  responder User?             @relation("ComplaintResponder", fields: [respondedBy], references: [id])
+
+  @@map("complaints")
+}
+
+enum ComplaintStatus {
+  SUBMITTED
+  IN_REVIEW
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+// ============================================
+// GALLERY
+// ============================================
+
+model GalleryCategory {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  slug      String   @unique
+  createdAt DateTime @default(now())
+
+  // Relations
+  items GalleryItem[]
+
+  @@map("gallery_categories")
+}
+
+model GalleryItem {
+  id          String    @id @default(cuid())
+  categoryId  String
+  title       String
+  description String?   @db.Text
+  mediaType   MediaType
+  mediaUrl    String // Cloudinary URL
+  createdAt   DateTime  @default(now())
+
+  // Relations
+  category GalleryCategory @relation(fields: [categoryId], references: [id])
+
+  @@map("gallery_items")
+}
+
+enum MediaType {
+  IMAGE
+  VIDEO
+}
+
+// ============================================
+// DOCUMENTS
+// ============================================
+
+model Document {
+  id          String   @id @default(cuid())
+  title       String
+  description String?  @db.Text
+  category    String
+  fileUrl     String // Cloudinary URL or external link
+  fileType    String // pdf, doc, etc
+  downloads   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("documents")
+}
+
+// ============================================
+// VILLAGE PROFILE
+// ============================================
+
+model VillageProfile {
+  id        String   @id @default(cuid())
+  sejarah   String   @db.Text
+  visi      String   @db.Text
+  misi      String   @db.Text
+  wilayah   Json? // Map data, coordinates, etc
+  potensi   Json? // Village potential data
+  updatedAt DateTime @updatedAt
+
+  @@map("village_profile")
+}
+
+// ============================================
+// EVENTS & ANNOUNCEMENTS
+// ============================================
+
+model Announcement {
+  id        String   @id @default(cuid())
+  title     String
+  content   String   @db.Text
+  priority  Priority @default(NORMAL)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("announcements")
+}
+
+enum Priority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+}
+
+// ============================================
+// SITE SETTINGS
+// ============================================
+
+model SiteSettings {
+  id        String   @id @default(cuid())
+  settings  Json // Stores all settings as JSON
+  updatedAt DateTime @updatedAt
+
+  @@map("site_settings")
+}
+
+// ============================================
+// VILLAGE ORGANIZATIONAL STRUCTURE
+// ============================================
+
+model VillageOfficialPosition {
+  id           String   @id @default(cuid())
+  category     String // "LEADERSHIP", "ADVISORY", "RELIGIOUS", "SECRETARIAT", "DUSUN"
+  positionKey  String   @unique // e.g., "KEUCHIK", "SEKDES", "KASI_PEMERINTAHAN", "DUSUN_1"
+  positionName String // Display name in Bahasa/Aceh
+  level        Int // Hierarchy level for display (1=top, 6=bottom)
+  sortOrder    Int      @default(0) // Order within same level
+  dusunName    String? // For Kepala Dusun positions only
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  official VillageOfficial?
+
+  @@map("village_official_positions")
+}
+
+model VillageOfficial {
+  id         String    @id @default(cuid())
+  positionId String    @unique
+  name       String
+  photo      String? // Cloudinary URL
+  phone      String // Will be hidden, requires NIK to view
+  email      String?
+  address    String?
+  startDate  DateTime  @default(now())
+  endDate    DateTime? // For term limits
+  isActive   Boolean   @default(true)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  // Relations
+  position VillageOfficialPosition @relation(fields: [positionId], references: [id], onDelete: Cascade)
+
+  @@map("village_officials")
+}
+
+// For tracking NIK verification attempts (security logging)
+model PhoneViewLog {
+  id        String   @id @default(cuid())
+  nik       String
+  ipAddress String?
+  userAgent String?
+  viewedAt  DateTime @default(now())
+
+  @@map("phone_view_logs")
+}
+
+// ============================================
+// EXTERNAL DATA (BMKG)
+// ============================================
+
+model Earthquake {
+  id          String   @id @default(cuid())
+  datetime    DateTime // Waktu gempa (ISO)
+  date        String // Tanggal textual (e.g. "04 Feb 2026")
+  time        String // Jam textual (e.g. "12:00:00 WIB")
+  coordinates String // "-7.12,110.34"
+  lintang     String
+  bujur       String
+  magnitude   String
+  depth       String
+  location    String
+  potential   String
+  shakemap    String // URL to BMKG shakemap image
+  createdAt   DateTime @default(now())
+
+  @@map("earthquakes")
+}
+
+// ============================================
+// DISASTER MANAGEMENT (TANGGAP BENCANA)
+// ============================================
+
+model DisasterEvent {
+  id          String         @id @default(cuid())
+  title       String
+  description String         @db.Text
+  status      DisasterStatus @default(ACTIVE)
+  startDate   DateTime       @default(now())
+  endDate     DateTime?
+  location    String? // General location/scope
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  // Relations
+  affected  AffectedResident[]
+  damage    DamageAssessment[]
+  posts     CommandPost[]
+
+  @@map("disaster_events")
+}
+
+enum DisasterStatus {
+  ACTIVE
+  RESOLVED
+  ARCHIVED
+}
+
+model CommandPost {
+  id              String   @id @default(cuid())
+  eventId         String
+  name            String
+  location        String // Text address
+  latitude        Float?
+  longitude       Float?
+  locationLink    String? // Google Maps Share Link
+  mapEmbedUrl     String?  @db.Text // Google Maps Embed Iframe URL
+  picName         String // Person in Charge
+  picPhone        String
+  capacity        Int      @default(0)
+  currentRefugees Int      @default(0)
+  facilities      String?  @db.Text
+  photo           String? // Cloudinary URL
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  event    DisasterEvent      @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  refugees AffectedResident[]
+  logistics Logistics[]
+
+  @@map("command_posts")
+}
+
+model AffectedResident {
+  id              String            @id @default(cuid())
+  eventId         String
+  pendudukId      String? // Made Optional
+  
+  // Manual Entry Fields
+  manualName      String?
+  manualAge       Int?
+  manualGender    JenisKelamin?
+  manualAddress   String? // Or use current location?
+
+  condition       ResidentCondition
+  specialNeeds    String? // Lansia, Balita, Hamil, Sakit, Difabel
+
+  currentLocation String? // Example: "Posko A", "Rumah Saudara"
+  poskoId         String? // New Relation
+  notes           String?           @db.Text
+  reportedBy      String? // User ID who reported
+  lastUpdate      DateTime          @default(now())
+
+  // Relations
+  event    DisasterEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  penduduk Penduduk?      @relation(fields: [pendudukId], references: [id])
+  posko    CommandPost?  @relation(fields: [poskoId], references: [id])
+  reporter User?         @relation("ReportedBy", fields: [reportedBy], references: [id])
+
+  @@map("affected_residents")
+}
+
+enum ResidentCondition {
+  SAFE
+  DISPLACED // Mengungsi
+  INJURED // Luka-luka
+  MISSING // Hilang
+  DECEASED // Meninggal
+  NEEDS_HELP // Butuh Bantuan
+}
+
+model DamageAssessment {
+  id          String           @id @default(cuid())
+  eventId     String
+  type        DamageType
+  title       String // e.g., "Jembatan A Putus" or "Rumah Bpk Budi"
+  description String           @db.Text
+  location    String
+  dusun       String? // Optional filter
+  severity    DamageSeverity
+  photo       String? // Cloudinary URL
+  status      AssessmentStatus @default(REPORTED)
+  reportedAt  DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  // Relations
+  event DisasterEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@map("damage_assessments")
+}
+
+enum DamageType {
+  INFRASTRUCTURE
+  HOUSE
+  PUBLIC_FACILITY
+  AGRICULTURE
+  OTHER
+}
+
+enum DamageSeverity {
+  LIGHT
+  MODERATE
+  SEVERE
+  TOTAL_LOSS
+}
+
+enum AssessmentStatus {
+  REPORTED
+  VERIFIED
+  IN_REPAIR
+  REPAIRED
+}
+
+model Logistics {
+  id           String        @id @default(cuid())
+  poskoId      String
+  itemName     String
+  unit         String // kg, box, pcs
+  currentStock Int           @default(0)
+  type         LogisticsType
+  description  String?       @db.Text
+  photo        String?
+  updatedAt    DateTime      @updatedAt
+
+  // Relations
+  posko       CommandPost @relation(fields: [poskoId], references: [id], onDelete: Cascade)
+  transactions LogisticsTransaction[]
+
+  @@map("logistics")
+}
+
+model LogisticsTransaction {
+  id          String   @id @default(cuid())
+  logisticsId String
+  type        TransactionType
+  amount      Int
+  description String?
+  date        DateTime @default(now())
+  reportedBy  String?
+
+  // Relations
+  item        Logistics @relation(fields: [logisticsId], references: [id], onDelete: Cascade)
+  reporter    User?     @relation("LogisticsReporter", fields: [reportedBy], references: [id])
+  
+  @@map("logistics_transactions")
+}
+
+enum TransactionType {
+  IN
+  OUT
+}
+
+enum LogisticsType {
+  FOOD
+  MEDICINE
+  CLOTHING
+  EQUIPMENT
+  OTHER
+}
