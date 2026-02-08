@@ -39,6 +39,7 @@ export default function PendudukTable({
   searchParams,
 }: PendudukTableProps) {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [selectAllPages, setSelectAllPages] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
@@ -54,14 +55,46 @@ export default function PendudukTable({
       newSelected.add(id);
     }
     setSelectedIds(newSelected);
+    setSelectAllPages(false); // Reset select all pages if individual toggle
   };
 
-  // Handle select all toggle
+  // Handle select all on current page
   const toggleSelectAll = () => {
-    if (selectedIds.size === penduduk.length) {
+    if (selectAllPages) {
+      // If all pages selected, unselect all
+      setSelectedIds(new Set());
+      setSelectAllPages(false);
+    } else if (selectedIds.size === penduduk.length) {
+      // If current page selected, unselect current page
       setSelectedIds(new Set());
     } else {
+      // Select current page
       setSelectedIds(new Set(penduduk.map((p) => p.id)));
+    }
+  };
+
+  // Handle select all across all pages
+  const handleSelectAllPages = async () => {
+    setIsDeleting(true);
+    try {
+      // Build query params for filtering
+      const params = new URLSearchParams();
+      if (searchParams.search) params.append('search', searchParams.search);
+      if (searchParams.dusun) params.append('dusun', searchParams.dusun);
+      
+      // Fetch all IDs matching current filters
+      const response = await fetch(`/api/admin/penduduk/ids?${params}`);
+      if (!response.ok) throw new Error('Gagal mengambil data');
+      
+      const data = await response.json();
+      setSelectedIds(new Set(data.ids));
+      setSelectAllPages(true);
+      toast.success(`${data.ids.length} data penduduk dipilih`);
+    } catch (error) {
+      console.error('Error fetching all IDs:', error);
+      toast.error('Gagal memilih semua data');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -88,6 +121,7 @@ export default function PendudukTable({
 
       toast.success(`Berhasil menghapus ${selectedIds.size} data penduduk`);
       setSelectedIds(new Set());
+      setSelectAllPages(false);
       setShowDeleteModal(false);
       
       // Reload page to refresh data
@@ -100,6 +134,9 @@ export default function PendudukTable({
     }
   };
 
+  const allCurrentPageSelected = selectedIds.size === penduduk.length && penduduk.length > 0;
+  const someSelected = selectedIds.size > 0;
+
   return (
     <>
       <div className="overflow-hidden rounded-lg border border-gray-200 bg-white">
@@ -110,7 +147,7 @@ export default function PendudukTable({
                 <th className="px-6 py-3 text-left">
                   <input
                     type="checkbox"
-                    checked={selectedIds.size === penduduk.length && penduduk.length > 0}
+                    checked={allCurrentPageSelected || selectAllPages}
                     onChange={toggleSelectAll}
                     className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                   />
@@ -188,12 +225,30 @@ export default function PendudukTable({
           </table>
         </div>
 
+        {/* Select All Pages Banner */}
+        {allCurrentPageSelected && !selectAllPages && totalCount > perPage && (
+          <div className="border-t border-gray-200 bg-blue-50 px-6 py-2 text-sm">
+            <span className="text-blue-900">
+              {penduduk.length} data di halaman ini dipilih.{' '}
+            </span>
+            <button
+              onClick={handleSelectAllPages}
+              disabled={isDeleting}
+              className="font-semibold text-blue-600 hover:text-blue-800 underline"
+            >
+              Pilih semua {totalCount} data penduduk
+            </button>
+          </div>
+        )}
+
         {/* Bulk Actions Bar */}
-        {selectedIds.size > 0 && (
+        {someSelected && (
           <div className="border-t border-gray-200 bg-blue-50 px-6 py-3">
             <div className="flex items-center justify-between">
               <div className="text-sm font-medium text-blue-900">
-                {selectedIds.size} penduduk dipilih
+                {selectAllPages 
+                  ? `Semua ${selectedIds.size} penduduk dipilih` 
+                  : `${selectedIds.size} penduduk dipilih`}
               </div>
               <button
                 onClick={() => setShowDeleteModal(true)}
