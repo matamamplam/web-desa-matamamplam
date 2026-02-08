@@ -90,7 +90,7 @@ export default function DisasterPage() {
               Lokasi: {event.location}
            </p>
            <p className="mt-6 text-lg max-w-4xl mx-auto bg-white/10 p-6 rounded-xl border border-white/20">
-              "{event.description}"
+              &quot;{event.description}&quot;
            </p>
         </div>
       </section>

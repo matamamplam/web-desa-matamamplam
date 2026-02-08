@@ -91,15 +91,16 @@ export default function ImportPage() {
             Upload file Excel untuk import data penduduk secara massal
           </p>
         </div>
-        <a
+        <Link
           href="/api/admin/penduduk/template"
+          target="_blank"
           className="inline-flex items-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
         >
           <svg className="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
           </svg>
           Download Template
-        </a>
+        </Link>
       </div>
 
       {/* Upload Area */}

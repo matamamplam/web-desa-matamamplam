@@ -82,7 +82,7 @@ export default async function LetterTemplatesPage() {
             {templates.length === 0 ? (
               <tr>
                 <td colSpan={6} className="px-6 py-12 text-center text-sm text-gray-500">
-                  Belum ada template. Klik "Tambah Template" untuk membuat template baru.
+                  Belum ada template. Klik &quot;Tambah Template&quot; untuk membuat template baru.
                 </td>
               </tr>
             ) : (

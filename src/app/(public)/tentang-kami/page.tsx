@@ -51,7 +51,7 @@ export default async function TentangKamiPage() {
           <div className="bg-blue-50 rounded-2xl p-8 mb-8">
             <h3 className="text-xl font-bold text-blue-900 mb-4">Visi</h3>
             <p className="text-gray-700 leading-relaxed">
-              "{settings?.about?.vision || 'Terwujudnya Desa Mata Mamplam yang maju, sejahtera, dan berdaya saing melalui pemanfaatan teknologi digital dan pemberdayaan masyarakat.'}"
+              &quot;{settings?.about?.vision || 'Terwujudnya Desa Mata Mamplam yang maju, sejahtera, dan berdaya saing melalui pemanfaatan teknologi digital dan pemberdayaan masyarakat.'}&quot;
             </p>
           </div>
 
