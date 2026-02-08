@@ -17,7 +17,7 @@ export async function GET(
       where: { id },
       include: {
         category: { select: { id: true, name: true } },
-        penduduk: { select: { nama: true, nik: true, alamat: true } },
+        penduduk: { select: { nama: true, nik: true, kk: { select: { alamat: true } } } },
         responder: { select: { name: true } }
       }
     })

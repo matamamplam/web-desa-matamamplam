@@ -13,8 +13,8 @@ export async function GET() {
       prisma.penduduk.count({ where: { jenisKelamin: 'PEREMPUAN' } }),
       prisma.kartuKeluarga.count(),
       prisma.uMKM.count(),
-      prisma.developmentProject.count(),
-      prisma.developmentProject.count({ where: { status: 'ONGOING' } }),
+      prisma.project.count(),
+      prisma.project.count({ where: { status: 'IN_PROGRESS' } }),
     ]);
 
     const stats = {

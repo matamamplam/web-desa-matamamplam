@@ -35,7 +35,7 @@ export async function GET(req: NextRequest) {
           },
         },
         logo: true,
-        phone: true,
+        ownerPhone: true,
         address: true,
       },
     });
