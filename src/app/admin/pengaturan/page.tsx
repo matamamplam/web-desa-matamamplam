@@ -346,17 +346,25 @@ export default function PengaturanPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Google Maps Embed URL
+                    Google Maps Embed
                   </label>
-                  <input
-                    type="text"
+                  <textarea
                     value={settings.contact.mapUrl}
-                    onChange={(e) => updateSettings(['contact', 'mapUrl'], e.target.value)}
-                    placeholder="https://www.google.com/maps/embed?pb=..."
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                    onChange={(e) => {
+                      let value = e.target.value.trim();
+                      // Extract URL from iframe if full HTML is pasted
+                      const srcMatch = value.match(/src=["']([^"']+)["']/);
+                      if (srcMatch) {
+                        value = srcMatch[1];
+                      }
+                      updateSettings(['contact', 'mapUrl'], value);
+                    }}
+                    rows={3}
+                    placeholder="Paste Google Maps iframe code or just the embed URL"
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white font-mono text-sm"
                   />
                   <p className="text-xs text-gray-500 mt-1">
-                    Buka Google Maps, klik Share ? Embed a map ? Copy HTML ? Paste URL di sini
+                    📍 Buka Google Maps → klik &quot;Share&quot; → &quot;Embed a map&quot; → Copy HTML dan paste di sini (URL akan otomatis diekstrak)
                   </p>
                 </div>
 
