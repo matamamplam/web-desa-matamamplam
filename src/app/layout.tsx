@@ -14,24 +14,35 @@ const outfit = Outfit({
 });
 
 export async function generateMetadata(): Promise<Metadata> {
-  const settings = await prisma.siteSettings.findFirst();
-  const rawSettings = settings?.settings as any || {};
-  const favicon = rawSettings?.branding?.favicon || '/favicon.ico';
-  const siteName = rawSettings?.general?.siteName || 'Desa Mata Mamplam';
+  try {
+    const settings = await prisma.siteSettings.findFirst();
+    const rawSettings = settings?.settings as any || {};
+    const favicon = rawSettings?.branding?.favicon || '/favicon.ico';
+    const siteName = rawSettings?.general?.siteName || 'Desa Mata Mamplam';
 
-  return {
-    title: {
-      template: `%s | ${siteName}`,
-      default: siteName,
-    },
-    description: rawSettings?.general?.description || 'Website resmi pemerintahan desa',
-    icons: {
-      icon: favicon,
-    },
-    verification: {
-      google: 'kHYQHSlDSv119nFDThYj7lKT9b7AzICrdg8czc88h-g',
-    },
-  };
+    return {
+      title: {
+        template: `%s | ${siteName}`,
+        default: siteName,
+      },
+      description: rawSettings?.general?.description || 'Website resmi pemerintahan desa',
+      icons: {
+        icon: favicon,
+      },
+      verification: {
+        google: 'kHYQHSlDSv119nFDThYj7lKT9b7AzICrdg8czc88h-g',
+      },
+    };
+  } catch (error) {
+    console.error('Failed to fetch settings for metadata:', error);
+    return {
+      title: 'Desa Mata Mamplam',
+      description: 'Website resmi pemerintahan desa',
+      icons: {
+        icon: '/favicon.ico',
+      },
+    };
+  }
 }
 
 export default function RootLayout({

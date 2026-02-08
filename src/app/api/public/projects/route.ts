@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
 export const revalidate = 600; // Cache for 10 minutes
+export const dynamic = 'force-dynamic';
 
 // GET /api/public/projects - Get development projects
 export async function GET(req: NextRequest) {
