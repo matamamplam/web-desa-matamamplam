@@ -11,30 +11,30 @@ import VillageMap from '@/components/landing/VillageMap';
 import DisasterAlert from '@/components/landing/DisasterAlert';
 import FAQSection from '@/components/landing/FAQSection';
 
-async function getData() {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+import { 
+  getPublicStats, 
+  getPublicNews, 
+  getPublicUMKM, 
+  getPublicProjects, 
+  getPublicSettings, 
+  getPublicStructure, 
+  getPublicDisaster 
+} from '@/lib/data-public';
 
+async function getData() {
   try {
-    const [statsRes, newsRes, umkmRes, projectsRes, settingsRes, structureRes, disasterRes] = await Promise.all([
-      fetch(`${baseUrl}/api/public/stats`, { next: { revalidate: 3600 } }),
-      fetch(`${baseUrl}/api/public/news?limit=3`, { next: { revalidate: 300 } }),
-      fetch(`${baseUrl}/api/public/umkm?limit=6`, { next: { revalidate: 600 } }),
-      fetch(`${baseUrl}/api/public/projects?limit=3&status=ONGOING`, { next: { revalidate: 600 } }),
-      fetch(`${baseUrl}/api/public/settings`, { next: { revalidate: 300 } }),
-      fetch(`${baseUrl}/api/public/structure`, { next: { revalidate: 300 } }),
-      fetch(`${baseUrl}/api/public/disaster`, { next: { revalidate: 0 } }), // Always fresh for disaster
+    const [stats, newsData, umkmData, projectsData, settingsData, structureData, disaster] = await Promise.all([
+      getPublicStats(),
+      getPublicNews(3),
+      getPublicUMKM(6),
+      getPublicProjects(3, 'IN_PROGRESS'),
+      getPublicSettings(),
+      getPublicStructure(),
+      getPublicDisaster(),
     ]);
 
-    const stats = statsRes.ok ? await statsRes.json() : null;
-    const newsData = newsRes.ok ? await newsRes.json() : { news: [] };
-    const umkmData = umkmRes.ok ? await umkmRes.json() : { umkm: [] };
-    const projectsData = projectsRes.ok ? await projectsRes.json() : { projects: [] };
-    const settingsData = settingsRes.ok ? await settingsRes.json() : { settings: {} };
-    const structureData = structureRes.ok ? await structureRes.json() : { structure: { level1: [], level4: [] } };
-    const disasterData = disasterRes.ok ? await disasterRes.json() : null;
-
     // Extract settings
-    const rawSettings = settingsData.settings || settingsData;
+    const rawSettings = settingsData?.settings || settingsData || {};
     
     // Transform settings to expected format
     const settings = {
@@ -52,12 +52,12 @@ async function getData() {
 
     return {
       stats,
-      news: newsData.news || [],
-      umkm: umkmData.umkm || [],
-      projects: projectsData.projects || [],
+      news: newsData?.news || [],
+      umkm: umkmData?.umkm || [],
+      projects: projectsData?.projects || [],
       settings,
-      structure: structureData.structure || { level1: [], level4: [] },
-      disaster: disasterData
+      structure: structureData?.structure || { level1: [], level4: [] },
+      disaster
     };
   } catch (error) {
     console.error('Error fetching landing page data:', error);

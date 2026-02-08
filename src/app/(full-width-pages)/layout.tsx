@@ -1,20 +1,20 @@
 import PublicNavbar from '@/components/PublicNavbar';
 import PublicFooter from '@/components/PublicFooter';
 
+import { getPublicSettings } from '@/lib/data-public';
+
 async function getSettings() {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-  
   try {
-    const res = await fetch(`${baseUrl}/api/public/settings`, {
-      next: { revalidate: 300 }, // Cache for 5 minutes
-    });
+    const settingsData = await getPublicSettings();
     
-    if (!res.ok) {
+    if (!settingsData) {
       return null;
     }
     
-    const data = await res.json();
-    const rawSettings = data.settings || data;
+    // The helper returns the Prisma record (which has a 'settings' field)
+    // or a default object wrapper (which also has a 'settings' field)
+    // We cast to any because the JSON field type in Prisma is generic
+    const rawSettings = (settingsData as any).settings || {};
     
     // Transform to expected format
     return {
