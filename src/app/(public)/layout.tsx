@@ -3,33 +3,28 @@ import PublicFooter from '@/components/PublicFooter';
 
 import { getPublicSettings } from '@/lib/data-public';
 
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+
+// Use ISR for better performance - cache and revalidate every 60 seconds
+export const revalidate = 60;
+
 
 async function getSettings() {
   try {
-    const settingsData = await getPublicSettings();
+    const settings = await getPublicSettings();
     
-    if (!settingsData) {
+    if (!settings) {
       return null;
     }
     
-    // The helper returns the Prisma record (which has a 'settings' field)
-    // or a default object wrapper (which also has a 'settings' field)
-    const rawSettings = (settingsData as any).settings || {};
+    console.log('🔧 Public Layout - Settings received:', {
+      hasGeneral: !!settings.general,
+      hasBranding: !!settings.branding,
+      hasLogo: !!settings.branding?.logo,
+      siteName: settings.general?.siteName,
+    });
     
-    // Transform to expected format
-    return {
-      general: rawSettings.general || {},
-      branding: rawSettings.branding || {},
-      contactInfo: {
-        phone: rawSettings.contact?.phone || '',
-        email: rawSettings.contact?.email || '',
-        address: rawSettings.contact?.address || '',
-        mapEmbedUrl: rawSettings.contact?.mapUrl || '',
-      },
-      footer: rawSettings.footer || {},
-    };
+    // getPublicSettings now returns the correct structure directly
+    return settings;
   } catch (error) {
     console.error('Error fetching settings:', error);
     return null;
@@ -57,7 +52,7 @@ export default async function PublicLayout({
       </main>
 
       {/* Footer */}
-      <PublicFooter settings={settings || undefined} />
+      <PublicFooter settings={settings} />
     </div>
   );
 }

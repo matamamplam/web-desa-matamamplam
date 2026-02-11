@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://desa-mata-mamplam.vercel.app';
+  const baseUrl = 'https://matamamplam.my.id';
 
   // Static routes
   const routes = [
@@ -9,13 +9,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     '/tentang-kami',
     '/berita',
     '/umkm',
+    '/pembangunan',
+    '/struktur-organisasi',
+    '/galeri',
+    '/pengaduan',
     '/kontak',
-    '/faq',
+    '/bencana',
+    '/layanan-surat',
+    '/cek-surat',
   ].map((route) => ({
     url: `${baseUrl}${route}`,
     lastModified: new Date(),
-    changeFrequency: 'daily' as const,
-    priority: route === '' ? 1 : 0.8,
+    changeFrequency: (route === '' || route === '/berita' ? 'daily' : 'weekly') as 'daily' | 'weekly',
+    priority: route === '' ? 1 : route === '/berita' ? 0.9 : 0.8,
   }));
 
   // You can fetch dynamic routes here (e.g. from database)

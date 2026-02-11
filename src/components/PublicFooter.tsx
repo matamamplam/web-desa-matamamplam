@@ -5,7 +5,7 @@ interface FooterProps {
     general?: {
       siteName?: string;
     };
-    contactInfo?: {
+    contact?: {
       phone?: string;
       email?: string;
       address?: string;
@@ -25,9 +25,9 @@ interface FooterProps {
 
 export default function PublicFooter({ settings }: FooterProps) {
   const siteName = settings?.general?.siteName || 'Desa Mata Mamplam';
-  const phone = settings?.contactInfo?.phone;
-  const email = settings?.contactInfo?.email;
-  const address = settings?.contactInfo?.address;
+  const phone = settings?.contact?.phone;
+  const email = settings?.contact?.email;
+  const address = settings?.contact?.address;
   const description = settings?.footer?.description || 'Website resmi Pemerintah Desa';
   const social = settings?.footer?.socialMedia;
   

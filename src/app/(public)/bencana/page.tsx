@@ -3,9 +3,6 @@
 import { useState, useEffect } from "react"
 import { FiAlertTriangle, FiCheckCircle, FiMapPin, FiPhone, FiInfo } from "react-icons/fi"
 
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
-
 export default function DisasterPage() {
   const [data, setData] = useState<any>(null)
   const [loading, setLoading] = useState(true)

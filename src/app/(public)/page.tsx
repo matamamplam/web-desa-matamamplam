@@ -23,7 +23,11 @@ import {
 } from '@/lib/data-public';
 import { prisma } from '@/lib/prisma';
 
-export const dynamic = 'force-dynamic';
+
+// Use ISR (Incremental Static Regeneration) for better performance
+// Page will be cached and revalidated every 60 seconds
+export const revalidate = 60;
+
 
 // Helper function to get weather description from code
 function getWeatherDesc(code: number) {
@@ -54,11 +58,17 @@ async function getData() {
     const rawSettings = settingsData || {};
     
     // Debug logging
-    console.log('🔍 Raw Settings:', JSON.stringify(rawSettings, null, 2));
+    console.log('🔍 Landing Page - Raw Settings:', {
+      hasGeneral: !!rawSettings.general,
+      hasBranding: !!rawSettings.branding,
+      hasContact: !!rawSettings.contact,
+    });
     console.log('🗺️ Map URL from DB:', rawSettings.contact?.mapUrl);
     console.log('🖼️ Hero Background from DB:', rawSettings.general?.heroBackground);
+    console.log('🎨 Logo from DB:', rawSettings.branding?.logo);
+    console.log('⭐ Favicon from DB:', rawSettings.branding?.favicon);
     
-    // Transform settings to expected format
+    // Use settings directly with proper structure
     const settings = {
       general: rawSettings.general || {},
       branding: rawSettings.branding || {},
@@ -70,11 +80,11 @@ async function getData() {
       },
       footer: rawSettings.footer || {},
       faq: rawSettings.faq || [],
-    } as any; // Cast to satisfy component prop types if needed
+    } as any;
 
     console.log('✅ Transformed settings.general:', settings.general);
+    console.log('✅ Transformed settings.branding:', settings.branding);
     console.log('✅ Transformed settings.contactInfo:', settings.contactInfo);
-
 
 
 
@@ -106,7 +116,10 @@ async function getData() {
     const OPEN_METEO_URL = "https://api.open-meteo.com/v1/forecast?latitude=5.1667&longitude=96.8333&current=temperature_2m,weather_code,relative_humidity_2m,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=Asia%2FBangkok&forecast_days=7";
     let weather = null;
     try {
-      const weatherRes = await fetch(OPEN_METEO_URL, { cache: 'no-store', next: { revalidate: 3600 } });
+      // Cache weather data for 5 minutes (300 seconds)
+      const weatherRes = await fetch(OPEN_METEO_URL, { 
+        next: { revalidate: 300 }
+      });
       if (weatherRes.ok) {
         const weatherData = await weatherRes.json();
         const weatherDesc = getWeatherDesc(weatherData.current.weather_code);

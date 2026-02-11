@@ -21,15 +21,6 @@ export default function HeroSection({ settings }: { settings: Settings }) {
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* DEBUG OVERLAY - REMOVE LATER */}
-      <div className="fixed top-20 right-4 z-50 bg-black/80 text-white p-4 rounded-lg text-xs max-w-sm">
-        <div className="font-bold mb-2">🐛 Debug Info:</div>
-        <div>Hero BG: {heroBackground || '❌ NULL'}</div>
-        <div className="mt-2 break-all">
-          {heroBackground && `Path: ${heroBackground}`}
-        </div>
-      </div>
-
       {/* Background Image or Gradient */}
       {heroBackground ? (
         <>

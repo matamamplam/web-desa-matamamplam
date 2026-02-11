@@ -1,7 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { Prisma } from '@prisma/client';
 
-export const revalidate = 300; // Default cache
 
 export async function getPublicStats() {
   try {
@@ -164,8 +163,19 @@ export async function getPublicSettings() {
       };
     }
 
-    // Return the JSON settings content, not the whole record
-    return settingsRecord.settings as any;
+    // IMPORTANT: Return the JSON settings content directly
+    // This ensures consistent structure across all consumers
+    const settings = settingsRecord.settings as any;
+    
+    console.log('📤 getPublicSettings returning:', {
+      hasGeneral: !!settings?.general,
+      hasBranding: !!settings?.branding,
+      hasHeroBackground: !!settings?.general?.heroBackground,
+      hasLogo: !!settings?.branding?.logo,
+      hasFavicon: !!settings?.branding?.favicon,
+    });
+    
+    return settings;
   } catch (error) {
     console.error('Error fetching public settings:', error);
     return null;

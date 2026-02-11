@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+# Disallow admin pages
+Disallow: /admin
+Disallow: /api
+
+# Sitemap location
+Sitemap: https://matamamplam.my.id/sitemap.xml
