@@ -13,7 +13,7 @@
 
 | Variable Name | Value | Environment |
 |--------------|-------|-------------|
-| `DATABASE_URL` | `postgresql://postgres.rjwyazisrouqiahdgeqs:mata_mamplam_2026@aws-1-ap-southeast-2.pooler.supabase.com:6543/postgres?pgbouncer=true&connection_limit=1` | Production, Preview, Development |
+| `DATABASE_URL` | `postgresql://postgres.rjwyazisrouqiahdgeqs:mata_mamplam_2026@aws-1-ap-southeast-2.pooler.supabase.com:6543/postgres?pgbouncer=true&connection_limit=2` | Production, Preview, Development |
 | `DIRECT_URL` | `postgresql://postgres.rjwyazisrouqiahdgeqs:mata_mamplam_2026@aws-1-ap-southeast-2.pooler.supabase.com:5432/postgres` | Production, Preview, Development |
 | `NEXTAUTH_URL` | **REPLACE dengan domain production Anda**<br>(contoh: `https://desa-matamamplam.vercel.app`) | Production |
 | `NEXTAUTH_SECRET` | **GENERATE BARU!**<br>Jalankan: `openssl rand -base64 32` | Production, Preview, Development |

@@ -1,3 +1,5 @@
+"use client";
+
 interface Settings {
   contactInfo?: {
     phone?: string;

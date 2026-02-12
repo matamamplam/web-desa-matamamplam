@@ -1,28 +1,248 @@
-19:48:37.146 Error fetching stats: Error [PrismaClientKnownRequestError]: 
-19:48:37.156 Error fetching public UMKM: Error [PrismaClientKnownRequestError]: 
-19:48:37.156 Error fetching public projects: Error [PrismaClientKnownRequestError]: 
-19:48:37.157 Error fetching public settings: Error [PrismaClientKnownRequestError]: 
-19:48:37.159 Error fetching public structure: Error [PrismaClientKnownRequestError]: 
-19:48:37.163 API Error (Public Disaster): Error [PrismaClientKnownRequestError]: 
-19:48:37.173 Failed to fetch settings for metadata: Error [PrismaClientKnownRequestError]: 
-19:48:37.198 Error fetching public settings: Error [PrismaClientKnownRequestError]: 
-19:48:37.200 Failed to fetch settings for metadata: Error [PrismaClientKnownRequestError]: 
-19:48:50.050 Failed to fetch settings for metadata: Error [PrismaClientKnownRequestError]: 
-19:48:50.054 Failed to fetch settings for metadata: Error [PrismaClientKnownRequestError]: 
-
-19:47:45.768 111:17  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
-19:47:45.768 128:38  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
-19:47:45.769 251:42  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
-19:47:45.769 128:17  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
-19:47:45.770 336:31  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
-19:47:45.770 37:15  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
-19:47:45.771 35:6  Warning: React Hook useEffect has a missing dependency: 'fetchDamages'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
-19:47:45.771 66:27  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
-19:47:45.771 58:6  Warning: React Hook useEffect has a missing dependency: 'fetchItems'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
-19:47:45.772 36:6  Warning: React Hook useEffect has a missing dependency: 'fetchPosts'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
-19:47:45.790 70:19  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
-19:47:45.802 42:6  Warning: React Hook useEffect has a missing dependency: 'fetchAffected'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
-19:47:45.805 251:8  Warning: React Hook useEffect has missing dependencies: 'poskos' and 'setValue'. Either include them or remove the dependency array.  react-hooks/exhaustive-deps
-19:47:45.805 428:7  Warning: React Hook useEffect has a missing dependency: 'fetchResidents'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
-19:47:45.806 199:17  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
-
+01:03:40.601 Running build in Washington, D.C., USA (East) – iad1
+01:03:40.602 Build machine configuration: 2 cores, 8 GB
+01:03:40.827 Cloning github.com/matamamplam/web-desa-matamamplam (Branch: main, Commit: 46ef189)
+01:03:42.655 Cloning completed: 1.827s
+01:03:43.498 Restored build cache from previous deployment (DTbyw7qGouNE8v48cX9a8S8vtnLs)
+01:03:43.751 Running "vercel build"
+01:03:44.279 Vercel CLI 50.15.1
+01:03:44.626 Installing dependencies...
+01:03:46.103 
+01:03:46.104 > sid-mata-mamplam@1.0.0 postinstall
+01:03:46.104 > prisma generate
+01:03:46.105 
+01:03:47.107 Environment variables loaded from .env
+01:03:47.114 Prisma schema loaded from prisma/schema.prisma
+01:03:47.746 
+01:03:47.747 ✔ Generated Prisma Client (v6.19.2) to ./node_modules/@prisma/client in 315ms
+01:03:47.747 
+01:03:47.747 Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+01:03:47.747 
+01:03:47.747 Tip: Want to turn off tips and other hints? https://pris.ly/tip-4-nohints
+01:03:47.747 
+01:03:47.769 
+01:03:47.770 up to date in 3s
+01:03:47.771 
+01:03:47.771 228 packages are looking for funding
+01:03:47.771   run `npm fund` for details
+01:03:47.798 Detected Next.js version: 15.5.9
+01:03:47.803 Running "npm run build"
+01:03:47.895 
+01:03:47.896 > sid-mata-mamplam@1.0.0 build
+01:03:47.896 > next build
+01:03:47.897 
+01:03:48.910    ▲ Next.js 15.5.9
+01:03:48.911    - Environments: .env.production, .env
+01:03:48.911 
+01:03:48.971    Creating an optimized production build ...
+01:04:02.503  ✓ Compiled successfully in 13.3s
+01:04:02.506    Linting and checking validity of types ...
+01:04:11.661 
+01:04:11.662 ./src/app/(full-width-pages)/cek-surat/[code]/page.tsx
+01:04:11.662 111:17  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+01:04:11.662 
+01:04:11.662 ./src/app/(public)/bencana/page.tsx
+01:04:11.662 128:38  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+01:04:11.662 251:42  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+01:04:11.663 
+01:04:11.663 ./src/app/admin/layanan-surat/cetak/[id]/page.tsx
+01:04:11.663 128:17  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+01:04:11.663 
+01:04:11.663 ./src/app/admin/struktur-organisasi/page.tsx
+01:04:11.663 336:31  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+01:04:11.663 
+01:04:11.663 ./src/components/PublicNavbar.tsx
+01:04:11.663 37:15  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+01:04:11.663 
+01:04:11.663 ./src/components/admin/disaster/DamageManager.tsx
+01:04:11.663 35:6  Warning: React Hook useEffect has a missing dependency: 'fetchDamages'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+01:04:11.664 66:27  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+01:04:11.664 
+01:04:11.664 ./src/components/admin/disaster/LogisticsManager.tsx
+01:04:11.665 58:6  Warning: React Hook useEffect has a missing dependency: 'fetchItems'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+01:04:11.665 
+01:04:11.665 ./src/components/admin/disaster/PoskoManager.tsx
+01:04:11.665 36:6  Warning: React Hook useEffect has a missing dependency: 'fetchPosts'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+01:04:11.665 70:19  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+01:04:11.665 
+01:04:11.665 ./src/components/admin/disaster/ResidentManager.tsx
+01:04:11.665 42:6  Warning: React Hook useEffect has a missing dependency: 'fetchAffected'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+01:04:11.665 251:8  Warning: React Hook useEffect has missing dependencies: 'poskos' and 'setValue'. Either include them or remove the dependency array.  react-hooks/exhaustive-deps
+01:04:11.665 428:7  Warning: React Hook useEffect has a missing dependency: 'fetchResidents'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+01:04:11.665 
+01:04:11.665 ./src/components/landing/InfoBar.tsx
+01:04:11.666 199:17  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+01:04:11.666 
+01:04:11.666 info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/app/api-reference/config/eslint#disabling-rules
+01:04:22.077    Collecting page data ...
+01:04:27.908    Generating static pages (0/90) ...
+01:04:31.333    Generating static pages (22/90) 
+01:04:32.678    Generating static pages (44/90) 
+01:04:58.624 📤 getPublicSettings returning: {
+01:04:58.625   hasGeneral: true,
+01:04:58.625   hasBranding: true,
+01:04:58.625   hasHeroBackground: true,
+01:04:58.625   hasMapUrl: true
+01:04:58.625 }
+01:04:58.626 🔧 Public Layout - Settings received: {
+01:04:58.626   hasGeneral: true,
+01:04:58.626   hasBranding: true,
+01:04:58.626   hasLogo: true,
+01:04:58.626   siteName: 'Desa Mata Mamplam'
+01:04:58.626 }
+01:05:00.637 📤 getPublicSettings returning: {
+01:05:00.637   hasGeneral: true,
+01:05:00.637   hasBranding: true,
+01:05:00.637   hasHeroBackground: true,
+01:05:00.637   hasMapUrl: true
+01:05:00.637 }
+01:05:00.638 🔧 Public Layout - Settings received: {
+01:05:00.638   hasGeneral: true,
+01:05:00.638   hasBranding: true,
+01:05:00.638   hasLogo: true,
+01:05:00.638   siteName: 'Desa Mata Mamplam'
+01:05:00.638 }
+01:05:01.573 prisma:error 
+01:05:01.574 Invalid `prisma.siteSettings.findFirst()` invocation:
+01:05:01.574 
+01:05:01.574 
+01:05:01.574 Timed out fetching a new connection from the connection pool. More info: http://pris.ly/d/connection-pool (Current connection pool timeout: 10, connection limit: 1)
+01:05:01.577 Failed to fetch settings for metadata: Error [PrismaClientKnownRequestError]: 
+01:05:01.578 Invalid `prisma.siteSettings.findFirst()` invocation:
+01:05:01.578 
+01:05:01.578 
+01:05:01.578 Timed out fetching a new connection from the connection pool. More info: http://pris.ly/d/connection-pool (Current connection pool timeout: 10, connection limit: 1)
+01:05:01.580     at async Module.l (.next/server/chunks/8044.js:1:5585) {
+01:05:01.580   code: 'P2024',
+01:05:01.580   meta: [Object],
+01:05:01.580   clientVersion: '6.19.2'
+01:05:01.580 }
+01:05:01.845 📤 getPublicSettings returning: {
+01:05:01.848   hasGeneral: true,
+01:05:01.848   hasBranding: true,
+01:05:01.849   hasHeroBackground: true,
+01:05:01.849   hasMapUrl: true
+01:05:01.849 }
+01:05:11.851 prisma:error 
+01:05:11.851 Invalid `prisma.project.count()` invocation:
+01:05:11.851 
+01:05:11.852 
+01:05:11.852 Timed out fetching a new connection from the connection pool. More info: http://pris.ly/d/connection-pool (Current connection pool timeout: 10, connection limit: 1)
+01:05:11.853 Error fetching stats: Error [PrismaClientKnownRequestError]: 
+01:05:11.854 Invalid `prisma.project.count()` invocation:
+01:05:11.854 
+01:05:11.854 
+01:05:11.854 Timed out fetching a new connection from the connection pool. More info: http://pris.ly/d/connection-pool (Current connection pool timeout: 10, connection limit: 1)
+01:05:11.854     at async e (.next/server/chunks/9234.js:1:11144)
+01:05:11.854     at async w (.next/server/app/(public)/page.js:1:35690)
+01:05:11.854     at async x (.next/server/app/(public)/page.js:1:39168) {
+01:05:11.854   code: 'P2024',
+01:05:11.854   meta: [Object],
+01:05:11.854   clientVersion: '6.19.2'
+01:05:11.854 }
+01:05:11.855 prisma:error 
+01:05:11.855 Invalid `prisma.project.count()` invocation:
+01:05:11.855 
+01:05:11.855 
+01:05:11.855 Timed out fetching a new connection from the connection pool. More info: http://pris.ly/d/connection-pool (Current connection pool timeout: 10, connection limit: 1)
+01:05:11.855 prisma:error 
+01:05:11.855 Invalid `prisma.disasterEvent.findFirst()` invocation:
+01:05:11.855 
+01:05:11.855 
+01:05:11.855 Timed out fetching a new connection from the connection pool. More info: http://pris.ly/d/connection-pool (Current connection pool timeout: 10, connection limit: 1)
+01:05:11.856 API Error (Public Disaster): Error [PrismaClientKnownRequestError]: 
+01:05:11.856 Invalid `prisma.disasterEvent.findFirst()` invocation:
+01:05:11.856 
+01:05:11.856 
+01:05:11.856 Timed out fetching a new connection from the connection pool. More info: http://pris.ly/d/connection-pool (Current connection pool timeout: 10, connection limit: 1)
+01:05:11.856     at async k (.next/server/chunks/9234.js:1:14347)
+01:05:11.856     at async w (.next/server/app/(public)/page.js:1:35690)
+01:05:11.856     at async x (.next/server/app/(public)/page.js:1:39168) {
+01:05:11.856   code: 'P2024',
+01:05:11.856   meta: [Object],
+01:05:11.856   clientVersion: '6.19.2'
+01:05:11.856 }
+01:05:12.546 🔍 Landing Page - Raw Settings: { hasGeneral: true, hasBranding: true, hasContact: true }
+01:05:12.547 🗺️ Map URL from DB: https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d12105.941855624562!2d96.74381091459554!3d5.226176322781911!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3047682c06be8af5%3A0x1fb981f0e1d25c64!2sMata%20Mamplam%2C%20Kec.%20Peusangan%2C%20Kabupaten%20Bireuen%2C%20Aceh!5e1!3m2!1sid!2sid!4v1770528235358!5m2!1sid!2sid
+01:05:12.547 🖼️ Hero Background from DB: https://res.cloudinary.com/dsgizpjxr/image/upload/v1770544327/WhatsApp_Image_2026-01-20_at_11.43.53_kjwepf.jpg
+01:05:12.547 🎨 Logo from DB: https://res.cloudinary.com/dsgizpjxr/image/upload/v1770541712/logo_kkm_icon_xramew.png
+01:05:12.547 ⭐ Favicon from DB: https://res.cloudinary.com/dsgizpjxr/image/upload/v1770541737/favicon-32x32_jexe3h.png
+01:05:12.547 ✅ Transformed settings.general: {
+01:05:12.547   tagline: 'Maju, Sejahtera, Islami',
+01:05:12.547   siteName: 'Desa Mata Mamplam',
+01:05:12.547   description: 'Website Resmi Pemerintah Gampong Mata Mamplam',
+01:05:12.547   heroBackground: 'https://res.cloudinary.com/dsgizpjxr/image/upload/v1770544327/WhatsApp_Image_2026-01-20_at_11.43.53_kjwepf.jpg'
+01:05:12.549 }
+01:05:12.549 ✅ Transformed settings.branding: {
+01:05:12.550   logo: 'https://res.cloudinary.com/dsgizpjxr/image/upload/v1770541712/logo_kkm_icon_xramew.png',
+01:05:12.550   favicon: 'https://res.cloudinary.com/dsgizpjxr/image/upload/v1770541737/favicon-32x32_jexe3h.png',
+01:05:12.550   letterLogo: ''
+01:05:12.550 }
+01:05:12.550 ✅ Transformed settings.contactInfo: {
+01:05:12.550   phone: '081234567890',
+01:05:12.550   email: 'matamamplam2026@gmail.com',
+01:05:12.550   address: 'Jalan Cot Ijue, Kecamatan Peusangan',
+01:05:12.550   mapEmbedUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d12105.941855624562!2d96.74381091459554!3d5.226176322781911!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3047682c06be8af5%3A0x1fb981f0e1d25c64!2sMata%20Mamplam%2C%20Kec.%20Peusangan%2C%20Kabupaten%20Bireuen%2C%20Aceh!5e1!3m2!1sid!2sid!4v1770528235358!5m2!1sid!2sid'
+01:05:12.550 }
+01:05:14.092 🗺️ VillageMap received settings: {
+01:05:14.092   general: {
+01:05:14.092     tagline: 'Maju, Sejahtera, Islami',
+01:05:14.092     siteName: 'Desa Mata Mamplam',
+01:05:14.092     description: 'Website Resmi Pemerintah Gampong Mata Mamplam',
+01:05:14.093     heroBackground: 'https://res.cloudinary.com/dsgizpjxr/image/upload/v1770544327/WhatsApp_Image_2026-01-20_at_11.43.53_kjwepf.jpg'
+01:05:14.093   },
+01:05:14.093   branding: {
+01:05:14.093     logo: 'https://res.cloudinary.com/dsgizpjxr/image/upload/v1770541712/logo_kkm_icon_xramew.png',
+01:05:14.093     favicon: 'https://res.cloudinary.com/dsgizpjxr/image/upload/v1770541737/favicon-32x32_jexe3h.png',
+01:05:14.093     letterLogo: ''
+01:05:14.093   },
+01:05:14.093   contactInfo: {
+01:05:14.093     phone: '081234567890',
+01:05:14.093     email: 'matamamplam2026@gmail.com',
+01:05:14.093     address: 'Jalan Cot Ijue, Kecamatan Peusangan',
+01:05:14.093     mapEmbedUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d12105.941855624562!2d96.74381091459554!3d5.226176322781911!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3047682c06be8af5%3A0x1fb981f0e1d25c64!2sMata%20Mamplam%2C%20Kec.%20Peusangan%2C%20Kabupaten%20Bireuen%2C%20Aceh!5e1!3m2!1sid!2sid!4v1770528235358!5m2!1sid!2sid'
+01:05:14.094   },
+01:05:14.094   footer: {
+01:05:14.094     copyright: '© 2026 Desa Mata Mamplam',
+01:05:14.094     description: 'Website Resmi Pemerintah Gampong Mata Mamplam',
+01:05:14.094     socialMedia: {
+01:05:14.095       twitter: 'https://twitter.com',
+01:05:14.095       youtube: 'https://youtube.com',
+01:05:14.095       facebook: 'https://facebook.com',
+01:05:14.096       instagram: 'https://instagram.com'
+01:05:14.096     }
+01:05:14.096   },
+01:05:14.096   faq: [
+01:05:14.096     {
+01:05:14.096       answer: 'Silahkan datang ke kantor Keuchik (Kantor Desa) dengan membawa KTP dan KK asli serta fotokopi. Anda juga bisa mengajukan surat secara online melalui menu "Layanan Surat" di website ini.',
+01:05:14.096       question: 'Bagaimana cara mengurus surat keterangan?'
+01:05:14.096     },
+01:05:14.096     {
+01:05:14.096       answer: 'Proses pembuatan surat biasanya memakan waktu 10-15 menit jika persyaratan lengkap dan pejabat yang berwenang (Keuchik/Sekdes) berada di tempat.',
+01:05:14.096       question: 'Berapa lama proses pembuatan surat?'
+01:05:14.096     },
+01:05:14.097     {
+01:05:14.097       answer: 'Tidak ada biaya. Seluruh layanan administrasi kependudukan di Gampong Mata Mamplam tidak dipungut biaya (Gratis).',
+01:05:14.097       question: 'Apakah ada biaya untuk pengurusan surat?'
+01:05:14.097     },
+01:05:14.097     {
+01:05:14.097       answer: 'Senin - Jumat: 08:00 - 16:00 WIB, Istirahat: 12:00 - 14:00 WIB. Sabtu: 08:00 - 12:00 WIB. Minggu dan Hari Libur Nasional tutup.',
+01:05:14.098       question: 'Kapan jam operasional kantor desa?'
+01:05:14.098     },
+01:05:14.098     {
+01:05:14.098       answer: 'Untuk pindah datang, lapor ke Kepala Dusun dan bawa Surat Pindah dari daerah asal. Untuk pindah keluar, bawa KTP & KK ke kantor desa untuk dibuatkan Surat Pengantar Pindah.',
+01:05:14.098       question: 'Bagaimana prosedur pindah datang/pindah keluar?'
+01:05:14.098     }
+01:05:14.098   ]
+01:05:14.098 }
+01:05:14.098 🗺️ VillageMap mapUrl: https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d12105.941855624562!2d96.74381091459554!3d5.226176322781911!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3047682c06be8af5%3A0x1fb981f0e1d25c64!2sMata%20Mamplam%2C%20Kec.%20Peusangan%2C%20Kabupaten%20Bireuen%2C%20Aceh!5e1!3m2!1sid!2sid!4v1770528235358!5m2!1sid!2sid
+01:05:15.124 Error occurred prerendering page "/". Read more: https://nextjs.org/docs/messages/prerender-error
+01:05:15.125 Error: Event handlers cannot be passed to Client Component props.
+01:05:15.125   {src: ..., alt: ..., fill: true, className: ..., priority: ..., unoptimized: ..., onError: function onError}
+01:05:15.126                                                                                              ^^^^^^^^^^^^^^^^
+01:05:15.127 If you need interactivity, consider converting part of this to a Client Component.
+01:05:15.127     at stringify (<anonymous>) {
+01:05:15.127   digest: '2627370240'
+01:05:15.127 }
+01:05:15.127 Export encountered an error on /(public)/page: /, exiting the build.
+01:05:15.147  ⨯ Next.js build worker exited with code: 1 and signal: null
+01:05:15.180 Error: Command "npm run build" exited with 1
