@@ -178,33 +178,40 @@ export async function getPublicSettings() {
     navigation: { externalLinks: [] },
   };
 
-  try {
-    const settingsRecord = await prisma.siteSettings.findFirst();
+  // Retry logic for settings (Critical data)
+  let retries = 3;
+  while (retries > 0) {
+    try {
+      const settingsRecord = await prisma.siteSettings.findFirst();
 
-    if (!settingsRecord) {
-      console.warn('⚠️ No settings record found in database, using defaults');
-      return defaultSettings;
+      if (!settingsRecord) {
+        console.warn('⚠️ No settings record found in database, using defaults');
+        return defaultSettings;
+      }
+
+      // IMPORTANT: Return the JSON settings content directly
+      const settings = settingsRecord.settings as any;
+      
+      console.log('📤 getPublicSettings returning:', {
+        hasGeneral: !!settings?.general,
+        hasBranding: !!settings?.branding,
+        hasHeroBackground: !!settings?.general?.heroBackground,
+        hasMapUrl: !!settings?.contact?.mapUrl,
+      });
+      
+      return settings;
+    } catch (error) {
+      console.error(`❌ Error fetching public settings (Attempt ${4 - retries}/3):`, error);
+      retries--;
+      if (retries === 0) {
+        // Return defaults instead of null to prevent undefined errors
+        return defaultSettings;
+      }
+      // Wait 1 second before retrying
+      await new Promise(resolve => setTimeout(resolve, 1000));
     }
-
-    // IMPORTANT: Return the JSON settings content directly
-    // This ensures consistent structure across all consumers
-    const settings = settingsRecord.settings as any;
-    
-    console.log('📤 getPublicSettings returning:', {
-      hasGeneral: !!settings?.general,
-      hasBranding: !!settings?.branding,
-      hasHeroBackground: !!settings?.general?.heroBackground,
-      hasLogo: !!settings?.branding?.logo,
-      hasFavicon: !!settings?.branding?.favicon,
-      hasMapUrl: !!settings?.contact?.mapUrl,
-    });
-    
-    return settings;
-  } catch (error) {
-    console.error('❌ Error fetching public settings:', error);
-    // Return defaults instead of null to prevent undefined errors
-    return defaultSettings;
   }
+  return defaultSettings;
 }
 
 export async function getPublicStructure() {

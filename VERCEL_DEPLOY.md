@@ -208,7 +208,12 @@ Summary perubahan yang sudah dilakukan:
    - `VillageMap`: Iframe error handling
    - Better console logging for debugging
 
-5. **✅ Environment Setup**
+5. **✅ Data Fetching Optimization (New!)**
+   - **Sequencing**: Settings fetched first (critical), then others in parallel
+   - **Retry Logic**: `getPublicSettings` auto-retries 3x on failure
+   - **Impact**: Reduces initial DB load and handles transient connection errors
+
+7. **✅ Environment Setup**
    - Created `.env.production` template
    - Documented all required variables
    - Added deployment instructions

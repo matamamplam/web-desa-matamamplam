@@ -43,16 +43,18 @@ function getWeatherDesc(code: number) {
 
 async function getData() {
   try {
-    const [stats, newsData, umkmData, projectsData, settingsData, structureData, disasterData] = await Promise.all([
+    // 1. Fetch Settings FIRST (Critical for UI)
+    const settingsData = await getPublicSettings();
+
+    // 2. Fetch other data in parallel (but separated from settings to reduce initial load)
+    const [stats, newsData, umkmData, projectsData, structureData, disasterData] = await Promise.all([
       getPublicStats(),
       getPublicNews(),
       getPublicUMKM(),
       getPublicProjects(),
-      getPublicSettings(),
       getPublicStructure(),
       getPublicDisaster(),
     ]);
-
 
     // getPublicSettings now returns the JSON settings content directly
     const rawSettings = settingsData || {};
