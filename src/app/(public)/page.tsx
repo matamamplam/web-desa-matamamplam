@@ -180,22 +180,34 @@ async function getData() {
       earthquake,
     };
   } catch (error) {
-    console.error('Error fetching landing page data:', error);
+    console.error('❌ Error fetching landing page data:', error);
+    // Return complete fallback structure to prevent undefined errors
+    // This ensures page renders even when database connection fails during build
     return {
       stats: null,
       news: [],
       umkm: [],
       projects: [],
       settings: {
-        general: {},
-        branding: {},
+        general: {
+          siteName: 'Desa Mata Mamplam',
+          tagline: 'Kecamatan Peusangan, Kabupaten Bireuen',
+          description: 'Website resmi pemerintahan desa',
+          heroBackground: '',
+        },
+        branding: {
+          logo: '/images/logo.png',
+          favicon: '/images/favicon.ico',
+        },
         contactInfo: {
           phone: '',
           email: '',
           address: '',
           mapEmbedUrl: '',
         },
-        footer: {},
+        footer: {
+          copyright: `© ${new Date().getFullYear()} Desa Mata Mamplam. All rights reserved.`,
+        },
         faq: [],
       },
       structure: { level1: [], level4: [] },

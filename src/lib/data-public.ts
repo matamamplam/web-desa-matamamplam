@@ -144,23 +144,46 @@ export async function getPublicProjects(limit: number = 6, status?: 'PLANNING' |
 }
 
 export async function getPublicSettings() {
+  // Comprehensive fallback settings for build/runtime failures
+  const defaultSettings = {
+    general: { 
+      siteName: 'Desa Mata Mamplam', 
+      tagline: 'Kecamatan Peusangan, Kabupaten Bireuen',
+      description: 'Website resmi pemerintahan desa',
+      heroBackground: '' // Empty string instead of null
+    },
+    branding: { 
+      logo: '/images/logo.png', 
+      favicon: '/images/favicon.ico' 
+    },
+    contact: { 
+      email: '', 
+      phone: '', 
+      whatsapp: '', 
+      address: '', 
+      mapUrl: '' // Empty string instead of null
+    },
+    about: { 
+      title: '', 
+      content: '', 
+      vision: '', 
+      mission: [] 
+    },
+    faq: [],
+    footer: {
+      description: '',
+      socialMedia: { facebook: '', instagram: '', twitter: '', youtube: '' },
+      copyright: `© ${new Date().getFullYear()} Desa Mata Mamplam. All rights reserved.`,
+    },
+    navigation: { externalLinks: [] },
+  };
+
   try {
     const settingsRecord = await prisma.siteSettings.findFirst();
 
     if (!settingsRecord) {
-      return {
-        general: { siteName: 'Website Desa', tagline: '', description: '' },
-        branding: { logo: '/images/logo.png', favicon: '/images/favicon.ico' },
-        contact: { email: '', phone: '', whatsapp: '', address: '', mapUrl: '' },
-        about: { title: '', content: '', vision: '', mission: [] },
-        faq: [],
-        footer: {
-          description: '',
-          socialMedia: { facebook: '', instagram: '', twitter: '', youtube: '' },
-          copyright: '© 2024 Website Desa. All rights reserved.',
-        },
-        navigation: { externalLinks: [] },
-      };
+      console.warn('⚠️ No settings record found in database, using defaults');
+      return defaultSettings;
     }
 
     // IMPORTANT: Return the JSON settings content directly
@@ -173,12 +196,14 @@ export async function getPublicSettings() {
       hasHeroBackground: !!settings?.general?.heroBackground,
       hasLogo: !!settings?.branding?.logo,
       hasFavicon: !!settings?.branding?.favicon,
+      hasMapUrl: !!settings?.contact?.mapUrl,
     });
     
     return settings;
   } catch (error) {
-    console.error('Error fetching public settings:', error);
-    return null;
+    console.error('❌ Error fetching public settings:', error);
+    // Return defaults instead of null to prevent undefined errors
+    return defaultSettings;
   }
 }
 

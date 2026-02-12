@@ -31,6 +31,12 @@ export default function HeroSection({ settings }: { settings: Settings }) {
               fill
               className="object-cover"
               priority
+              unoptimized={heroBackground.includes('cloudinary') ? false : true}
+              onError={(e) => {
+                console.error('Failed to load hero background:', heroBackground);
+                // Hide image on error
+                (e.target as HTMLElement).style.display = 'none';
+              }}
             />
           </div>
           {/* Dark overlay for better text readability */}

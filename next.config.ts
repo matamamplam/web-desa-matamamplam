@@ -17,11 +17,16 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  // Optimize build performance for Vercel
   // Limit concurrency to prevent DB connection timeout during build
   experimental: {
+    // Disable worker threads to reduce concurrent DB connections during build
     workerThreads: false,
+    // Limit CPU usage to prevent connection pool exhaustion
     cpus: 1,
   },
+  // Add output configuration for better Vercel deployment
+  output: 'standalone',
   webpack(config) {
     config.module.rules.push({
       test: /\.svg$/,

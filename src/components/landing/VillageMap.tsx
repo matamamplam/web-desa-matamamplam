@@ -32,6 +32,9 @@ export default function VillageMap({ settings }: { settings: Settings }) {
               allowFullScreen
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
+              onError={(e) => {
+                console.error('Failed to load map iframe:', mapUrl);
+              }}
             />
           </div>
         ) : (
