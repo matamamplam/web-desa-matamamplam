@@ -33,11 +33,14 @@ async function getStructure() {
 
     return {
       leadership: positions.filter((p: any) => p.level === 1), // Keuchik
-      advisory: positions.filter((p: any) => p.level === 2), // Tuha Peut & Imum
-      community: positions.filter((p: any) => p.level === 3), // PKK & Pemuda
-      secretariat: positions.filter((p: any) => p.level === 4), // Sekdes & Kaur
-      technical: positions.filter((p: any) => p.level === 5), // Kasi
-      regional: positions.filter((p: any) => p.level === 6), // Kadus
+      advisory: positions.filter((p: any) => p.level === 2), // Tuha Lapan, Tuha Peut & Imum
+      // Skip community (level 3) - not used in government structure
+      secretary: positions.filter((p: any) => p.level === 4 && p.positionName.toLowerCase().includes('sekretaris')), // Sekdes only
+      operational: positions.filter((p: any) => 
+        (p.level === 4 && !p.positionName.toLowerCase().includes('sekretaris')) || // KAUR
+        p.level === 5 // KASI
+      ),
+      regional: positions.filter((p: any) => p.level === 6), // Petua Dusun
     };
   } catch (error) {
     console.error('Error fetching structure:', error);
@@ -151,9 +154,14 @@ export default async function StructurePage() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         
-        {/* Level 1: Leadership (Keuchik) - PROMINENT */}
+        {/* LEVEL 1: KEUCHIK - Pimpinan Gampong (Paling Atas) */}
         {structure.leadership.length > 0 && (
-          <div className="mb-16">
+          <div className="mb-12">
+            <div className="text-center mb-4">
+              <span className="inline-block px-4 py-2 bg-indigo-100 text-indigo-700 rounded-full text-sm font-semibold">
+                🏛 PIMPINAN GAMPONG
+              </span>
+            </div>
             <div className="flex justify-center mb-8">
               {structure.leadership.map((pos: any) => (
                 <div key={pos.id} className="transform hover:scale-105 transition-duration-300">
@@ -174,11 +182,15 @@ export default async function StructurePage() {
           </div>
         )}
 
-        {/* Level 2: Advisory & Religious */}
+        {/* LEVEL 2: ADVISORY - Mitra & Pengawasan (Sejajar) */}
         {structure.advisory.length > 0 && (
           <div className="mb-12">
-            <h2 className="text-2xl font-bold text-gray-800 mb-8 text-center">Badan Permusyawaratan & Keagamaan</h2>
-            <div className="flex flex-wrap justify-center gap-8 mb-8">
+            <div className="text-center mb-4">
+              <span className="inline-block px-4 py-2 bg-purple-100 text-purple-700 rounded-full text-sm font-semibold">
+                🕌 MITRA & PENGAWASAN ADAT/KEAGAMAAN
+              </span>
+            </div>
+            <div className="flex flex-wrap justify-center gap-6 mb-8">
               {structure.advisory.map((pos: any) => (
                 <div key={pos.id} className="w-full sm:w-auto">
                   <OfficialCard
@@ -196,12 +208,42 @@ export default async function StructurePage() {
           </div>
         )}
 
-        {/* Level 3: Community Institutions */}
-        {structure.community.length > 0 && (
+        {/* LEVEL 3: SEKRETARIS DESA */}
+        {structure.secretary && structure.secretary.length > 0 && (
           <div className="mb-12">
-             <h2 className="text-2xl font-bold text-gray-800 mb-8 text-center">Lembaga Kemasyarakatan</h2>
+            <div className="text-center mb-4">
+              <span className="inline-block px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold">
+                🗂 SEKRETARIAT DESA
+              </span>
+            </div>
+            <div className="flex justify-center mb-8">
+              {structure.secretary.map((pos: any) => (
+                <div key={pos.id}>
+                  <OfficialCard
+                    name={pos.official?.name || "Belum Terisi"}
+                    position={pos.positionName}
+                    photo={pos.official?.photo || null}
+                    size="medium"
+                  />
+                </div>
+              ))}
+            </div>
+            <div className="flex justify-center">
+              <div className="w-1 h-12 bg-gradient-to-b from-indigo-300 to-transparent"></div>
+            </div>
+          </div>
+        )}
+
+        {/* LEVEL 4 & 5: KAUR & KASI - Pelaksana Teknis */}
+        {structure.operational && structure.operational.length > 0 && (
+          <div className="mb-12">
+            <div className="text-center mb-4">
+              <span className="inline-block px-4 py-2 bg-green-100 text-green-700 rounded-full text-sm font-semibold">
+                🏢 PELAKSANA TEKNIS (KAUR & KASI)
+              </span>
+            </div>
             <div className="flex flex-wrap justify-center gap-6 mb-8">
-              {structure.community.map((pos: any) => (
+              {structure.operational.map((pos: any) => (
                 <div key={pos.id} className="w-full sm:w-auto">
                   <OfficialCard
                     name={pos.official?.name || "Belum Terisi"}
@@ -218,54 +260,14 @@ export default async function StructurePage() {
           </div>
         )}
 
-        {/* Level 4: Secretariat (Sekdes & Kaur) */}
-        {structure.secretariat.length > 0 && (
-          <div className="mb-12">
-            <h2 className="text-2xl font-bold text-gray-800 mb-8 text-center">Sekretariat Desa</h2>
-            <div className="flex flex-wrap justify-center gap-6 mb-8">
-              {structure.secretariat.map((pos: any) => (
-                <div key={pos.id} className="w-full sm:w-auto">
-                  <OfficialCard
-                    name={pos.official?.name || "Belum Terisi"}
-                    position={pos.positionName}
-                    photo={pos.official?.photo || null}
-                    size="small"
-                  />
-                </div>
-              ))}
-            </div>
-            <div className="flex justify-center">
-              <div className="w-1 h-12 bg-gradient-to-b from-indigo-300 to-transparent"></div>
-            </div>
-          </div>
-        )}
-
-        {/* Level 5: Technical (Kasi) */}
-        {structure.technical.length > 0 && (
-          <div className="mb-12">
-            <h2 className="text-2xl font-bold text-gray-800 mb-8 text-center">Pelaksana Teknis</h2>
-            <div className="flex flex-wrap justify-center gap-6 mb-8">
-              {structure.technical.map((pos: any) => (
-                <div key={pos.id} className="w-full sm:w-auto">
-                  <OfficialCard
-                    name={pos.official?.name || "Belum Terisi"}
-                    position={pos.positionName}
-                    photo={pos.official?.photo || null}
-                    size="small"
-                  />
-                </div>
-              ))}
-            </div>
-            <div className="flex justify-center">
-              <div className="w-1 h-12 bg-gradient-to-b from-indigo-300 to-transparent"></div>
-            </div>
-          </div>
-        )}
-
-        {/* Level 6: Regional (Kadus) */}
+        {/* LEVEL 6: PETUA DUSUN - Perangkat Kewilayahan */}
         {structure.regional.length > 0 && (
           <div className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-8 text-center">Kepala Kewilayahan (Dusun)</h2>
+            <div className="text-center mb-4">
+              <span className="inline-block px-4 py-2 bg-amber-100 text-amber-700 rounded-full text-sm font-semibold">
+                🏘 PERANGKAT KEWILAYAHAN
+              </span>
+            </div>
             <div className="flex flex-wrap justify-center gap-6">
               {structure.regional.map((pos: any) => (
                 <div key={pos.id} className="w-full sm:w-auto">
