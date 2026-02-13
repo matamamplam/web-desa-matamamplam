@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { handleError } from '@/lib/error-handler';
+import { successResponse } from '@/lib/api-response';
 
 export const revalidate = 3600; // Cache for 1 hour
 
@@ -36,12 +38,8 @@ export async function GET() {
       lastUpdated: new Date().toISOString(),
     };
 
-    return NextResponse.json(stats);
+    return successResponse(stats);
   } catch (error) {
-    console.error('Error fetching stats:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch statistics' },
-      { status: 500 }
-    );
+    return handleError(error);
   }
 }

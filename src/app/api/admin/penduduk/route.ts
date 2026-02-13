@@ -1,18 +1,20 @@
 import { NextResponse, NextRequest } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { auth } from "@/lib/auth"
+import { handleError } from "@/lib/error-handler"
+import { successResponse } from "@/lib/api-response"
+import { AuthError, ValidationError, ResourceConflictError, NotFoundError } from "@/lib/errors/exceptions"
 
 // GET - List/Search penduduk
 export async function GET(request: NextRequest) {
   try {
     const session = await auth()
     if (!session) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
+      throw new AuthError()
     }
 
     const { searchParams } = new URL(request.url)
     const search = searchParams.get("search")
-    const dusun = searchParams.get("dusun")
     const page = parseInt(searchParams.get("page") || "1")
     const limitParam = searchParams.get("limit")
     const perPage = limitParam ? parseInt(limitParam) : 20
@@ -37,7 +39,7 @@ export async function GET(request: NextRequest) {
               alamat: true,
               rt: true,
               rw: true,
-              dusun: true // Ensure dusun is selected
+              dusun: true 
             },
           },
         },
@@ -48,18 +50,14 @@ export async function GET(request: NextRequest) {
       prisma.penduduk.count({ where }),
     ])
 
-    return NextResponse.json({
+    return successResponse({
       penduduk,
       totalCount,
       currentPage: page,
       totalPages: Math.ceil(totalCount / perPage),
     })
-  } catch (error: any) {
-    console.error("Get penduduk error:", error)
-    return NextResponse.json(
-      { message: error.message || "Internal server error" },
-      { status: 500 }
-    )
+  } catch (error) {
+    return handleError(error)
   }
 }
 
@@ -67,7 +65,7 @@ export async function POST(request: Request) {
   try {
     const session = await auth()
     if (!session) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
+      throw new AuthError()
     }
 
     const body = await request.json()
@@ -80,10 +78,7 @@ export async function POST(request: Request) {
     
     for (const field of requiredFields) {
       if (!body[field]) {
-        return NextResponse.json(
-          { message: `Field ${field} is required` },
-          { status: 400 }
-        )
+        throw new ValidationError({ field, message: `Field ${field} is required` })
       }
     }
 
@@ -93,10 +88,7 @@ export async function POST(request: Request) {
     })
 
     if (existing) {
-      return NextResponse.json(
-        { message: "NIK sudah terdaftar" },
-        { status: 400 }
-      )
+      throw new ResourceConflictError("NIK sudah terdaftar")
     }
 
     // Verify KK exists
@@ -105,10 +97,7 @@ export async function POST(request: Request) {
     })
 
     if (!kk) {
-      return NextResponse.json(
-        { message: "Kartu Keluarga tidak ditemukan" },
-        { status: 404 }
-      )
+      throw new NotFoundError({ resource: "Kartu Keluarga", id: body.kkId })
     }
 
     const penduduk = await prisma.penduduk.create({
@@ -133,11 +122,8 @@ export async function POST(request: Request) {
       },
     })
 
-    return NextResponse.json(penduduk, { status: 201 })
-  } catch (error: any) {
-    return NextResponse.json(
-      { message: error.message || "Internal server error" },
-      { status: 500 }
-    )
+    return successResponse(penduduk, "Data penduduk berhasil ditambahkan", 201)
+  } catch (error) {
+    return handleError(error)
   }
 }

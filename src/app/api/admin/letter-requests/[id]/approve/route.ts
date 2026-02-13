@@ -36,40 +36,29 @@ export async function POST(
       )
     }
 
-    // Generate letter number
-    const now = new Date()
-    const month = String(now.getMonth() + 1).padStart(2, "0")
-    const year = now.getFullYear()
-
-    // Get the last letter number for this month
-    const monthStart = new Date(year, now.getMonth(), 1)
-    const monthEnd = new Date(year, now.getMonth() + 1, 0, 23, 59, 59)
-
-    const lastLetter = await prisma.letterRequest.findFirst({
-      where: {
-        status: { in: ["APPROVED", "COMPLETED"] },
-        approvedAt: {
-          gte: monthStart,
-          lte: monthEnd,
-        },
-        nomorSurat: { not: { startsWith: "TEMP-" } },
-      },
-      orderBy: { approvedAt: "desc" },
-    })
-
-    let sequence = 1
-    if (lastLetter && lastLetter.nomorSurat) {
-      // Extract sequence from format: 001/CODE/MM/YYYY
-      const parts = lastLetter.nomorSurat.split("/")
-      if (parts.length > 0) {
-        const lastSeq = parseInt(parts[0])
-        if (!isNaN(lastSeq)) {
-          sequence = lastSeq + 1
-        }
-      }
+    // Validate manual letter number
+    const { letterNumber } = body
+    if (!letterNumber) {
+      return NextResponse.json(
+        { message: "Nomor surat wajib diisi" },
+        { status: 400 }
+      )
     }
 
-    const letterNumber = `${String(sequence).padStart(3, "0")}/${letterRequest.template.code}/${month}/${year}`
+    // Check availability
+    const existing = await prisma.letterRequest.findFirst({
+      where: {
+        nomorSurat: letterNumber,
+        id: { not: id } // Exclude current request
+      }
+    })
+
+    if (existing) {
+      return NextResponse.json(
+        { message: "Nomor surat sudah digunakan" },
+        { status: 400 }
+      )
+    }
 
     // Generate verification code (unique)
     const verificationCode = `${letterRequest.template.code}-${Date.now()}-${Math.random().toString(36).substring(7)}`

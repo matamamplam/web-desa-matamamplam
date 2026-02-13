@@ -20,13 +20,38 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           throw new Error("Email dan password harus diisi")
         }
 
+
         const user = await prisma.user.findUnique({
-          where: {
-            email: credentials.email as string,
-          },
+          where: { email: credentials.email as string }
         })
 
+        // 1. Check for recent failed attempts (Brute Force Protection)
+        const lockoutThreshold = 5
+        const lockoutWindow = 15 * 60 * 1000 // 15 minutes
+        
+        const recentFailures = await prisma.loginAttempt.count({
+          where: {
+            email: credentials.email as string,
+            isSuccess: false,
+            attemptedAt: {
+              gt: new Date(Date.now() - lockoutWindow)
+            }
+          }
+        })
+
+        if (recentFailures >= lockoutThreshold) {
+          throw new Error("Akun terkunci sementara karena terlalu banyak percobaan login gagal. Coba lagi dalam 15 menit.")
+        }
+
         if (!user) {
+           // Record failed attempt for non-existent user to prevent enumeration (optional, but good practice)
+           await prisma.loginAttempt.create({
+            data: {
+              email: credentials.email as string,
+              isSuccess: false,
+              // ipAddress: req.ip // Note: IP tracking in next-auth credential provider is tricky without passing req
+            }
+          })
           throw new Error("Email atau password salah")
         }
 
@@ -40,8 +65,24 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         )
 
         if (!isPasswordValid) {
+          // Record failed attempt
+          await prisma.loginAttempt.create({
+            data: {
+              email: credentials.email as string,
+              isSuccess: false,
+            }
+          })
           throw new Error("Email atau password salah")
         }
+
+        // Login Success
+        await prisma.loginAttempt.create({
+            data: {
+              email: credentials.email as string,
+              isSuccess: true,
+            }
+        })
+
 
         return {
           id: user.id,

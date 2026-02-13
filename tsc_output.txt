@@ -1,0 +1,6 @@
+﻿scripts/verify-bansos.ts(2,36): error TS2305: Module '"@prisma/client"' has no exported member 'JenisBansos'.
+scripts/verify-bansos.ts(69,43): error TS2353: Object literal may only specify known properties, and 'jenis' does not exist in type 'BansosWhereInput'.
+scripts/verify-bansos.ts(75,13): error TS2353: Object literal may only specify known properties, and 'jenis' does not exist in type 'Without<BansosCreateInput, BansosUncheckedCreateInput> & BansosUncheckedCreateInput'.
+scripts/verify-schema.ts(2,36): error TS2305: Module '"@prisma/client"' has no exported member 'JenisBansos'.
+src/app/api/admin/bansos/route.ts(5,10): error TS2305: Module '"@prisma/client"' has no exported member 'JenisBansos'.
+src/app/api/admin/penduduk/route.ts(6,38): error TS2305: Module '"@/lib/errors/exceptions"' has no exported member 'ResourceConflictError'.

@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { signIn } from "next-auth/react"
+import { toast } from "react-hot-toast"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
@@ -30,13 +31,30 @@ export default function LoginPage() {
       })
 
       if (result?.error) {
-        setError("Email atau password salah")
+        // Handle specific NextAuth errors
+        if (result.status === 401) {
+             setError("Email atau password salah")
+             toast.error("Gagal masuk. Periksa kembali email dan password Anda.")
+        } else if (result.status === 429) {
+             const msg = "Terlalu banyak percobaan. Mohon tunggu 1 menit."
+             setError(msg)
+             toast.error(msg)
+        } else if (result.error.includes("Akun terkunci")) {
+             setError("Akun terkunci sementara. Coba lagi dalam 15 menit.")
+             toast.error("Akun terkunci karena keamanan.")
+        } else {
+             setError("Terjadi kesalahan saat login.")
+             toast.error("Terjadi kesalahan sistem.")
+        }
       } else if (result?.ok) {
+        toast.success("Login berhasil! Mengalihkan...", { duration: 2000 })
         router.push("/admin")
         router.refresh()
       }
     } catch (error) {
-      setError("Terjadi kesalahan. Silakan coba lagi.")
+      console.error("Login caught error:", error)
+      setError("Terjadi kesalahan jaringan atau sistem.")
+      toast.error("Gagal terhubung ke server.")
     } finally {
       setIsLoading(false)
     }

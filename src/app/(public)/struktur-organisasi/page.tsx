@@ -187,14 +187,15 @@ export default async function StructurePage() {
         {structure.secretariat.length > 0 && (
           <div className="border-t border-gray-200 pt-8">
             <h2 className="text-2xl font-bold text-gray-800 mb-8 text-center">Sekretariat Desa</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 justify-center">
+            <div className="flex flex-wrap justify-center gap-6">
               {structure.secretariat.map((pos: any) => (
-                <OfficialCard
-                  key={pos.id}
-                  name={pos.official?.name || "Belum Terisi"}
-                  position={pos.positionName}
-                  photo={pos.official?.photo || null}
-                />
+                <div key={pos.id} className="w-full max-w-[280px]">
+                  <OfficialCard
+                    name={pos.official?.name || "Belum Terisi"}
+                    position={pos.positionName}
+                    photo={pos.official?.photo || null}
+                  />
+                </div>
               ))}
             </div>
           </div>
@@ -204,14 +205,15 @@ export default async function StructurePage() {
         {structure.technical.length > 0 && (
           <div className="border-t border-gray-200 pt-8">
             <h2 className="text-2xl font-bold text-gray-800 mb-8 text-center">Pelaksana Teknis</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 justify-center">
+            <div className="flex flex-wrap justify-center gap-6">
               {structure.technical.map((pos: any) => (
-                <OfficialCard
-                  key={pos.id}
-                  name={pos.official?.name || "Belum Terisi"}
-                  position={pos.positionName}
-                  photo={pos.official?.photo || null}
-                />
+                <div key={pos.id} className="w-full max-w-[280px]">
+                  <OfficialCard
+                    name={pos.official?.name || "Belum Terisi"}
+                    position={pos.positionName}
+                    photo={pos.official?.photo || null}
+                  />
+                </div>
               ))}
             </div>
           </div>
@@ -221,15 +223,16 @@ export default async function StructurePage() {
         {structure.regional.length > 0 && (
           <div className="border-t border-gray-200 pt-8">
             <h2 className="text-2xl font-bold text-gray-800 mb-8 text-center">Kepala Kewilayahan (Dusun)</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 justify-center">
+            <div className="flex flex-wrap justify-center gap-6">
               {structure.regional.map((pos: any) => (
-                <OfficialCard
-                  key={pos.id}
-                  name={pos.official?.name || "Belum Terisi"}
-                  position={pos.positionName}
-                  photo={pos.official?.photo || null}
-                  dusun={pos.dusunName}
-                />
+                <div key={pos.id} className="w-full max-w-[280px]">
+                  <OfficialCard
+                    name={pos.official?.name || "Belum Terisi"}
+                    position={pos.positionName}
+                    photo={pos.official?.photo || null}
+                    dusun={pos.dusunName}
+                  />
+                </div>
               ))}
             </div>
           </div>

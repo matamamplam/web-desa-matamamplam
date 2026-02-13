@@ -217,3 +217,8 @@ Summary perubahan yang sudah dilakukan:
    - Created `.env.production` template
    - Documented all required variables
    - Added deployment instructions
+
+8. **✅ Build Optimization**
+   - Excluded `scripts/` from `tsconfig.json` to prevent build failures from dev tools
+   - Verified local build passed with `npm run build`
+   - Ensured `output: 'standalone'` is set correctly

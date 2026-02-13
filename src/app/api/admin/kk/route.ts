@@ -88,6 +88,7 @@ export async function POST(request: Request) {
         provinsi: body.provinsi,
         // @ts-ignore
         dusun: body.dusun || body.alamat, // Use alamat as fallback
+        jenisRumah: body.jenisRumah,
       },
     })
 

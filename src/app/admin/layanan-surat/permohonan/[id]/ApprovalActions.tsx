@@ -20,14 +20,24 @@ export default function ApprovalActions({ request }: ApprovalActionsProps) {
   const [loading, setLoading] = useState(false)
   const [action, setAction] = useState<"approve" | "reject" | null>(null)
   const [notes, setNotes] = useState("")
+  const [letterNumber, setLetterNumber] = useState("")
   const [error, setError] = useState("")
 
   const handleApprove = async () => {
+    if (!letterNumber.trim()) {
+      toast.error("Nomor surat wajib diisi")
+      return
+    }
+
     const confirmed = await new Promise((resolve) => {
       toast((t) => (
         <div className="flex flex-col gap-3">
           <p className="font-semibold">Konfirmasi Persetujuan</p>
-          <p className="text-sm text-gray-600">Apakah Anda yakin ingin menyetujui permohonan ini?</p>
+          <p className="text-sm text-gray-600">
+            Pastikan nomor surat <strong>{letterNumber}</strong> sudah benar.
+            <br />
+            Apakah Anda yakin ingin menyetujui permohonan ini?
+          </p>
           <div className="flex gap-2">
             <button
               onClick={() => { toast.dismiss(t.id); resolve(true); }}
@@ -54,7 +64,7 @@ export default function ApprovalActions({ request }: ApprovalActionsProps) {
       const response = await fetch(`/api/admin/letter-requests/${request.id}/approve`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ notes }),
+        body: JSON.stringify({ notes, letterNumber }),
       })
 
       const data = await response.json()
@@ -69,10 +79,12 @@ export default function ApprovalActions({ request }: ApprovalActionsProps) {
       router.refresh()
     } catch (err: any) {
       setError(err.message)
+      toast.error(err.message)
     } finally {
       setLoading(false)
       setAction(null)
       setNotes("")
+      setLetterNumber("")
     }
   }
 
@@ -322,6 +334,21 @@ export default function ApprovalActions({ request }: ApprovalActionsProps) {
         {action === "approve" && (
           <div className="space-y-3">
             <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Nomor Surat <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                value={letterNumber}
+                onChange={(e) => setLetterNumber(e.target.value)}
+                placeholder="Contoh: 470/001/2026"
+                className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-blue-500"
+              />
+              <p className="mt-1 text-xs text-gray-500">
+                Masukkan nomor surat resmi sesuai format desa.
+              </p>
+            </div>
+            <div>
               <label className="block text-sm font-medium text-gray-700">Catatan (opsional)</label>
               <textarea
                 value={notes}
@@ -343,6 +370,7 @@ export default function ApprovalActions({ request }: ApprovalActionsProps) {
                 onClick={() => {
                   setAction(null)
                   setNotes("")
+                  setLetterNumber("")
                 }}
                 disabled={loading}
                 className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
@@ -466,8 +494,8 @@ export default function ApprovalActions({ request }: ApprovalActionsProps) {
           <div className="ml-3 text-sm text-blue-700">
             <p className="font-medium">Catatan:</p>
             <ul className="mt-1 list-inside list-disc space-y-1">
-              <li>Persetujuan akan generate nomor surat otomatis</li>
-              <li>PDF surat akan dibuat secara otomatis</li>
+              <li>Isi nomor surat secara manual (wajib)</li>
+              <li>PDF surat akan dibuat otomatis setelah persetujuan</li>
               <li>Penolakan wajib disertai alasan</li>
             </ul>
           </div>

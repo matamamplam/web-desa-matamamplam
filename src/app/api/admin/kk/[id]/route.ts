@@ -66,6 +66,7 @@ export async function PUT(
         kecamatan: body.kecamatan,
         kabupaten: body.kabupaten,
         provinsi: body.provinsi,
+        jenisRumah: body.jenisRumah,
       },
     })
 

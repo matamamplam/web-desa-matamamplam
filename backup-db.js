@@ -12,7 +12,8 @@ async function main() {
   // List of all models to backup
   const models = [
     'user',
-    'kartuKeluarga', 
+    'passwordResetToken',
+    'kartuKeluarga',
     'penduduk',
     'letterTemplate',
     'letterRequest',
@@ -21,7 +22,7 @@ async function main() {
     'newsComment',
     'project',
     'uMKMCategory',
-    'uMKM',
+    'uMKM', // Note: Prisma client typically camelCases this to uMKM or umkm depending on casing. I'll rely on the dynamic check if it fails, but standard is lowercased first letter. Actually let's check generated client normally.
     'product',
     'complaintCategory',
     'complaint',
@@ -29,8 +30,6 @@ async function main() {
     'galleryItem',
     'document',
     'villageProfile',
-    'officialPosition', // Checking this later
-    'event',
     'announcement',
     'siteSettings',
     'villageOfficialPosition',
@@ -45,7 +44,7 @@ async function main() {
     'logisticsTransaction'
   ]
 
-  console.log("Prisma Client Properties:", Object.keys(prisma).filter(k => !k.startsWith('_')))
+  console.log("Prisma Client Properties:", Object.keys(prisma).filter(k => !k.startsWith('_') && !k.startsWith('$')))
 
   for (const model of models) {
     try {
@@ -57,7 +56,7 @@ async function main() {
       } else {
         console.warn(`[WARN] Model '${model}' not found in Prisma Client instance`)
         // Try to find case-insensitive match
-        const actualKey = Object.keys(prisma).find(k => k.toLowerCase() === model.toLowerCase())
+        const actualKey = Object.keys(prisma).find(k => k.toLowerCase() === model.toLowerCase() && !k.startsWith('$') && !k.startsWith('_'))
         if (actualKey) {
              console.log(` - Retry with key '${actualKey}'...`)
              const data = await prisma[actualKey].findMany()
@@ -70,7 +69,12 @@ async function main() {
     }
   }
 
-  fs.writeFileSync('backup_full.json', JSON.stringify(backup, null, 2))
+
+  fs.writeFileSync('backup_full.json', JSON.stringify(backup, (key, value) => 
+    typeof value === 'bigint'
+      ? value.toString()
+      : value 
+  , 2))
   console.log("Backup saved to backup_full.json")
 }
 

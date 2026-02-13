@@ -76,6 +76,7 @@ model KartuKeluarga {
   provinsi       String
   kodePos        String?
   dusun          String? // Added for easy filtering
+  jenisRumah     JenisRumah? // Nullable for existing data
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
@@ -112,6 +113,7 @@ model Penduduk {
   letterRequests  LetterRequest[]
   complaints      Complaint[]
   affectedRecords AffectedResident[]
+  bansos          Bansos[]
 
   @@map("penduduk")
 }
@@ -119,6 +121,56 @@ model Penduduk {
 enum JenisKelamin {
   LAKI_LAKI
   PEREMPUAN
+}
+
+enum JenisRumah {
+  PERMANEN
+  SEMI_PERMANEN
+  KAYU
+  NUMPANG
+  TIDAK_PUNYA
+}
+
+// ============================================
+// SOCIAL AID (BANSOS)
+// ============================================
+
+model ProgramBansos {
+  id          String   @id @default(cuid())
+  nama        String   @unique // e.g., "BLT Dana Desa", "PKH"
+  keterangan  String?  @db.Text
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  bansos      Bansos[]
+
+  @@map("program_bansos")
+}
+
+model Bansos {
+  id          String      @id @default(cuid())
+  pendudukId  String
+  programId   String      // Changed from 'jenis' to relation
+  keterangan  String?     @db.Text
+  status      BansosStatus @default(AKTIF)
+  tahun       Int         // Year of aid
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  // Relations
+  penerima    Penduduk      @relation(fields: [pendudukId], references: [id], onDelete: Cascade)
+  program     ProgramBansos @relation(fields: [programId], references: [id])
+
+  @@map("bansos")
+}
+
+// Removed JenisBansos Enum
+
+enum BansosStatus {
+  AKTIF
+  NONAKTIF
 }
 
 enum Agama {
@@ -566,6 +618,41 @@ model PhoneViewLog {
   viewedAt  DateTime @default(now())
 
   @@map("phone_view_logs")
+}
+
+// ============================================
+// SECURITY LOGS
+// ============================================
+
+model LoginAttempt {
+  id        String   @id @default(cuid())
+  email     String
+  ipAddress String?
+  userAgent String?
+  isSuccess Boolean  @default(false)
+  attemptedAt DateTime @default(now())
+  
+  @@index([email])
+  @@index([ipAddress])
+  @@map("login_attempts")
+}
+
+model SystemLog {
+  id        String   @id @default(cuid())
+  level     LogLevel @default(ERROR)
+  message   String   @db.Text
+  stack     String?  @db.Text
+  context   Json?    // Additional metadata
+  createdAt DateTime @default(now())
+
+  @@map("system_logs")
+}
+
+enum LogLevel {
+  INFO
+  WARN
+  ERROR
+  FATAL
 }
 
 // ============================================

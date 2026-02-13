@@ -4,6 +4,7 @@ import { signOut } from "next-auth/react"
 import { useState } from "react"
 import { useAdminStats } from "@/hooks/useAdminStats"
 import { useSidebar } from "@/context/SidebarContext"
+import { toast } from "react-hot-toast"
 
 interface HeaderProps {
   user: {
@@ -21,7 +22,12 @@ export default function Header({ user }: HeaderProps) {
   const { toggleMobileSidebar } = useSidebar()
 
   const handleLogout = async () => {
-    await signOut({ callbackUrl: "/auth/login" })
+    try {
+      await signOut({ callbackUrl: "/auth/login" })
+    } catch (error) {
+       console.error("Logout failed:", error)
+       toast.error("Gagal keluar. Silakan coba lagi.")
+    }
   }
 
   return (
