@@ -71,6 +71,14 @@ export default function ExcelActions({ type }: ExcelActionsProps) {
 
       const data = await response.json()
       
+      // Debug: log data structure
+      console.log('PDF Export data:', data)
+      
+      // Check if data exists
+      if (!data || (type === 'penduduk' && !data.penduduk) || (type === 'kk' && !data.kk)) {
+        throw new Error('Data tidak ditemukan atau format tidak sesuai')
+      }
+      
       // Create PDF document
       const doc = new jsPDF('l', 'mm', 'a4') // landscape orientation
       
@@ -89,7 +97,8 @@ export default function ExcelActions({ type }: ExcelActionsProps) {
       
       if (type === 'penduduk') {
         headers = ['No', 'NIK', 'Nama', 'Jenis Kelamin', 'Tempat Lahir', 'Tanggal Lahir', 'Agama', 'Pendidikan', 'Pekerjaan', 'No. KK']
-        rows = data.penduduk.map((p: any, index: number) => [
+        const pendudukList = Array.isArray(data.penduduk) ? data.penduduk : (data.data?.penduduk || [])
+        rows = pendudukList.map((p: any, index: number) => [
           index + 1,
           p.nik || '-',
           p.nama || '-',
@@ -103,7 +112,8 @@ export default function ExcelActions({ type }: ExcelActionsProps) {
         ])
       } else {
         headers = ['No', 'No. KK', 'Kepala Keluarga', 'Dusun', 'Alamat', 'RT/RW', 'Jumlah Anggota']
-        rows = data.kk.map((k: any, index: number) => [
+        const kkList = Array.isArray(data.kk) ? data.kk : (data.data?.kk || [])
+        rows = kkList.map((k: any, index: number) => [
           index + 1,
           k.noKK || '-',
           k.kepalaKeluarga || '-',
