@@ -2,6 +2,8 @@ import Image from 'next/image';
 import { prisma } from '@/lib/prisma';
 import { SiteSettings } from '@/types/settings';
 
+export const dynamic = "force-dynamic";
+
 async function getSettings(): Promise<SiteSettings | null> {
   const settings = await prisma.siteSettings.findFirst();
   if (!settings?.settings) return null;

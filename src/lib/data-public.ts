@@ -60,6 +60,8 @@ export async function getPublicNews(limit: number = 10, category?: string) {
         slug: true,
         excerpt: true,
         thumbnail: true,
+      // No changes needed here if force-dynamic is used in pages.
+// But I should check the home page.,
         category: { select: { name: true } },
         createdAt: true,
         author: { select: { name: true } },
