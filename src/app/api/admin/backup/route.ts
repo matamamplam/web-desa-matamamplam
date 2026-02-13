@@ -44,18 +44,36 @@ export async function GET(request: NextRequest) {
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
     const filename = `backup_${timestamp}.json`;
 
+    // Custom JSON serializer to handle Date and BigInt
+    const jsonString = JSON.stringify(backup, (key, value) => {
+      // Convert Date objects to ISO strings
+      if (value instanceof Date) {
+        return value.toISOString();
+      }
+      // Convert BigInt to string
+      if (typeof value === 'bigint') {
+        return value.toString();
+      }
+      return value;
+    }, 2);
+
     // Return JSON file as download
-    return new NextResponse(JSON.stringify(backup, null, 2), {
+    return new NextResponse(jsonString, {
       status: 200,
       headers: {
         'Content-Type': 'application/json',
         'Content-Disposition': `attachment; filename="${filename}"`,
       },
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('❌ Backup error:', error);
+    console.error('Error stack:', error.stack);
     return NextResponse.json(
-      { error: 'Failed to create backup' },
+      { 
+        error: 'Failed to create backup',
+        message: error.message,
+        details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      },
       { status: 500 }
     );
   }
