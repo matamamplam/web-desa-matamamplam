@@ -3,7 +3,7 @@ import { prisma } from '@/lib/prisma';
 
 const resend = new Resend('re_Y4trVUWR_G9Q9FP3UEDScyiiUJqBCycm5');
 
-const domain = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+const domain = process.env.NEXT_PUBLIC_APP_URL || 'https://matamamplam.my.id';
 
 export const sendPasswordResetEmail = async (
   email: string, 

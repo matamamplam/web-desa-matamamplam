@@ -192,7 +192,7 @@ export default function ApprovalActions({ request }: ApprovalActionsProps) {
             href={`https://wa.me/${request.phoneNumber.replace(/^0/, "62")}?text=${encodeURIComponent(
               `Halo, Surat Anda dengan nomor *${request.nomorSurat}* telah Selesai dan Disetujui.\n\n` +
               `Kode Verifikasi: *${request.verificationCode}*\n` +
-              `Silakan cek dan unduh surat Anda di: ${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/cek-surat/${request.verificationCode}\n\n` +
+              `Silakan cek dan unduh surat Anda di: ${process.env.NEXT_PUBLIC_APP_URL || "https://matamamplam.my.id"}/cek-surat/${request.verificationCode}\n\n` +
               `Terima kasih.`
             )}`}
             target="_blank"

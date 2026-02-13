@@ -15,11 +15,11 @@ async function main() {
   const backup = JSON.parse(fs.readFileSync(backupPath, 'utf8'))
   console.log('✅ Loaded backup_full.json')
 
-  // 2. Clear tables that will be replaced by new feature seeds (Optional but safer)
+  // 2. Clear tables that will be replaced by new feature seeds (But be careful with Settings)
   // We want to use the NEW structure for these, not the old backup data
-  console.log('🧹 Clearing old settings and structure data...')
+  console.log('🧹 Clearing structure data...')
   try {
-    await prisma.siteSettings.deleteMany({})
+    // await prisma.siteSettings.deleteMany({}) // DON'T DELETE SETTINGS YET, we need to merge
     await prisma.villageOfficial.deleteMany({})
     await prisma.villageOfficialPosition.deleteMany({})
     // We keep DisasterEvent for now, or maybe clear it too if we want a fresh start?
@@ -56,14 +56,50 @@ async function main() {
         // Strip relations (arrays) and null IDs to prevent FK errors
         const cleanItem = { ...item }
         Object.keys(cleanItem).forEach(key => {
-            if (Array.isArray(cleanItem[key])) {
-                delete cleanItem[key] // Remove nested relations
+            if (Array.isArray(cleanItem[key]) || (typeof cleanItem[key] === 'object' && cleanItem[key] !== null && !(cleanItem[key] instanceof Date))) {
+                 // Check if it's a relation object (not Date or null)
+                 // Start with simple array check (One-to-Many)
+                delete cleanItem[key] // Remove nested relations or relation objects
             }
+            // The original code had this, but the above condition covers arrays.
+            // If there are other types of relations that are not arrays or objects (e.g., just IDs), they should be fine.
+            // if (Array.isArray(cleanItem[key])) {
+            //     delete cleanItem[key] // Remove nested relations
+            // }
             if (cleanItem[key] === null && key !== 'avatar' && key !== 'description') {
                 // Optional: keep nulls for fields that allow it, but relationships like 'dusun' might be null
                 // safely keeping null scalar fields is usually fine.
             }
         })
+        
+        // Specific cleanup for User to remove letterRequests relation if present as object/array
+        if (modelName === 'user') {
+            delete cleanItem.letterRequests
+            delete cleanItem.proposals
+            delete cleanItem.complaints
+            delete cleanItem.news
+        }
+
+        // Specific transformation for Letter Templates: Remove BOLD formatting from placeholders
+        if (modelName === 'letterTemplate' && cleanItem.template) {
+            // Regex to match <b>{{...}}</b>, <strong>{{...}}</strong>, or <span style="font-weight: bold">{{...}}</span>
+            // and replace with just the {{...}} content
+            
+            let temp = cleanItem.template
+            
+            // 1. Remove <b>{{variable}}</b> -> {{variable}}
+            temp = temp.replace(/<b>\s*({{.*?}})\s*<\/b>/gi, '$1')
+            
+            // 2. Remove <strong>{{variable}}</strong> -> {{variable}}
+            temp = temp.replace(/<strong>\s*({{.*?}})\s*<\/strong>/gi, '$1')
+            
+            // 3. Remove inline style bold spans: <span style="...font-weight: bold...">{{variable}}</span>
+            // This is trickier regex, but let's try a simple one for common case
+            temp = temp.replace(/<span[^>]*style="[^"]*font-weight:\s*bold[^"]*"[^>]*>\s*({{.*?}})\s*<\/span>/gi, '$1')
+            
+            cleanItem.template = temp
+            console.log(`   - Unbolded placeholders for template: ${cleanItem.name}`)
+        }
 
         await prisma[modelName].upsert({
             where: where,
@@ -90,7 +126,6 @@ async function main() {
   // Note: backup.uMKM items might contain "products" array which Prisma create handles, 
   // but if we do raw upsert with JSON data that includes relation arrays, it might fail if not formatted for create.
   // A simple backup dump often includes relations as arrays. 
-  // If the backup format is flat (just fields), safeRestore works.
   // If it includes relations, we might need to strip them.
   // For now, assuming backup is standard Prisma dump (flat-ish or includes ids).
 
@@ -99,6 +134,125 @@ async function main() {
   // letterRequests depend on inhabitants and templates
   await safeRestore('letterRequest', backup.letterRequest) 
 
+  // ============================================
+  // SPECIAL HANDLING: SITE SETTINGS (MERGE BACKUP + NEW DEFAULTS)
+  // ============================================
+  console.log('⚙️ Merging Site Settings...')
+  const backupSettings = backup.siteSettings && backup.siteSettings.length > 0 ? backup.siteSettings[0] : null
+  
+  // Default New Settings Structure
+  const defaultSettings = {
+        siteName: 'Desa Mata Mamplam',
+        siteDescription: 'Website Resmi Pemerintah Gampong Mata Mamplam',
+        contactEmail: 'matamamplam2026@gmail.com',
+        contactPhone: '081234567890',
+        address: 'Jalan Cot Ijue, Kecamatan Peusangan',
+        socialMedia: {
+            facebook: 'https://facebook.com',
+            instagram: 'https://instagram.com',
+            twitter: 'https://twitter.com',
+            youtube: 'https://youtube.com'
+        },
+        features: {
+            enableComments: true,
+            enablePublicComplaints: true,
+            enableSurveys: false
+        },
+        general: {
+            siteName: 'Desa Mata Mamplam',
+            tagline: 'Maju, Sejahtera, Islami',
+            description: 'Website Resmi Pemerintah Gampong Mata Mamplam',
+            heroBackground: ''
+        },
+        branding: {
+            logo: '',
+            letterLogo: '',
+            favicon: ''
+        },
+        contact: {
+            email: 'matamamplam2026@gmail.com',
+            phone: '081234567890',
+            whatsapp: '081234567890',
+            address: 'Jalan Cot Ijue, Kecamatan Peusangan',
+            mapUrl: '',
+            operationalHours: {
+                weekdays: '08:00 - 16:00',
+                saturday: '08:00 - 12:00',
+                sunday: 'Tutup'
+            }
+        },
+        faq: [],
+        footer: {
+            description: 'Website Resmi Pemerintah Gampong Mata Mamplam',
+            socialMedia: {
+                 facebook: 'https://facebook.com',
+                 instagram: 'https://instagram.com'
+            },
+            copyright: '© 2026 Desa Mata Mamplam'
+        }
+  }
+
+  // Merge logic: If backup has settings, try to preserve images/branding
+  let finalSettings = defaultSettings
+  
+  if (backupSettings && backupSettings.settings) {
+      console.log('   Found backup settings, merging...')
+      const old = backupSettings.settings
+      
+      // Attempt to map old structure to new if possible, or just overlay matching keys
+      // Assuming old structure was somewhat similar or we extract specific fields
+      
+      // Preserve Images if they exist in old settings (checking common paths)
+      if (old.branding?.logo) finalSettings.branding.logo = old.branding.logo
+      if (old.branding?.favicon) finalSettings.branding.favicon = old.branding.favicon
+      if (old.general?.heroBackground) finalSettings.general.heroBackground = old.general.heroBackground
+      if (old.contact?.mapUrl) finalSettings.contact.mapUrl = old.contact.mapUrl
+      
+      // Also try to preserve text
+      if (old.general?.siteName) finalSettings.general.siteName = old.general.siteName
+      if (old.general?.tagline) finalSettings.general.tagline = old.general.tagline
+      if (old.general?.description) finalSettings.general.description = old.general.description
+
+      // Preserve contact info
+      if (old.contact?.email) finalSettings.contact.email = old.contact.email
+      if (old.contact?.phone) finalSettings.contact.phone = old.contact.phone
+      if (old.contact?.whatsapp) finalSettings.contact.whatsapp = old.contact.whatsapp
+      if (old.contact?.address) finalSettings.contact.address = old.contact.address
+
+      // Preserve social media links (merge, don't overwrite entirely)
+      if (old.socialMedia) {
+          finalSettings.socialMedia = { ...finalSettings.socialMedia, ...old.socialMedia }
+      }
+      if (old.footer?.socialMedia) {
+          finalSettings.footer.socialMedia = { ...finalSettings.footer.socialMedia, ...old.footer.socialMedia }
+      }
+
+      // Preserve footer description and copyright
+      if (old.footer?.description) finalSettings.footer.description = old.footer.description
+      if (old.footer?.copyright) finalSettings.footer.copyright = old.footer.copyright
+
+      // Preserve features
+      if (old.features) {
+          finalSettings.features = { ...finalSettings.features, ...old.features }
+      }
+  }
+
+  // Upsert Settings
+  // Actually, wait, upsert needs a valid where. `siteSettings` usually has an ID.
+  // The backup item has an ID.
+  if (backupSettings) {
+      await prisma.siteSettings.upsert({
+          where: { id: backupSettings.id },
+          create: { id: backupSettings.id, settings: finalSettings },
+          update: { settings: finalSettings }
+      })
+  } else {
+      // Create new if no backup
+       await prisma.siteSettings.create({
+          data: { settings: finalSettings }
+      })
+  }
+  console.log('✅ Merged and restored Site Settings')
   // ============================================
   // 4. SEED NEW FEATURES (From Standard Seed)
   // ============================================
@@ -109,23 +263,44 @@ async function main() {
     // ============================================
   // ORGANIZATIONAL STRUCTURE (VILLAGE OFFICIALS)
   // ============================================
-  // Define positions hierarchy
+  // Updated based on 2026 Organization Chart
+  
+  // Clear existing to ensure clean slate for hierarchy
+  await prisma.villageOfficial.deleteMany({})
+  await prisma.villageOfficialPosition.deleteMany({})
+
   const positions = [
-      { key: 'KEUCHIK', name: 'Keuchik Gampong', level: 1, sort: 1, category: 'LEADERSHIP' },
-      { key: 'SEKDES', name: 'Sekretaris Gampong', level: 4, sort: 1, category: 'SECRETARIAT' },
-      { key: 'KAUR_KEUANGAN', name: 'Kaur Keuangan', level: 4, sort: 2, category: 'SECRETARIAT' },
-      { key: 'KAUR_UMUM', name: 'Kaur Umum & Perencanaan', level: 4, sort: 3, category: 'SECRETARIAT' },
-      { key: 'KASI_PEMERINTAHAN', name: 'Kasi Pemerintahan', level: 5, sort: 1, category: 'TECHNICAL' },
-      { key: 'KASI_KESEJAHTERAAN', name: 'Kasi Kesejahteraan', level: 5, sort: 2, category: 'TECHNICAL' },
-      { key: 'KADUS_TUNONG', name: 'Kepala Dusun Tunong', level: 6, sort: 1, category: 'DUSUN', dusun: 'Dusun Tunong' },
-      { key: 'KADUS_BAROH', name: 'Kepala Dusun Baroh', level: 6, sort: 2, category: 'DUSUN', dusun: 'Dusun Baroh' },
+      // ADVISORY / LEGISLATIVE
+      { key: 'TUHA_LAPAN', name: 'Tuha Lapan', level: 1, sort: 1, category: 'ADVISORY', official: 'Abdurrahman' },
+      { key: 'TUHA_PEUT', name: 'Tuha Peut', level: 1, sort: 2, category: 'ADVISORY', official: 'Zulkifli, SST.,MT' },
+      
+      // EXECUTIVE LEADERSHIP
+      { key: 'KEUCHIK', name: 'Keuchik Gampong', level: 1, sort: 3, category: 'LEADERSHIP', official: 'Taufik, ST' },
+      { key: 'IMUM_GAMPONG', name: 'Imum Gampong', level: 1, sort: 4, category: 'RELIGIOUS', official: 'Tgk. M. Nasir' },
+      
+      // SECRETARIAT
+      { key: 'SEKDES', name: 'Sekretaris Desa', level: 2, sort: 1, category: 'SECRETARIAT', official: 'Mirza Maladi, A.Md' },
+      
+      // KAUR (Urusan) - Under Sekdes
+      { key: 'KAUR_UMUM', name: 'Kaur Umum & Perencanaan', level: 3, sort: 1, category: 'SECRETARIAT', official: 'Abdul Muthalib' },
+      { key: 'KAUR_KEUANGAN', name: 'Kaur Keuangan', level: 3, sort: 2, category: 'SECRETARIAT', official: 'Saifannur, S.Pd' },
+      
+      // KASI (Seksi) - Technical
+      { key: 'KASI_PEMERINTAHAN', name: 'Kasi Pemerintahan', level: 3, sort: 3, category: 'TECHNICAL', official: 'Asrizal, S.Kom' },
+      { key: 'KASI_KEISTIMEWAAN', name: 'Kasi Keistimewaan', level: 3, sort: 4, category: 'TECHNICAL', official: 'Tgk. M. Roum' },
+      { key: 'KASI_PEMBANGUNAN', name: 'Kasi Pembangunan', level: 3, sort: 5, category: 'TECHNICAL', official: 'Azhari Ibrahim' },
+      
+      // DUSUN (Territorial)
+      { key: 'KADUS_KULAM', name: 'Petua Dusun Kulam', level: 4, sort: 1, category: 'DUSUN', dusun: 'Dusun Kulam', official: 'Jafar Abu' },
+      { key: 'KADUS_MUDA_INTAN', name: 'Petua Dusun Muda Intan', level: 4, sort: 2, category: 'DUSUN', dusun: 'Dusun Muda Intan', official: 'Zamzami, S.Pd' }, // Correction from Zamza
+      { key: 'KADUS_BALE_SEUTUI', name: 'Petua Dusun Bale Seutui', level: 4, sort: 3, category: 'DUSUN', dusun: 'Dusun Bale Seutui', official: 'Agus Rinaldi' },
   ]
 
+  console.log('🏛️  Seeding 2026 Organizational Structure...')
+
   for (const pos of positions) {
-      const position = await prisma.villageOfficialPosition.upsert({
-          where: { positionKey: pos.key },
-          update: {},
-          create: {
+      const position = await prisma.villageOfficialPosition.create({
+          data: {
               category: pos.category,
               positionKey: pos.key,
               positionName: pos.name,
@@ -135,20 +310,18 @@ async function main() {
           }
       })
 
-      // Assign dummy official
-      await prisma.villageOfficial.upsert({
-          where: { positionId: position.id },
-          update: {},
-          create: {
+      // Assign official
+      await prisma.villageOfficial.create({
+          data: {
               positionId: position.id,
-              name: `Pejabat ${pos.name}`, // Placeholder name
-              phone: '0812xxxxxxxx',
+              name: pos.official,
+              phone: '0812xxxxxxxx', // Placeholder, user can update later
               address: 'Mata Mamplam',
               isActive: true
           }
       })
   }
-  console.log('✅ Created organizational structure (New Feature)')
+  console.log('✅ Created organizational structure (13 Officials)')
 
   // ============================================
   // DISASTER MANAGEMENT (DUMMY DATA)
@@ -200,68 +373,9 @@ async function main() {
   }
 
   // ============================================
-  // SITE SETTINGS (DEFAULT)
+  // SITE SETTINGS (ALREADY HANDLED ABOVE)
   // ============================================
-  // Check if settings already exist
-  const existingSettings = await prisma.siteSettings.findFirst()
-  if (!existingSettings) {
-      await prisma.siteSettings.create({
-        data: {
-            settings: {
-                siteName: 'Desa Mata Mamplam',
-                siteDescription: 'Website Resmi Pemerintah Gampong Mata Mamplam',
-                contactEmail: 'matamamplam2026@gmail.com',
-                contactPhone: '081234567890',
-                address: 'Jalan Cot Ijue, Kecamatan Peusangan',
-                socialMedia: {
-                    facebook: 'https://facebook.com',
-                    instagram: 'https://instagram.com',
-                    twitter: 'https://twitter.com',
-                    youtube: 'https://youtube.com'
-                },
-                features: {
-                    enableComments: true,
-                    enablePublicComplaints: true,
-                    enableSurveys: false
-                },
-                // Updated structure elements for footer/navbar map prevention
-                 general: {
-                    siteName: 'Desa Mata Mamplam',
-                    tagline: 'Maju, Sejahtera, Islami',
-                    description: 'Website Resmi Pemerintah Gampong Mata Mamplam',
-                    heroBackground: ''
-                },
-                branding: {
-                    logo: '',
-                    letterLogo: '',
-                    favicon: ''
-                },
-                contact: {
-                    email: 'matamamplam2026@gmail.com',
-                    phone: '081234567890',
-                    whatsapp: '081234567890',
-                    address: 'Jalan Cot Ijue, Kecamatan Peusangan',
-                    mapUrl: '',
-                    operationalHours: {
-                        weekdays: '08:00 - 16:00',
-                        saturday: '08:00 - 12:00',
-                        sunday: 'Tutup'
-                    }
-                },
-                faq: [], // Can be populated if needed
-                footer: {
-                    description: 'Website Resmi Pemerintah Gampong Mata Mamplam',
-                    socialMedia: {
-                         facebook: 'https://facebook.com',
-                         instagram: 'https://instagram.com'
-                    },
-                    copyright: '© 2026 Desa Mata Mamplam'
-                }
-            }
-        }
-      })
-      console.log('✅ Created default site settings (New Feature Compatible)')
-  }
+  console.log('✅ Site Settings processing complete.')
 
   console.log('\n🎉 Restoration & Upgrade completed!')
 }
