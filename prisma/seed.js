@@ -191,8 +191,10 @@ async function main() {
 
   const kulinerCat = await prisma.uMKMCategory.findFirst({ where: { slug: 'kuliner' } })
   if (kulinerCat) {
-      await prisma.uMKM.create({
-          data: {
+      await prisma.uMKM.upsert({
+          where: { slug: 'keripik-melinjo-mak-nyak' },
+          update: {},
+          create: {
               name: 'Keripik Melinjo Mak Nyak',
               slug: 'keripik-melinjo-mak-nyak',
               description: 'Keripik melinjo renyah khas Mata Mamplam.',
@@ -375,29 +377,35 @@ async function main() {
   // ============================================
   // 11. SITE SETTINGS (DEFAULT)
   // ============================================
-  await prisma.siteSettings.create({
-    data: {
-        settings: {
-            siteName: 'Desa Mata Mamplam',
-            siteDescription: 'Website Resmi Pemerintah Gampong Mata Mamplam',
-            contactEmail: 'matamamplam2026@gmail.com',
-            contactPhone: '081234567890',
-            address: 'Jalan Cot Ijue, Kecamatan Peusangan',
-            socialMedia: {
-                facebook: 'https://facebook.com',
-                instagram: 'https://instagram.com',
-                twitter: 'https://twitter.com',
-                youtube: 'https://youtube.com'
-            },
-            features: {
-                enableComments: true,
-                enablePublicComplaints: true,
-                enableSurveys: false
+  // Check if settings already exist
+  const existingSettings = await prisma.siteSettings.findFirst()
+  if (!existingSettings) {
+      await prisma.siteSettings.create({
+        data: {
+            settings: {
+                siteName: 'Desa Mata Mamplam',
+                siteDescription: 'Website Resmi Pemerintah Gampong Mata Mamplam',
+                contactEmail: 'matamamplam2026@gmail.com',
+                contactPhone: '081234567890',
+                address: 'Jalan Cot Ijue, Kecamatan Peusangan',
+                socialMedia: {
+                    facebook: 'https://facebook.com',
+                    instagram: 'https://instagram.com',
+                    twitter: 'https://twitter.com',
+                    youtube: 'https://youtube.com'
+                },
+                features: {
+                    enableComments: true,
+                    enablePublicComplaints: true,
+                    enableSurveys: false
+                }
             }
         }
-    }
-  })
-  console.log('✅ Created default site settings')
+      })
+      console.log('✅ Created default site settings')
+  } else {
+      console.log('✅ Site settings already exist')
+  }
 
   console.log('\n🎉 Database seeding completed successfully!')
   console.log('📝 Default Admin: matamamplam2026@gmail.com / kkm-matamamplam2026')
