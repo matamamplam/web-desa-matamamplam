@@ -2,6 +2,8 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import jsPDF from "jspdf"
+import autoTable from "jspdf-autotable"
 
 interface ExcelActionsProps {
   type: "kk" | "penduduk"
@@ -51,6 +53,92 @@ export default function ExcelActions({ type }: ExcelActionsProps) {
       setImportMessage({
         type: "error",
         text: `❌ Export gagal: ${error.message}`,
+      })
+    } finally {
+      setIsExporting(false)
+    }
+  }
+
+  const handleExportPDF = async () => {
+    setIsExporting(true)
+    try {
+      // Fetch all data for PDF export
+      const response = await fetch(`/api/admin/${type}?all=true`)
+      
+      if (!response.ok) {
+        throw new Error("Failed to fetch data")
+      }
+
+      const data = await response.json()
+      
+      // Create PDF document
+      const doc = new jsPDF('l', 'mm', 'a4') // landscape orientation
+      
+      // Add title
+      const title = type === 'kk' ? 'Data Kartu Keluarga' : 'Data Penduduk'
+      doc.setFontSize(16)
+      doc.text(title, 14, 15)
+      
+      // Add subtitle with date
+      doc.setFontSize(10)
+      doc.text(`Desa Mata Mamplam - ${new Date().toLocaleDateString('id-ID')}`, 14, 22)
+      
+      // Prepare table data
+      let headers: string[] = []
+      let rows: any[][] = []
+      
+      if (type === 'penduduk') {
+        headers = ['No', 'NIK', 'Nama', 'Jenis Kelamin', 'Tempat Lahir', 'Tanggal Lahir', 'Agama', 'Pendidikan', 'Pekerjaan', 'No. KK']
+        rows = data.penduduk.map((p: any, index: number) => [
+          index + 1,
+          p.nik || '-',
+          p.nama || '-',
+          p.jenisKelamin === 'LAKI_LAKI' ? 'L' : 'P',
+          p.tempatLahir || '-',
+          p.tanggalLahir ? new Date(p.tanggalLahir).toLocaleDateString('id-ID') : '-',
+          p.agama || '-',
+          p.pendidikan || '-',
+          p.pekerjaan || '-',
+          p.kk?.noKK || '-'
+        ])
+      } else {
+        headers = ['No', 'No. KK', 'Kepala Keluarga', 'Dusun', 'Alamat', 'RT/RW', 'Jumlah Anggota']
+        rows = data.kk.map((k: any, index: number) => [
+          index + 1,
+          k.noKK || '-',
+          k.kepalaKeluarga || '-',
+          k.dusun || '-',
+          k.alamat || '-',
+          `${k.rt || '-'}/${k.rw || '-'}`,
+          k._count?.anggota || 0
+        ])
+      }
+      
+      // Generate table
+      autoTable(doc, {
+        head: [headers],
+        body: rows,
+        startY: 28,
+        styles: { fontSize: 8, cellPadding: 2 },
+        headStyles: { fillColor: [37, 99, 235], textColor: 255, fontStyle: 'bold' },
+        alternateRowStyles: { fillColor: [245, 247, 250] },
+        margin: { top: 28, right: 14, bottom: 14, left: 14 },
+      })
+      
+      // Save PDF
+      const filename = `${title.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0, 10)}.pdf`
+      doc.save(filename)
+      
+      setImportMessage({
+        type: "success",
+        text: "✅ Export PDF berhasil! File sudah didownload.",
+      })
+      
+      setTimeout(() => setImportMessage(null), 3000)
+    } catch (error: any) {
+      setImportMessage({
+        type: "error",
+        text: `❌ Export PDF gagal: ${error.message}`,
       })
     } finally {
       setIsExporting(false)
@@ -110,7 +198,7 @@ export default function ExcelActions({ type }: ExcelActionsProps) {
   return (
     <div className="space-y-4">
       <div className="flex space-x-3">
-        {/* Export Button */}
+        {/* Export Excel Button */}
         <button
           onClick={handleExport}
           disabled={isExporting}
@@ -130,6 +218,30 @@ export default function ExcelActions({ type }: ExcelActionsProps) {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
               Export Excel
+            </>
+          )}
+        </button>
+
+        {/* Export PDF Button */}
+        <button
+          onClick={handleExportPDF}
+          disabled={isExporting}
+          className="inline-flex items-center rounded-lg border border-red-600 bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {isExporting ? (
+            <>
+              <svg className="mr-2 h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Exporting...
+            </>
+          ) : (
+            <>
+              <svg className="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+              </svg>
+              Export PDF
             </>
           )}
         </button>

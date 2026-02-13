@@ -186,9 +186,31 @@ async function main() {
             description: 'Website Resmi Pemerintah Gampong Mata Mamplam',
             socialMedia: {
                  facebook: 'https://facebook.com',
-                 instagram: 'https://instagram.com'
+                 instagram: 'https://instagram.com',
+                 twitter: 'https://twitter.com',
+                 youtube: 'https://youtube.com'
             },
             copyright: '© 2026 Desa Mata Mamplam'
+        },
+        about: {
+            title: 'Tentang Desa Mata Mamplam',
+            content: '<p>Deskripsi lengkap mengenai sejarah dan profil Desa Mata Mamplam...</p>',
+            vision: 'Terwujudnya Desa Mata Mamplam yang maju, sejahtera, dan berdaya saing.',
+            mission: ['Meningkatkan pelayanan publik', 'Mewujudkan tata kelola pemerintahan yang baik']
+        },
+        navigation: {
+            externalLinks: []
+        },
+        geography: {
+            location: 'Kecamatan Peusangan, Kabupaten Bireuen',
+            area: '±500 Ha',
+            boundaries: {
+                north: 'Desa A',
+                south: 'Desa B',
+                east: 'Desa C',
+                west: 'Desa D'
+            },
+            totalDusun: '4 Dusun'
         }
   }
 
@@ -234,6 +256,21 @@ async function main() {
       // Preserve features
       if (old.features) {
           finalSettings.features = { ...finalSettings.features, ...old.features }
+      }
+
+      // Preserve About
+      if (old.about) {
+          finalSettings.about = { ...finalSettings.about, ...old.about }
+      }
+
+      // Preserve Navigation
+      if (old.navigation) {
+          finalSettings.navigation = { ...finalSettings.navigation, ...old.navigation }
+      }
+
+      // Preserve Geography
+      if (old.geography) {
+          finalSettings.geography = { ...finalSettings.geography, ...old.geography }
       }
   }
 

@@ -11,6 +11,7 @@ export async function GET(request: Request) {
 
     const { searchParams } = new URL(request.url)
     const search = searchParams.get("search")
+    const all = searchParams.get("all") === "true"
 
     const where: any = {}
     if (search) {
@@ -18,6 +19,22 @@ export async function GET(request: Request) {
         { noKK: { contains: search, mode: "insensitive" } },
         { kepalaKeluarga: { contains: search, mode: "insensitive" } },
       ]
+    }
+
+    // If fetching all data (for PDF), include all fields and count
+    if (all) {
+      const kk = await prisma.kartuKeluarga.findMany({
+        where,
+        include: {
+          _count: {
+            select: {
+              anggota: true
+            }
+          }
+        },
+        orderBy: { kepalaKeluarga: "asc" },
+      })
+      return NextResponse.json({ kk })
     }
 
     const kkList = await prisma.kartuKeluarga.findMany({

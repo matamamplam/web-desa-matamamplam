@@ -15,10 +15,11 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url)
     const search = searchParams.get("search")
+    const all = searchParams.get("all") === "true"
     const page = parseInt(searchParams.get("page") || "1")
     const limitParam = searchParams.get("limit")
     const perPage = limitParam ? parseInt(limitParam) : 20
-    const skip = (page - 1) * perPage
+    const skip = all ? 0 : (page - 1) * perPage
 
     const where: any = {}
 
@@ -27,6 +28,27 @@ export async function GET(request: NextRequest) {
         { nik: { contains: search, mode: "insensitive" } },
         { nama: { contains: search, mode: "insensitive" } },
       ]
+    }
+
+    // If fetching all data (for PDF), don't paginate
+    if (all) {
+      const penduduk = await prisma.penduduk.findMany({
+        where,
+        include: {
+          kk: {
+            select: {
+              noKK: true,
+              alamat: true,
+              rt: true,
+              rw: true,
+              dusun: true 
+            },
+          },
+        },
+        orderBy: { nama: "asc" },
+      })
+
+      return successResponse ({ penduduk })
     }
 
     const [penduduk, totalCount] = await Promise.all([
