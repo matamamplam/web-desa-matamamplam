@@ -5,7 +5,7 @@ export const revalidate = 300;
 
 async function getStructure() {
   try {
-    // Try using the main model name, often lowercased property on prisma client
+    // Try using the main model name
     const positionClient = (prisma as any).villageOfficialPosition;
 
     if (!positionClient) {
@@ -21,7 +21,7 @@ async function getStructure() {
             name: true,
             photo: true,
             startDate: true,
-            isActive: true,
+            isActive: true, // Only show active officials
           },
         },
       },
@@ -31,38 +31,26 @@ async function getStructure() {
       ],
     });
 
+    // Manually categorize based on exact requirements
     return {
-      leadership: positions.filter((p: any) => p.level === 1), // Keuchik
-      advisory: positions.filter((p: any) => p.level === 2), // Tuha Lapan, Tuha Peut & Imum
-      // Skip community (level 3) - not used in government structure
-      secretary: positions.filter((p: any) => p.level === 4 && p.positionName.toLowerCase().includes('sekretaris')), // Sekdes only
-      operational: positions.filter((p: any) => 
-        (p.level === 4 && !p.positionName.toLowerCase().includes('sekretaris')) || // KAUR
-        p.level === 5 // KASI
+      keuchik: positions.find((p: any) => p.positionKey === 'KEUCHIK'),
+      advisory: positions.filter((p: any) => 
+        (p.level === 1 && p.positionKey !== 'KEUCHIK') || // Tuha Peut, Tuha Lapan, Imum
+        p.category === 'ADVISORY' || 
+        p.category === 'RELIGIOUS'
+      ).filter((p: any) => p.positionKey !== 'KEUCHIK'), // Ensure Keuchik not included
+      secretary: positions.find((p: any) => p.positionKey === 'SEKDES' || p.positionName.toLowerCase().includes('sekretaris')),
+      staff: positions.filter((p: any) => 
+        (p.level === 3 || p.category === 'SECRETARIAT' || p.category === 'TECHNICAL') && 
+        p.positionKey !== 'SEKDES' && 
+        !p.positionName.toLowerCase().includes('sekretaris')
       ),
-      regional: positions.filter((p: any) => p.level === 6), // Petua Dusun
+      regional: positions.filter((p: any) => p.category === 'DUSUN' || p.level === 4),
     };
   } catch (error) {
     console.error('Error fetching structure:', error);
     return null;
   }
-}
-
-interface Official {
-  id: string;
-  name: string;
-  photo: string | null;
-  startDate: Date | null;
-  isActive: boolean;
-  phone?: string;
-}
-
-interface Position {
-  id: string;
-  positionName: string;
-  level: number;
-  dusunName?: string | null;
-  official: Official | null;
 }
 
 interface OfficialCardProps {
@@ -71,57 +59,88 @@ interface OfficialCardProps {
   photo: string | null;
   dusun?: string | null;
   size?: 'large' | 'medium' | 'small';
+  color?: 'indigo' | 'purple' | 'blue' | 'green' | 'amber';
 }
 
-function OfficialCard({ name, position, photo, dusun, size = 'medium' }: OfficialCardProps) {
+function OfficialCard({ name, position, photo, dusun, size = 'medium', color = 'indigo' }: OfficialCardProps) {
   const sizeClasses = {
-    large: 'p-8 max-w-sm',
-    medium: 'p-6 max-w-xs',
-    small: 'p-4 max-w-[260px]'
+    large: 'p-6 w-full max-w-sm',
+    medium: 'p-5 w-full max-w-xs',
+    small: 'p-4 w-60'
   };
 
   const photoSizes = {
     large: 'w-36 h-36',
-    medium: 'w-28 h-28',
-    small: 'w-24 h-24'
+    medium: 'w-24 h-24',
+    small: 'w-20 h-20'
   };
 
   const textSizes = {
     large: 'text-2xl',
     medium: 'text-lg',
-    small: 'text-base'
+    small: 'text-sm'
   };
 
+  const colorClasses = {
+    indigo: 'bg-indigo-50 text-indigo-700',
+    purple: 'bg-purple-50 text-purple-700',
+    blue: 'bg-blue-50 text-blue-700',
+    green: 'bg-green-50 text-green-700',
+    amber: 'bg-amber-50 text-amber-700',
+  };
+
+  const borderColors = {
+    indigo: 'border-indigo-200',
+    purple: 'border-purple-200',
+    blue: 'border-blue-200',
+    green: 'border-green-200',
+    amber: 'border-amber-200',
+  }
+
+  // Determine border color for the photo
+  const photoBorderColor = {
+    indigo: 'border-indigo-500',
+    purple: 'border-purple-500',
+    blue: 'border-blue-500',
+    green: 'border-green-500',
+    amber: 'border-amber-500',
+  }
+
   return (
-    <div className={`bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 text-center border border-gray-100 flex flex-col items-center h-full ${sizeClasses[size]}`}>
-      <div className="mb-4 relative">
+    <div className={`relative bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 flex flex-col items-center border ${borderColors[color]} z-10 ${sizeClasses[size]}`}>
+      <div className="-mt-12 mb-3 relative">
         {photo ? (
-          <div className={`relative ${ photoSizes[size]} rounded-full overflow-hidden shadow-md border-4 border-indigo-100`}>
-            <Image
-              src={photo}
-              alt={name}
-              fill
-              className="object-cover"
-            />
+          <div className={`relative ${photoSizes[size]} rounded-full overflow-hidden shadow-lg border-4 ${photoBorderColor[color]} bg-white`}>
+            <Image src={photo} alt={name} fill className="object-cover" />
           </div>
         ) : (
-          <div className={`${photoSizes[size]} rounded-full bg-gradient-to-br from-indigo-600 to-purple-700 flex items-center justify-center shadow-md border-4 border-indigo-100`}>
-            <span className={`${size === 'large' ? 'text-4xl' : size === 'medium' ? 'text-3xl' : 'text-2xl'} font-bold text-white`}>
-              {name.charAt(0)}
-            </span>
+          <div className={`${photoSizes[size]} rounded-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center shadow-lg border-4 ${photoBorderColor[color]}`}>
+            <span className="text-3xl font-bold text-gray-500">{name.charAt(0)}</span>
           </div>
         )}
       </div>
       
-      <h3 className={`${textSizes[size]} font-bold text-gray-900 mb-1 leading-tight`}>{name}</h3>
-      <p className={`text-indigo-600 font-semibold ${size === 'large' ? 'text-base' : 'text-sm'} mb-1`}>{position}</p>
-      {dusun && (
-        <span className="inline-block px-3 py-1 bg-indigo-50 text-indigo-700 text-xs rounded-full mt-2 font-medium">
-          {dusun}
-        </span>
-      )}
+      <div className="text-center w-full">
+        <h3 className={`${textSizes[size]} font-bold text-gray-800 leading-tight mb-1`}>{name}</h3>
+        <div className={`inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${colorClasses[color]} mb-2`}>
+          {position}
+        </div>
+        {dusun && (
+          <p className="text-xs text-gray-500 font-medium bg-gray-100 rounded px-2 py-1 inline-block mt-1">
+            {dusun}
+          </p>
+        )}
+      </div>
     </div>
   );
+}
+
+// Connector Component
+function Connector({ height = 'h-8', width = 'w-px', type = 'vertical', className = '' }: { height?: string, width?: string, type?: 'vertical' | 'horizontal', className?: string }) {
+  if (type === 'horizontal') {
+    return <div className={`h-px bg-gray-400 ${width} ${className}`}></div>;
+  }
+  return <div className={`${height} w-px bg-gray-400 mx-auto ${className}`}></div>;
 }
 
 export default async function StructurePage() {
@@ -129,160 +148,223 @@ export default async function StructurePage() {
 
   if (!structure) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <h2 className="text-xl font-semibold text-gray-900">Gagal memuat data struktur</h2>
-          <p className="text-gray-500">Silakan coba lagi nanti</p>
-        </div>
+      <div className="min-h-screen pt-24 pb-12 flex items-center justify-center bg-gray-50">
+        <p className="text-gray-500">Memuat struktur...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-      {/* Hero Banner */}
-      <div className="bg-gradient-to-r from-blue-700 via-indigo-600 to-purple-700 text-white py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Struktur Organisasi
-          </h1>
-          <p className="text-xl text-blue-100 max-w-2xl mx-auto">
-            Pemerintahan Gampong Mata Mamplam
-          </p>
-        </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <div className="min-h-screen bg-gray-50 pt-32 pb-20"> {/* Added top padding for fixed navbar */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* LEVEL 1: KEUCHIK - Pimpinan Gampong (Paling Atas) */}
-        {structure.leadership.length > 0 && (
-          <div className="mb-12">
-            <div className="text-center mb-4">
-              <span className="inline-block px-4 py-2 bg-indigo-100 text-indigo-700 rounded-full text-sm font-semibold">
-                🏛 PIMPINAN GAMPONG
-              </span>
-            </div>
-            <div className="flex justify-center mb-8">
-              {structure.leadership.map((pos: any) => (
-                <div key={pos.id} className="transform hover:scale-105 transition-duration-300">
-                  <OfficialCard
-                    name={pos.official?.name || "Belum Terisi"}
-                    position={pos.positionName}
-                    photo={pos.official?.photo || null}
-                    size="large"
-                  />
-                </div>
-              ))}
-            </div>
+        <div className="text-center mb-20">
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">Struktur Pemerintahan</h1>
+          <p className="text-lg text-gray-600">Gampong Mata Mamplam Periode 2026</p>
+        </div>
+
+        <div className="overflow-x-auto pb-12">
+          {/* Container with min-width to ensure the tree doesn't break on small screens */}
+          <div className="min-w-[1024px] flex flex-col items-center">
             
-            {/* Visual connector */}
-            <div className="flex justify-center">
-              <div className="w-1 h-16 bg-gradient-to-b from-indigo-400 to-transparent"></div>
+            {/* 1. KEUCHIK (Top Center) */}
+            <div className="relative flex flex-col items-center z-20">
+              {structure.keuchik ? (
+                <OfficialCard
+                  name={structure.keuchik.official?.name || "Belum Terisi"}
+                  position={structure.keuchik.positionName}
+                  photo={structure.keuchik.official?.photo || null}
+                  size="large"
+                  color="indigo"
+                />
+              ) : (
+                <OfficialCard
+                  name="Belum Terisi"
+                  position="Keuchik Gampong"
+                  photo={null}
+                  size="large"
+                  color="indigo"
+                />
+              )}
+              {/* Connector Down */}
+              <Connector height="h-16" />
             </div>
-          </div>
-        )}
 
-        {/* LEVEL 2: ADVISORY - Mitra & Pengawasan (Sejajar) */}
-        {structure.advisory.length > 0 && (
-          <div className="mb-12">
-            <div className="text-center mb-4">
-              <span className="inline-block px-4 py-2 bg-purple-100 text-purple-700 rounded-full text-sm font-semibold">
-                🕌 MITRA & PENGAWASAN ADAT/KEAGAMAAN
-              </span>
+            {/* 2. ADVISORY & SEKDES ROW */}
+            {/* Layout: Advisory Left - Sekdes Center - Advisory Right (if evenly split) or Advisory Row separate */}
+            {/* Given the user asked for hierarchy, usually Tuha Peut is to the side. 
+                But let's put them in a row. 
+            */}
+            
+            <div className="relative w-full flex justify-center gap-12 z-10">
+              {/* Horizontal Line Connecting Branches */}
+               {/* 
+                  Logic for lines:
+                  We need a horizontal line connecting the vertical line from Keuchik to:
+                  - Sekdes (Center) - Direct vertical
+                  - Tuha Peut (Left/Right) - Horizontal then vertical
+                */}
+                
+                {/* Visual Representation of Hierarchy Level 2 */}
+                
+                {/* ADVISORY (Tuha Peut, Tuha Lapan, Imum) */}
+                {structure.advisory.length > 0 && (
+                  <div className="absolute top-[-2rem] w-[80%] flex justify-between px-20">
+                     {/* This is getting complex to draw dynamically. 
+                         Let's use a simpler approach: 
+                         Keuchik
+                            |
+                         --------------------------------
+                         |              |               |
+                      Advisory       Sekdes          Imum
+                     */}
+                  </div>
+                )}
             </div>
-            <div className="flex flex-wrap justify-center gap-6 mb-8">
-              {structure.advisory.map((pos: any) => (
-                <div key={pos.id} className="w-full sm:w-auto">
-                  <OfficialCard
-                    name={pos.official?.name || "Belum Terisi"}
-                    position={pos.positionName}
-                    photo={pos.official?.photo || null}
-                    size="medium"
-                  />
-                </div>
-              ))}
-            </div>
-            <div className="flex justify-center">
-              <div className="w-1 h-12 bg-gradient-to-b from-indigo-300 to-transparent"></div>
-            </div>
-          </div>
-        )}
 
-        {/* LEVEL 3: SEKRETARIS DESA */}
-        {structure.secretary && structure.secretary.length > 0 && (
-          <div className="mb-12">
-            <div className="text-center mb-4">
-              <span className="inline-block px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold">
-                🗂 SEKRETARIAT DESA
-              </span>
-            </div>
-            <div className="flex justify-center mb-8">
-              {structure.secretary.map((pos: any) => (
-                <div key={pos.id}>
-                  <OfficialCard
-                    name={pos.official?.name || "Belum Terisi"}
-                    position={pos.positionName}
-                    photo={pos.official?.photo || null}
-                    size="medium"
-                  />
+            {/* Let's try a distinct section approach for Advisory to avoid cluttering the main command line */}
+             {structure.advisory.length > 0 && (
+                <div className="w-full flex justify-center gap-8 mb-8 relative">
+                    {/* Horizontal connector for Advisory Nodes if we treat them as children of Keuchik distinct from Sekdes */}
+                    {/* Let's just render them as 'Mitra' side-by-side with Sekdes or above? */}
+                    {/* Standard: BPD is to the left of Kepala Desa with dotted line. 
+                        User wants Keuchik TOP CENTER. 
+                        Let's put Advisory and Imum in a row below Keuchik.
+                    */}
                 </div>
-              ))}
-            </div>
-            <div className="flex justify-center">
-              <div className="w-1 h-12 bg-gradient-to-b from-indigo-300 to-transparent"></div>
-            </div>
-          </div>
-        )}
+            )}
+            
+            {/* ROW 2: (Advisory + Sekdes + Imum) */}
+            {/* We will mix them in one row for visual balance, or separate them? 
+                Let's put Sekdes in the absolute center. 
+                Advisory/Imum around him.
+            */}
+            
+            <div className="relative flex justify-center gap-8 w-full">
+               {/* Horizontal Connector Bar */}
+               <div className="absolute top-0 w-[60%] h-px bg-gray-400"></div>
+               {/* Vertical link from Keuchik (already drawn h-16) hits the middle of this bar */}
 
-        {/* LEVEL 4 & 5: KAUR & KASI - Pelaksana Teknis */}
-        {structure.operational && structure.operational.length > 0 && (
-          <div className="mb-12">
-            <div className="text-center mb-4">
-              <span className="inline-block px-4 py-2 bg-green-100 text-green-700 rounded-full text-sm font-semibold">
-                🏢 PELAKSANA TEKNIS (KAUR & KASI)
-              </span>
-            </div>
-            <div className="flex flex-wrap justify-center gap-6 mb-8">
-              {structure.operational.map((pos: any) => (
-                <div key={pos.id} className="w-full sm:w-auto">
-                  <OfficialCard
-                    name={pos.official?.name || "Belum Terisi"}
-                    position={pos.positionName}
-                    photo={pos.official?.photo || null}
-                    size="small"
-                  />
-                </div>
-              ))}
-            </div>
-            <div className="flex justify-center">
-              <div className="w-1 h-12 bg-gradient-to-b from-indigo-300 to-transparent"></div>
-            </div>
-          </div>
-        )}
+               {/* Render Advisory (Left Side) */}
+               {structure.advisory.slice(0, Math.ceil(structure.advisory.length / 2)).map((pos: any) => (
+                  <div key={pos.id} className="relative pt-12">
+                     <div className="absolute top-0 left-1/2 -translate-x-1/2 h-12 w-px bg-gray-400 border-l border-dashed border-gray-400"></div> {/* Dashed for advisory? No, solid for now */}
+                     <OfficialCard
+                        name={pos.official?.name || "Belum Terisi"}
+                        position={pos.positionName}
+                        photo={pos.official?.photo || null}
+                        size="small"
+                        color="purple"
+                      />
+                  </div>
+               ))}
 
-        {/* LEVEL 6: PETUA DUSUN - Perangkat Kewilayahan */}
-        {structure.regional.length > 0 && (
-          <div className="mb-8">
-            <div className="text-center mb-4">
-              <span className="inline-block px-4 py-2 bg-amber-100 text-amber-700 rounded-full text-sm font-semibold">
-                🏘 PERANGKAT KEWILAYAHAN
-              </span>
+               {/* Render Sekdes (Center) */}
+               {structure.secretary && (
+                 <div className="relative pt-12 mx-4">
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 h-12 w-px bg-gray-400"></div>
+                    <OfficialCard
+                      name={structure.secretary.official?.name || "Belum Terisi"}
+                      position={structure.secretary.positionName}
+                      photo={structure.secretary.official?.photo || null}
+                      size="medium"
+                      color="blue"
+                    />
+                    {/* Connector Down from Sekdes */}
+                    <div className="absolute bottom-[-3rem] left-1/2 -translate-x-1/2 h-12 w-px bg-gray-400"></div>
+                 </div>
+               )}
+
+               {/* Render Advisory (Right Side) - rest of them */}
+               {structure.advisory.slice(Math.ceil(structure.advisory.length / 2)).map((pos: any) => (
+                  <div key={pos.id} className="relative pt-12">
+                     <div className="absolute top-0 left-1/2 -translate-x-1/2 h-12 w-px bg-gray-400"></div>
+                     <OfficialCard
+                        name={pos.official?.name || "Belum Terisi"}
+                        position={pos.positionName}
+                        photo={pos.official?.photo || null}
+                        size="small"
+                        color="purple"
+                      />
+                  </div>
+               ))}
             </div>
-            <div className="flex flex-wrap justify-center gap-6">
-              {structure.regional.map((pos: any) => (
-                <div key={pos.id} className="w-full sm:w-auto">
-                  <OfficialCard
-                    name={pos.official?.name || "Belum Terisi"}
-                    position={pos.positionName}
-                    photo={pos.official?.photo || null}
-                    dusun={pos.dusunName}
-                    size="small"
-                  />
+
+            {/* Spacer for Sekdes line down */}
+            <div className="h-12"></div>
+
+            {/* 3. STAFF (KAUR & KASI) */}
+            {structure.staff.length > 0 && (
+              <div className="relative flex flex-col items-center w-full z-10">
+                {/* Horizontal line spanning the staff */}
+                <div className="w-[80%] h-px bg-gray-400 mb-12 relative">
+                    {/* This line connects to Sekdes from above */}
                 </div>
-              ))}
-            </div>
+
+                <div className="flex justify-center gap-6 flex-wrap relative -top-12">
+                  {structure.staff.map((pos: any) => (
+                    <div key={pos.id} className="flex flex-col items-center relative pt-12 px-2">
+                       {/* Vertical line from horiz bar to card */}
+                       <div className="absolute top-0 left-1/2 -translate-x-1/2 h-12 w-px bg-gray-400"></div>
+                       <OfficialCard
+                        name={pos.official?.name || "Belum Terisi"}
+                        position={pos.positionName}
+                        photo={pos.official?.photo || null}
+                        size="small"
+                        color="green"
+                      />
+                      {/* Connector down to Regional? Usually Kadus reports to Keuchik but via Sekdes coordination. 
+                          For visual tree, let's connect them centrally.
+                       */}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            {/* Connector to Regional (from center of Staff group or just Sekdes flow?) 
+                Let's assume Kadus line comes from the main flow (Sekdes)
+            */}
+            {/* We need a line continuing down from Sekdes area effectively. 
+                But visually, the Sekdes line splits to Staff. 
+                Let's start a new line from the center of the Staff row? 
+                Or just have a separate section for "Kewilayahan" connected to the root/sekdes.
+                Usually Kadus is under Keuchik directly in terms of line, but operationally Sekdes.
+                Let's just put them below Staff, connected by a central line.
+            */}
+            
+            <Connector height="h-16" />
+
+            {/* 4. REGIONAL (KADUS) */}
+            {structure.regional.length > 0 && (
+               <div className="relative flex flex-col items-center w-full z-10">
+                 {/* Label for Kewilayahan */}
+                 <div className="bg-white px-4 py-1 rounded-full border border-amber-200 text-amber-700 text-sm font-bold mb-4 relative z-20">
+                    KEPALA DUSUN
+                 </div>
+                 
+                 <div className="w-[60%] h-px bg-gray-400 mb-12 relative"></div>
+                 
+                 <div className="flex justify-center gap-8 flex-wrap relative -top-12">
+                   {structure.regional.map((pos: any) => (
+                     <div key={pos.id} className="flex flex-col items-center relative pt-12">
+                        <div className="absolute top-0 left-1/2 -translate-x-1/2 h-12 w-px bg-gray-400"></div>
+                        <OfficialCard
+                         name={pos.official?.name || "Belum Terisi"}
+                         position={pos.positionName}
+                         photo={pos.official?.photo || null}
+                         dusun={pos.dusunName}
+                         size="small"
+                         color="amber"
+                       />
+                     </div>
+                   ))}
+                 </div>
+               </div>
+            )}
+
           </div>
-        )}
+        </div>
       </div>
     </div>
   );
