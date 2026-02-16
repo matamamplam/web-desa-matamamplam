@@ -161,9 +161,9 @@ function OfficialCard({ name, position, photo, dusun, size = 'medium', color = '
   );
 }
 
-// Connector Component
-function Connector({ height = 'h-8', width = 'w-px', className = '' }: { height?: string, width?: string, className?: string }) {
-  return <div className={`${height} ${width} bg-gray-400 mx-auto ${className}`}></div>;
+// Connector Component (for simple vertical spacing)
+function VerticalLine({ height = 'h-8', className = '' }: { height?: string, className?: string }) {
+  return <div className={`${height} w-px bg-gray-400 mx-auto ${className}`}></div>;
 }
 
 export default async function StructurePage() {
@@ -179,15 +179,20 @@ export default async function StructurePage() {
 
   return (
     <div className="min-h-screen bg-gray-50 pt-32 pb-20 overflow-x-auto">
-      <div className="min-w-[1600px] max-w-none mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center">
+      {/* 
+         Structure Strategy: Use strict width percentages for layouts to ensure line connections 
+         are always mathematically correct relative to the screen, regardless of zoom.
+         NO GAP in parents. Padding in children.
+      */}
+      <div className="min-w-[1600px] max-w-none mx-auto px-4 flex flex-col items-center">
         
         <div className="text-center mb-16">
           <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">Struktur Pemerintahan</h1>
           <p className="text-lg text-gray-600">Gampong Mata Mamplam</p>
         </div>
 
-        {/* 1. KEUCHIK (Top Center) */}
-        <div className="relative flex flex-col items-center mb-16">
+        {/* --- LEVEL 1: KEUCHIK --- */}
+        <div className="relative flex flex-col items-center mb-16 w-full">
             {structure.keuchik ? (
               <OfficialCard
                 name={structure.keuchik.official?.name || "Belum Terisi"}
@@ -199,34 +204,34 @@ export default async function StructurePage() {
             ) : (
                <OfficialCard name="Belum Terisi" position="Keuchik Gampong" photo={null} size="large" color="indigo" />
             )}
-            {/* Connector Down from Keuchik */}
+            {/* Vertical Line DOWN from Keuchik */}
              <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 h-10 w-px bg-gray-400"></div>
         </div>
 
-        {/* MAIN SPLIT: LEGISLATIVE (Left) vs EXECUTIVE (Right) */}
-        <div className="flex justify-center gap-12 w-full relative">
-            {/* Horizontal Line Connecting Left and Right Branches */}
-            {/* Legislative (30%) center ~ 15%. Executive (70%) center ~ 65% (30+35). Line 15% to 65% */}
-            <div className="absolute -top-6 left-[15%] right-[35%] h-px bg-gray-400"></div>
-            {/* Vertical Line from Keuchik connects to this horizontal line's 'center'? No, connects to Keuchik above */}
-            {/* Keuchik is centered at 50% of page. Line should connect 50% to the horizontal bar? 
-                The horizontal bar goes from 15% to 65%. The visuals might be off if strict %.
-                Let's rely on the visual center of Keuchik.
-            */}
-             <div className="absolute -top-6 left-1/2 -translate-x-1/2 h-6 w-px bg-gray-400"></div>
+        {/* --- MAIN SPLIT (Legislative vs Executive) --- */}
+        {/* 
+            Legislative: 35% Width -> Center at 17.5%
+            Executive:   65% Width -> Center at 35% + (65/2)% = 35 + 32.5 = 67.5%
+            Total Line Span: 17.5% to 67.5%
+            Left: 17.5%
+            Right: 100 - 67.5 = 32.5%
+        */}
+        <div className="relative w-full flex">
+            {/* Horizontal Bridge Line */}
+            <div className="absolute -top-6 left-[17.5%] right-[32.5%] h-px bg-gray-400"></div>
+            {/* Top Connector (Connects to Keuchik) - At 50% */}
+            <div className="absolute -top-6 left-1/2 h-6 w-px bg-gray-400"></div>
 
-
-             {/* --- LEFT BRANCH: LEGISLATIVE --- */}
-            <div className="flex flex-col items-center w-[30%] relative">
-                 {/* Connection to Main Horizontal */}
-                 <div className="absolute -top-6 left-1/2 -translate-x-1/2 h-6 w-px bg-gray-400"></div>
+            {/* LEGISLATIVE BRANCH (35%) */}
+            <div className="w-[35%] flex flex-col items-center relative px-4">
+                 {/* Connection from Bridge */}
+                 <div className="absolute -top-6 left-1/2 h-6 w-px bg-gray-400"></div>
                  
                  <div className="mb-4 px-4 py-1 bg-white border border-red-200 text-red-700 font-bold rounded-full text-sm z-20">
                     LEGISLATIF
                  </div>
 
-                 {/* Tuha Peut & Others */}
-                 <div className="flex flex-wrap justify-center gap-8 mt-4">
+                 <div className="flex flex-wrap justify-center gap-8 mt-4 w-full">
                      {structure.legislative.map((pos: any) => (
                          <div key={pos.id} className="flex flex-col items-center">
                              <div className="h-6 w-px bg-gray-400 mb-0"></div>
@@ -242,67 +247,92 @@ export default async function StructurePage() {
                  </div>
             </div>
 
-
-            {/* --- RIGHT BRANCH: EXECUTIVE --- */}
-            <div className="flex flex-col items-center w-[70%] relative">
-                 {/* Connection to Main Horizontal */}
-                 <div className="absolute -top-6 left-1/2 -translate-x-1/2 h-6 w-px bg-gray-400"></div>
+            {/* EXECUTIVE BRANCH (65%) */}
+            <div className="w-[65%] flex flex-col items-center relative px-4">
+                 {/* Connection from Bridge */}
+                 <div className="absolute -top-6 left-1/2 h-6 w-px bg-gray-400"></div>
                  
                  <div className="mb-8 px-4 py-1 bg-white border border-blue-200 text-blue-700 font-bold rounded-full text-sm z-20">
                     EKSEKUTIF
                  </div>
 
-                 {/* Row 1: Kasi Direct + Sekdes */}
-                 <div className="relative w-full flex justify-center gap-16 mt-4">
-                     {/* Horizontal line for Executive immediate children */}
-                     {/* Kasi Direct (Left, ~30% of Executive) vs Sekdes (Right, ~70% of Executive) 
-                         Center of Kasi ~ 15%. Center of Sekdes ~ 65%.
-                         Line left-15% right-35%.
-                     */}
+                 {/* --- EXECUTIVE SUB-SPLIT (Kasi Direct vs Sekdes) --- */}
+                 {/* 
+                    Kasi Direct: 40% of Executive -> Center at 20%
+                    Sekdes:      60% of Executive -> Center at 40 + 30 = 70%
+                    Line Span:   20% to 70%
+                    Left: 20%
+                    Right: 30%
+                 */}
+                 <div className="relative w-full flex mt-4">
+                     {/* Horizontal Line */}
                      <div className="absolute -top-6 left-[20%] right-[30%] h-px bg-gray-400"></div>
+                     {/* Connection to Executive Label */}
                      <div className="absolute -top-12 left-1/2 -translate-x-1/2 h-12 w-px bg-gray-400"></div>
 
+                     {/* 1. Kasi Keistimewaan & Pembangunan (40% width) */}
+                     <div className="w-[40%] flex flex-col items-center relative pt-8 px-2">
+                         {/* Connector Up */}
+                         <div className="absolute -top-6 left-1/2 h-14 w-px bg-gray-400"></div>
+                         
+                         {/* If multiple Kasi Direct, stack them or row? Usually row. 
+                             Let's assume row centered.
+                          */}
+                         <div className="flex flex-wrap justify-center gap-4">
+                            {structure.executive.direct.map((pos: any) => (
+                                <div key={pos.id} className="flex flex-col items-center">
+                                    <OfficialCard
+                                        name={pos.official?.name || "Belum Terisi"}
+                                        position={pos.positionName}
+                                        photo={pos.official?.photo || null}
+                                        size="small"
+                                        color="green"
+                                    />
+                                </div>
+                            ))}
+                         </div>
+                     </div>
 
-                    {/* 1. Kasi Keistimewaan & Pembangunan (Direct) */}
-                    {structure.executive.direct.map((pos: any) => (
-                        <div key={pos.id} className="flex flex-col items-center pt-8 relative">
-                             {/* Connector up to Executive Line */}
-                             <div className="absolute -top-6 left-1/2 -translate-x-1/2 h-14 w-px bg-gray-400"></div>
-                             <OfficialCard
-                                name={pos.official?.name || "Belum Terisi"}
-                                position={pos.positionName}
-                                photo={pos.official?.photo || null}
-                                size="small"
-                                color="green"
-                              />
-                        </div>
-                    ))}
+                     {/* 2. Sekdes & Subordinates (60% width) */}
+                     <div className="w-[60%] flex flex-col items-center relative pt-8 px-2">
+                         {/* Connector Up */}
+                         <div className="absolute -top-6 left-1/2 h-14 w-px bg-gray-400"></div>
 
-                    {/* 2. Sekdes (Parent of Sub-Branch) */}
-                    {structure.executive.sekdes && (
-                        <div className="flex flex-col items-center pt-8 relative">
-                            {/* Connector up to Executive Line */}
-                            <div className="absolute -top-6 left-1/2 -translate-x-1/2 h-14 w-px bg-gray-400"></div>
-                            
-                            <OfficialCard
-                                name={structure.executive.sekdes.official?.name || "Belum Terisi"}
-                                position={structure.executive.sekdes.positionName}
-                                photo={structure.executive.sekdes.official?.photo || null}
-                                size="medium"
-                                color="blue"
-                            />
+                         <OfficialCard
+                            name={structure.executive.sekdes?.official?.name || "Belum Terisi"}
+                            position={structure.executive.sekdes?.positionName || "Sekretaris Desa"}
+                            photo={structure.executive.sekdes?.official?.photo || null}
+                            size="medium"
+                            color="blue"
+                        />
 
-                            {/* Children of Sekdes */}
-                            {structure.executive.subSekdes.length > 0 && (
-                                <div className="mt-12 flex justify-center gap-8 relative">
-                                     {/* Connector Down from Sekdes */}
-                                     <div className="absolute -top-12 left-1/2 -translate-x-1/2 h-6 w-px bg-gray-400"></div>
-                                     {/* Horizontal Line for Sekdes Children */}
-                                     <div className="absolute -top-6 left-[15%] right-[15%] h-px bg-gray-400"></div>
-
-                                     {structure.executive.subSekdes.map((pos: any) => (
-                                          <div key={pos.id} className="flex flex-col items-center relative">
-                                                <div className="absolute -top-6 left-1/2 -translate-x-1/2 h-6 w-px bg-gray-400"></div>
+                        {/* Line Down from Sekdes to his children (Kasi/Kaur) */}
+                         
+                         {/* --- SEKDES CHILDREN (Staff) --- */}
+                         {/* 
+                            Suppose 3 children. 33.3% each.
+                            Centers: 16.6%, 50%, 83.3%.
+                            Line Span: 16.6% to 83.3%.
+                            Left: 16.6%
+                            Right: 16.6%
+                         */}
+                         {structure.executive.subSekdes.length > 0 && (
+                            <div className="w-full relative mt-12"> 
+                                {/* Connector Down from Sekdes */}
+                                <div className="absolute -top-12 left-1/2 -translate-x-1/2 h-6 w-px bg-gray-400"></div>
+                                {/* Horizontal Bar across children */}
+                                <div className="absolute -top-6 left-[16.66%] right-[16.66%] h-px bg-gray-400"></div>
+                                
+                                <div className="flex w-full">
+                                    {structure.executive.subSekdes.map((pos: any, idx: number, arr: any[]) => {
+                                        // Dynamic sizing if not exactly 3?
+                                        // For simplicity, let's flex-1 them.
+                                        // Flex-1 might make varying widths if content differs.
+                                        // Strict widths are safer for lines. 
+                                        const widthPercent = 100 / (arr.length || 1);
+                                        return (
+                                            <div key={pos.id} style={{ width: `${widthPercent}%` }} className="flex flex-col items-center relative">
+                                                <div className="absolute -top-6 left-1/2 h-6 w-px bg-gray-400"></div>
                                                 <OfficialCard
                                                     name={pos.official?.name || "Belum Terisi"}
                                                     position={pos.positionName}
@@ -310,31 +340,26 @@ export default async function StructurePage() {
                                                     size="small"
                                                     color="blue"
                                                 />
-                                          </div>
-                                     ))}
+                                            </div>
+                                        );
+                                    })}
                                 </div>
-                            )}
-                        </div>
-                    )}
+                            </div>
+                         )}
+                     </div>
                  </div>
             </div>
         </div>
 
-        {/* 4. KEWILAYAHAN (Dusun) - Bottom Center */}
+        {/* --- LEVEL 4: REGIONAL (Kadus) --- */}
         {structure.dusun.length > 0 && (
             <div className="mt-20 relative flex flex-col items-center w-full">
-                {/* Connector from Executive/Legislative? Usually direct from Keuchik/Sekdes 
-                    Let's connect from center of everything 
-                */}
-                {/* Long line from Keuchik or Sekdes? 
-                    Let's draw a line from the bottom of Executive/Legislative container area 
-                */}
-                {/* Visual separation */}
+                {/* Visual Separator */}
                 <div className="w-full border-t-2 border-dashed border-gray-300 mb-8 relative">
                      <span className="absolute top-[-14px] left-1/2 -translate-x-1/2 bg-gray-50 px-4 text-gray-400 text-sm">KEWILAYAHAN</span>
                 </div>
 
-                <div className="flex flex-wrap justify-center gap-6">
+                <div className="flex flex-wrap justify-center gap-8">
                     {structure.dusun.map((pos: any) => (
                         <div key={pos.id} className="flex flex-col items-center">
                              <OfficialCard
