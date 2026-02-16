@@ -15,9 +15,7 @@ export default async function AjukanSuratPage({
   searchParams: Promise<{ templateId?: string }>
 }) {
   const session = await auth()
-  if (!session) {
-    redirect("/auth/login")
-  }
+  // Public page - auth optional
 
   const params = await searchParams
   const templateId = params.templateId
@@ -32,7 +30,7 @@ export default async function AjukanSuratPage({
     <SubmitLetterRequestForm 
       templates={templates} 
       initialTemplateId={templateId || ""}
-      user={session.user}
+      user={session?.user}
     />
   )
 }

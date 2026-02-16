@@ -4,10 +4,7 @@ import Link from "next/link"
 import { redirect } from "next/navigation"
 
 export default async function LayananSuratPage() {
-  const session = await auth()
-  if (!session) {
-    redirect("/auth/login")
-  }
+  // Public page - no auth check required
 
   // Fetch active letter templates
   const templates = await prisma.letterTemplate.findMany({

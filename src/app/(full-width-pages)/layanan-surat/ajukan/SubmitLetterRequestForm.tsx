@@ -20,10 +20,10 @@ interface Penduduk {
 interface SubmitLetterRequestFormProps {
   templates: Template[]
   initialTemplateId: string
-  user: {
+  user?: {
     name?: string | null
     email?: string | null
-  }
+  } | null
 }
 
 export default function SubmitLetterRequestForm({
@@ -100,7 +100,7 @@ export default function SubmitLetterRequestForm({
     setError("")
 
     try {
-      const res = await fetch("/api/admin/letter-requests", {
+      const res = await fetch("/api/public/letter-requests", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

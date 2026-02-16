@@ -2,7 +2,7 @@
 
 import { signOut } from "next-auth/react"
 import { useState } from "react"
-import { useAdminStats } from "@/hooks/useAdminStats"
+
 import { useSidebar } from "@/context/SidebarContext"
 import { toast } from "react-hot-toast"
 
@@ -13,12 +13,17 @@ interface HeaderProps {
     role?: string
     avatar?: string | null
   }
+  stats: {
+    letters: number
+    complaints: number
+    recent?: any[]
+    total: number
+  }
 }
 
-export default function Header({ user }: HeaderProps) {
+export default function Header({ user, stats }: HeaderProps) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [isNotifOpen, setIsNotifOpen] = useState(false)
-  const { stats } = useAdminStats()
   const { toggleMobileSidebar } = useSidebar()
 
   const handleLogout = async () => {

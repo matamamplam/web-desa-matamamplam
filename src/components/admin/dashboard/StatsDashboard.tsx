@@ -21,46 +21,12 @@ interface StatisticsData {
   monthlyTrend: Array<{ month: string; count: number }>
 }
 
-export default function StatsDashboard() {
-  const [data, setData] = useState<StatisticsData | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState("")
+interface StatsDashboardProps {
+  data: StatisticsData
+}
 
-  useEffect(() => {
-    async function fetchStats() {
-      try {
-        const response = await fetch("/api/admin/statistics/penduduk")
-        if (!response.ok) throw new Error("Failed to fetch statistics")
-        
-        const result = await response.json()
-        setData(result)
-      } catch (err: any) {
-        setError(err.message)
-      } finally {
-        setLoading(false)
-      }
-    }
+export default function StatsDashboard({ data }: StatsDashboardProps) {
 
-    fetchStats()
-  }, [])
-
-  if (loading) {
-    return (
-      <div className="flex h-96 items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-blue-600"></div>
-      </div>
-    )
-  }
-
-  if (error || !data) {
-    return (
-      <div className="rounded-lg border border-red-200 bg-red-50 p-4">
-        <p className="text-sm text-red-800">
-          {error || "Gagal memuat data statistik"}
-        </p>
-      </div>
-    )
-  }
 
   return (
     <div className="space-y-6">

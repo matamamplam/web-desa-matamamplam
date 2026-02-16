@@ -3,9 +3,82 @@ import { prisma } from "@/lib/prisma"
 import StatsCards from "@/components/admin/dashboard/StatsCards"
 import StatsDashboard from "@/components/admin/dashboard/StatsDashboard"
 import Link from "next/link"
+import {
+  calculateAge,
+  getAgeGroup,
+  formatEnumValue,
+  aggregateByField,
+  getTopN,
+  groupByAgeRanges,
+  getLastNMonths,
+} from "@/lib/statistics"
+
+async function getDemographicStats() {
+  const penduduk = await prisma.penduduk.findMany({
+    select: {
+      tanggalLahir: true,
+      jenisKelamin: true,
+      agama: true,
+      pendidikan: true,
+      pekerjaan: true,
+      statusPerkawinan: true,
+      createdAt: true,
+      kk: {
+        select: {
+          rt: true,
+          rw: true,
+        },
+      },
+    },
+  })
+
+  // Calculations
+  const ageDistribution = groupByAgeRanges(penduduk.map((p) => p.tanggalLahir))
+  const genderDistribution = aggregateByField(penduduk, "jenisKelamin", formatEnumValue)
+  const educationDistribution = aggregateByField(penduduk, "pendidikan", formatEnumValue)
+  const allOccupations = aggregateByField(penduduk, "pekerjaan")
+  const occupationDistribution = getTopN(allOccupations, 10)
+  const religionDistribution = aggregateByField(penduduk, "agama", formatEnumValue)
+  const maritalStatusDistribution = aggregateByField(penduduk, "statusPerkawinan", formatEnumValue)
+  
+  const rtRwData = penduduk.map((p) => ({ rtRw: `RT ${p.kk.rt}/RW ${p.kk.rw}` }))
+  const rtRwDistribution = getTopN(aggregateByField(rtRwData, "rtRw"), 10)
+
+  const productiveAge = penduduk.filter((p) => {
+    const age = calculateAge(p.tanggalLahir)
+    return age >= 15 && age <= 64
+  }).length
+
+  const children = penduduk.filter((p) => {
+    const age = calculateAge(p.tanggalLahir)
+    return age < 15
+  }).length
+
+  const elderly = penduduk.filter((p) => {
+    const age = calculateAge(p.tanggalLahir)
+    return age >= 65
+  }).length
+
+  return {
+    totalPopulation: penduduk.length,
+    productiveAge,
+    children,
+    elderly,
+    ageDistribution,
+    genderDistribution,
+    educationDistribution,
+    occupationDistribution,
+    religionDistribution,
+    maritalStatusDistribution,
+    rtRwDistribution,
+    monthlyTrend: [], // Simplified for now or implement if needed
+  }
+}
 
 export default async function AdminPage() {
   const session = await auth()
+  
+  const demographicStats = await getDemographicStats()
 
   // Fetch statistics
   // Fetch statistics sequentially to avoid connection pool timeout (limit: 1)
@@ -157,7 +230,7 @@ export default async function AdminPage() {
           </Link>
         </div>
         
-        <StatsDashboard />
+        <StatsDashboard data={demographicStats} />
       </div>
 
       {/* Quick Actions */}

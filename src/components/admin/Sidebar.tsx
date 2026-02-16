@@ -5,7 +5,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { useAdminStats } from "@/hooks/useAdminStats"
+
 import { useSettings } from "@/context/SettingsContext"
 import { useSidebar } from "@/context/SidebarContext"
 
@@ -14,6 +14,10 @@ interface SidebarProps {
     name?: string | null
     email?: string | null
     role?: string
+  }
+  stats: {
+    letters: number
+    complaints: number
   }
 }
 
@@ -181,9 +185,8 @@ const menuItems = [
   },
 ]
 
-export default function Sidebar({ user }: SidebarProps) {
+export default function Sidebar({ user, stats }: SidebarProps) {
   const pathname = usePathname()
-  const { stats } = useAdminStats()
   const { settings } = useSettings()
 
   const { isMobileOpen, closeMobileSidebar } = useSidebar()
