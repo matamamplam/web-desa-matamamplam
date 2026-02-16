@@ -15,13 +15,13 @@ export default function PublicNavbar({ siteName = 'Desa Mata Mamplam', logo }: N
 
   const navItems = [
     { label: 'Beranda', href: '/' },
-    { label: 'Tentang', href: '/tentang-kami' },
     { label: 'Berita', href: '/berita' },
     { label: 'UMKM', href: '/umkm' },
     { label: 'Pembangunan', href: '/pembangunan' },
     { label: 'Struktur Organisasi', href: '/struktur-organisasi' },
     { label: 'Galeri', href: '/galeri' },
     { label: 'Pengaduan', href: '/pengaduan' },
+    { label: 'Tentang', href: '/tentang-kami' },
     { label: 'Kontak', href: '/kontak' },
     { label: 'Info Bencana', href: '/bencana' },
     { label: 'Cek Surat', href: '/cek-surat' },
