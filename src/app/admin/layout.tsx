@@ -5,6 +5,7 @@ import Header from "@/components/admin/Header"
 import AdminLayoutClient from "@/components/admin/AdminLayoutClient"
 
 import { prisma } from "@/lib/prisma"
+import { getAdminDashboardStats } from "@/lib/data/admin"
 
 export default async function AdminLayout({
   children,
@@ -17,52 +18,14 @@ export default async function AdminLayout({
     redirect("/auth/login")
   }
 
-  // Fetch critical notices for sidebar badges and header notifications
-  const [pendingLetters, submittedComplaints, recentLetters, recentComplaints] = await Promise.all([
-    prisma.letterRequest.count({ where: { status: "PENDING" } }),
-    prisma.complaint.count({ where: { status: "SUBMITTED" } }),
-    prisma.letterRequest.findMany({
-      where: { status: "PENDING" },
-      take: 5,
-      orderBy: { createdAt: "desc" },
-      include: { 
-        penduduk: { select: { nama: true } },
-        template: { select: { name: true } }
-      }
-    }),
-    prisma.complaint.findMany({
-      where: { status: "SUBMITTED" },
-      take: 5,
-      orderBy: { createdAt: "desc" },
-      select: { id: true, title: true, createdAt: true }
-    })
-  ])
-
-  // Normalize and merge for "Recent Activity" feed
-  const recentItems = [
-    ...recentLetters.map(l => ({
-      id: l.id,
-      type: "LETTER",
-      title: `Surat: ${l.template.name}`,
-      subtitle: l.penduduk.nama,
-      time: l.createdAt.toISOString(),
-      link: `/admin/layanan-surat/permohonan/${l.id}`
-    })),
-    ...recentComplaints.map(c => ({
-      id: c.id,
-      type: "COMPLAINT",
-      title: `Pengaduan: ${c.title}`,
-      subtitle: "Laporan Baru",
-      time: c.createdAt.toISOString(),
-      link: `/admin/pengaduan/${c.id}`
-    }))
-  ].sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime()).slice(0, 5)
+  // Fetch critical notices for sidebar badges and header notifications using request memoization
+  const { counts, recentActivity } = await getAdminDashboardStats()
   
   const sidebarStats = {
-    letters: pendingLetters,
-    complaints: submittedComplaints,
-    total: pendingLetters + submittedComplaints,
-    recent: recentItems
+    letters: counts.pendingLetters,
+    complaints: counts.submittedComplaints,
+    total: counts.pendingLetters + counts.submittedComplaints,
+    recent: recentActivity
   }
 
   return (

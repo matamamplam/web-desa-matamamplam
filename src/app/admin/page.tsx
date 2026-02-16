@@ -12,6 +12,7 @@ import {
   groupByAgeRanges,
   getLastNMonths,
 } from "@/lib/statistics"
+import { getAdminDashboardStats, getAdminSummaryStats } from "@/lib/data/admin"
 
 async function getDemographicStats() {
   const penduduk = await prisma.penduduk.findMany({
@@ -80,62 +81,13 @@ export default async function AdminPage() {
   
   const demographicStats = await getDemographicStats()
 
-  // Fetch statistics
-  // Fetch statistics sequentially to avoid connection pool timeout (limit: 1)
-  const totalPenduduk = await prisma.penduduk.count()
-  const totalKK = await prisma.kartuKeluarga.count()
-  const totalLetterRequests = await prisma.letterRequest.count()
+  // Fetch statistics using request memoization (shared with layout)
+  const { counts, recentActivity } = await getAdminDashboardStats()
+  const { totalPenduduk, totalKK, totalLetterRequests, totalUMKM, totalComplaints } = await getAdminSummaryStats()
   
-  const pendingLetters = await prisma.letterRequest.count({
-    where: { status: "PENDING" },
-  })
-
-  const totalComplaints = await prisma.complaint.count()
-  
-  const submittedComplaints = await prisma.complaint.count({
-    where: { status: "SUBMITTED" }
-  })
-
-  const totalUMKM = await prisma.uMKM.count()
-
-  // Fetch recent letters
-  const recentLetters = await prisma.letterRequest.findMany({
-    where: { status: "PENDING" },
-    take: 5,
-    orderBy: { createdAt: "desc" },
-    include: { 
-      penduduk: { select: { nama: true } },
-      template: { select: { name: true } }
-    }
-  })
-
-  // Fetch recent complaints
-  const recentComplaints = await prisma.complaint.findMany({
-    where: { status: "SUBMITTED" },
-    take: 5,
-    orderBy: { createdAt: "desc" },
-    select: { id: true, title: true, createdAt: true }
-  })
-
-  // Combine and sort recent activity
-  const recentActivities = [
-    ...recentLetters.map(l => ({
-      id: l.id,
-      type: "LETTER" as const,
-      title: `Permohonan Surat: ${l.template.name}`,
-      subtitle: `Oleh: ${l.penduduk.nama}`,
-      date: l.createdAt,
-      link: `/admin/layanan-surat/permohonan/${l.id}`
-    })),
-    ...recentComplaints.map(c => ({
-      id: c.id,
-      type: "COMPLAINT" as const,
-      title: `Pengaduan: ${c.title}`,
-      subtitle: "Laporan Baru",
-      date: c.createdAt,
-      link: `/admin/pengaduan/${c.id}`
-    }))
-  ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 5)
+  const pendingLetters = counts.pendingLetters
+  const submittedComplaints = counts.submittedComplaints
+  const recentActivities = recentActivity
 
   const stats = [
     {

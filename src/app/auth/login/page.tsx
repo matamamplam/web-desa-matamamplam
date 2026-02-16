@@ -48,8 +48,8 @@ export default function LoginPage() {
         }
       } else if (result?.ok) {
         toast.success("Login berhasil! Mengalihkan...", { duration: 2000 })
-        router.push("/admin")
-        router.refresh()
+        // Force hard navigation to ensure session is fresh and prevent middleware loops
+        window.location.href = "/admin"
       }
     } catch (error) {
       console.error("Login caught error:", error)
