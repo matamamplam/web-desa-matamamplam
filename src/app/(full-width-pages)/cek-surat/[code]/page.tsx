@@ -3,6 +3,7 @@
 
 import { useState, use } from "react"
 import { useRouter } from "next/navigation"
+import Image from "next/image"
 import toast from "react-hot-toast"
 
 export default function VerifyLetterPage({ params }: { params: Promise<{ code: string }> }) {
@@ -107,12 +108,16 @@ export default function VerifyLetterPage({ params }: { params: Promise<{ code: s
            {/* Kop Surat (Header) */}
           <div className="mb-6 flex items-center border-b-[5px] border-double border-black pb-4">
              {/* Logo */}
-             <div className="mr-4 flex h-24 w-24 flex-shrink-0 items-center justify-center pt-2">
-                <img 
-                  src={letterData.logoUrl}
-                  alt="Logo Kabupaten Bireuen" 
-                  className="h-full w-full object-contain"
-                />
+             <div className="mr-4 flex h-24 w-24 flex-shrink-0 items-center justify-center pt-2 relative">
+                <div style={{ position: 'relative', width: '96px', height: '96px' }}>
+                  <Image 
+                    src={letterData.logoUrl}
+                    alt="Logo Kabupaten Bireuen" 
+                    fill
+                    className="object-contain"
+                    unoptimized
+                  />
+                 </div>
              </div>
              
              {/* Text */}

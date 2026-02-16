@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { toast } from "react-hot-toast"
+import Image from "next/image"
 import ImageUpload from "@/components/admin/ImageUpload"
 
 interface Position {
@@ -367,11 +368,15 @@ export default function StructureOrganizationClient({ initialPositions }: Struct
                         <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                           <div className="flex items-start gap-3">
                             {position.official.photo ? (
-                              <img
-                                src={position.official.photo}
-                                alt={position.official.name}
-                                className="w-16 h-16 rounded-lg object-cover"
-                              />
+                              <div className="relative w-16 h-16 rounded-lg overflow-hidden">
+                                <Image
+                                  src={position.official.photo}
+                                  alt={position.official.name}
+                                  fill
+                                  sizes="64px"
+                                  className="object-cover"
+                                />
+                              </div>
                             ) : (
                               <div className="w-16 h-16 rounded-lg bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
                                 <svg className="w-8 h-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
