@@ -248,20 +248,55 @@ export default function StructureOrganizationClient({ initialPositions }: Struct
     })
   }
 
-  // Group positions by level for hierarchical display
-  const positionsByLevel = positions.reduce((acc, pos) => {
-    if (!acc[pos.level]) acc[pos.level] = []
-    acc[pos.level].push(pos)
-    return acc
-  }, {} as Record<number, Position[]>)
+  // Group positions by Logical Category
+  const positionsByCategory = positions.reduce((acc, pos) => {
+    let categoryKey = "OTHER";
+    
+    // 1. Pimpinan Tertinggi
+    if (pos.positionKey === "KEUCHIK" || pos.positionName.toLowerCase().includes("keuchik")) {
+      categoryKey = "PIMPINAN";
+    }
+    // 2. Legislatif (Tuha Peut, Tuha Lapan, Imum)
+    else if (
+      pos.positionKey?.startsWith("TUHA") || 
+      pos.positionName.toLowerCase().includes("tuha") ||
+      pos.positionKey === "IMUM_GAMPONG" ||
+      pos.positionName.toLowerCase().includes("imum gampong") ||
+      pos.category === "ADVISORY" ||
+      pos.category === "RELIGIOUS"
+    ) {
+      categoryKey = "LEGISLATIF";
+    }
+    // 4. Kewilayahan (Dusun)
+    else if (pos.category === "DUSUN" || pos.positionName.toLowerCase().includes("dusun")) {
+      categoryKey = "KEWILAYAHAN";
+    }
+    // 3. Eksekutif (Sekdes, Kasi, Kaur) - Catch all others essentially
+    else {
+      categoryKey = "EKSEKUTIF";
+    }
 
-  const levelLabels: Record<number, string> = {
-    1: "Pimpinan Tertinggi",
-    2: "Badan Permusyawaratan & Keagamaan",
-    3: "Lembaga Kemasyarakatan",
-    4: "Sekretariat",
-    5: "Kepala Seksi",
-    6: "Kepala Dusun",
+    if (!acc[categoryKey]) acc[categoryKey] = [];
+    acc[categoryKey].push(pos);
+    return acc;
+  }, {} as Record<string, Position[]>)
+
+  const categoryOrder = ["PIMPINAN", "LEGISLATIF", "EKSEKUTIF", "KEWILAYAHAN", "OTHER"];
+  
+  const categoryLabels: Record<string, string> = {
+    "PIMPINAN": "Pimpinan Tertinggi",
+    "LEGISLATIF": "Badan Permusyawaratan (Legislatif)",
+    "EKSEKUTIF": "Perangkat Desa (Eksekutif)",
+    "KEWILAYAHAN": "Kewilayahan (Kepala Dusun)",
+    "OTHER": "Lainnya"
+  }
+
+  const categoryColors: Record<string, string> = {
+    "PIMPINAN": "bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200",
+    "LEGISLATIF": "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
+    "EKSEKUTIF": "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
+    "KEWILAYAHAN": "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200",
+    "OTHER": "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
   }
 
   return (
@@ -287,21 +322,21 @@ export default function StructureOrganizationClient({ initialPositions }: Struct
 
         {/* Organizational Structure */}
         <div className="space-y-8">
-          {[1, 2, 3, 4, 5, 6].map((level) => {
-            const levelPositions = positionsByLevel[level] || []
-            if (levelPositions.length === 0) return null
+          {categoryOrder.map((category) => {
+            const categoryPositions = positionsByCategory[category] || []
+            if (categoryPositions.length === 0) return null
 
             return (
-              <div key={level} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+              <div key={category} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-                  <span className="flex items-center justify-center w-8 h-8 bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 rounded-full mr-3 text-sm font-bold">
-                    {level}
+                  <span className={`flex items-center justify-center px-3 py-1 rounded-full mr-3 text-xs font-bold uppercase tracking-wider ${categoryColors[category]}`}>
+                    {category}
                   </span>
-                  {levelLabels[level]}
+                  {categoryLabels[category]}
                 </h2>
 
-                <div className={`grid gap-4 ${level === 1 ? "grid-cols-1 md:grid-cols-1" : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"}`}>
-                  {levelPositions.map((position) => (
+                <div className={`grid gap-4 ${category === "PIMPINAN" ? "grid-cols-1 md:grid-cols-1" : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"}`}>
+                  {categoryPositions.map((position) => (
                     <div
                       key={position.id}
                       className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-md transition-shadow"

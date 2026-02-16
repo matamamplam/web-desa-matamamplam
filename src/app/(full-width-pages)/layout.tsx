@@ -15,9 +15,9 @@ async function getSettings() {
     }
     
     // The helper returns the Prisma record (which has a 'settings' field)
-    // or a default object wrapper (which also has a 'settings' field)
-    // We cast to any because the JSON field type in Prisma is generic
-    const rawSettings = (settingsData as any).settings || {};
+    // or a default object wrapper (which already has the structure we need)
+    // getPublicSettings now returns the JSON content directly, so we use it as is.
+    const rawSettings = settingsData || {};
     
     // Transform to expected format
     return {

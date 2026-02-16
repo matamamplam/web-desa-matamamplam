@@ -19,9 +19,21 @@ interface Structure {
   level4: Position[];
 }
 
-export default function StructurePreview({ structure }: { structure: Structure }) {
-  const keuchik = structure.level1?.[0];
-  const sekdes = structure.level4?.[0];
+export default function StructurePreview({ structure }: { structure: any }) {
+  // Filter strictly for Keuchik and Sekdes
+  // Using 'all' array from the structure prop which contains all positions
+  const allPositions = structure.all || [];
+  
+  const keuchik = allPositions.find((p: any) => 
+    p.positionKey === 'KEUCHIK' || 
+    p.positionName.toLowerCase().includes('keuchik')
+  );
+  
+  const sekdes = allPositions.find((p: any) => 
+    p.positionKey === 'SEKDES' || 
+    p.positionName.toLowerCase().includes('sekretaris') || 
+    p.positionName.toLowerCase().includes('sekdes')
+  );
 
   if (!keuchik && !sekdes) return null;
 
@@ -38,7 +50,7 @@ export default function StructurePreview({ structure }: { structure: Structure }
             <div className="bg-white rounded-2xl p-8 shadow-xl text-center max-w-sm">
               <div className="mb-4">
                 {keuchik.official.photo ? (
-                  <div className="relative w-32 h-32 mx-auto">
+                  <div className="relative w-32 h-32 mx-auto pt-1">
                     <Image
                       src={keuchik.official.photo}
                       alt={keuchik.official.name}
@@ -67,7 +79,7 @@ export default function StructurePreview({ structure }: { structure: Structure }
             <div className="bg-white rounded-2xl p-8 shadow-xl text-center max-w-sm">
               <div className="mb-4">
                 {sekdes.official.photo ? (
-                  <div className="relative w-32 h-32 mx-auto">
+                  <div className="relative w-32 h-32 mx-auto pt-1">
                     <Image
                       src={sekdes.official.photo}
                       alt={sekdes.official.name}
