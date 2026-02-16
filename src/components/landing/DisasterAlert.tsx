@@ -1,4 +1,4 @@
-"use client"
+
 
 import Link from "next/link"
 import { FiAlertTriangle } from "react-icons/fi"

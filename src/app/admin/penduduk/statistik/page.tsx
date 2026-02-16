@@ -1,6 +1,6 @@
-"use client"
-
-import { useEffect, useState } from "react"
+import { auth } from "@/lib/auth"
+import { prisma } from "@/lib/prisma"
+import { redirect } from "next/navigation"
 import Link from "next/link"
 import AgeDistributionChart from "@/components/admin/charts/AgeDistributionChart"
 import GenderChart from "@/components/admin/charts/GenderChart"
@@ -10,71 +10,131 @@ import ReligionChart from "@/components/admin/charts/ReligionChart"
 import MaritalStatusChart from "@/components/admin/charts/MaritalStatusChart"
 import RTRWChart from "@/components/admin/charts/RTRWChart"
 import PopulationTrendChart from "@/components/admin/charts/PopulationTrendChart"
+import {
+  calculateAge,
+  formatEnumValue,
+  aggregateByField,
+  getTopN,
+  groupByAgeRanges,
+  getLastNMonths,
+} from "@/lib/statistics"
 
-interface StatisticsData {
-  totalPopulation: number
-  productiveAge: number
-  children: number
-  elderly: number
-  ageDistribution: Array<{ range: string; count: number }>
-  genderDistribution: Array<{ label: string; value: number }>
-  educationDistribution: Array<{ label: string; value: number }>
-  occupationDistribution: Array<{ label: string; value: number }>
-  religionDistribution: Array<{ label: string; value: number }>
-  maritalStatusDistribution: Array<{ label: string; value: number }>
-  rtRwDistribution: Array<{ label: string; value: number }>
-  monthlyTrend: Array<{ month: string; count: number }>
-}
-
-export default function StatisticsPage() {
-  const [data, setData] = useState<StatisticsData | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState("")
-
-  useEffect(() => {
-    async function fetchStats() {
-      try {
-        const response = await fetch("/api/admin/statistics/penduduk")
-        if (!response.ok) throw new Error("Failed to fetch statistics")
-        
-        const result = await response.json()
-        setData(result)
-      } catch (err: any) {
-        setError(err.message)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchStats()
-  }, [])
-
-  if (loading) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-blue-600"></div>
-      </div>
-    )
+export default async function StatisticsPage() {
+  const session = await auth()
+  
+  if (!session) {
+    redirect("/auth/login")
   }
 
-  if (error || !data) {
-    return (
-      <div className="p-6">
-        <div className="rounded-lg border border-red-200 bg-red-50 p-4">
-          <p className="text-sm text-red-800">
-            {error || "Gagal memuat data statistik"}
-          </p>
-          <div className="mt-4">
-            <Link
-              href="/admin/penduduk"
-              className="text-sm font-medium text-red-600 hover:text-red-500"
-            >
-              &larr; Kembali ke Data Penduduk
-            </Link>
-          </div>
-        </div>
-      </div>
-    )
+  // Fetch all penduduk with minimal fields for statistics
+  const penduduk = await prisma.penduduk.findMany({
+    select: {
+      tanggalLahir: true,
+      jenisKelamin: true,
+      agama: true,
+      pendidikan: true,
+      pekerjaan: true,
+      statusPerkawinan: true,
+      createdAt: true,
+      kk: {
+        select: {
+          rt: true,
+          rw: true,
+        },
+      },
+    },
+  })
+
+  // Calculate Statistics
+  const totalPopulation = penduduk.length
+
+  // Age Distribution
+  const ageDistribution = groupByAgeRanges(penduduk.map((p) => p.tanggalLahir))
+
+  // Gender Distribution
+  const genderDistribution = aggregateByField(
+    penduduk,
+    "jenisKelamin",
+    formatEnumValue
+  )
+
+  // Education Distribution
+  const educationDistribution = aggregateByField(
+    penduduk,
+    "pendidikan",
+    formatEnumValue
+  )
+
+  // Occupation Distribution (Top 10)
+  const allOccupations = aggregateByField(penduduk, "pekerjaan")
+  const occupationDistribution = getTopN(allOccupations, 10)
+
+  // Religious Distribution
+  const religionDistribution = aggregateByField(
+    penduduk,
+    "agama",
+    formatEnumValue
+  )
+
+  // Marital Status Distribution
+  const maritalStatusDistribution = aggregateByField(
+    penduduk,
+    "statusPerkawinan",
+    formatEnumValue
+  )
+
+  // RT/RW Distribution (Top 10)
+  const rtRwData = penduduk.map((p) => ({
+    rtRw: `RT ${p.kk.rt}/RW ${p.kk.rw}`,
+  }))
+  const allRtRw = aggregateByField(rtRwData, "rtRw")
+  const rtRwDistribution = getTopN(allRtRw, 10)
+
+  // Monthly Registration Trend (Last 12 months)
+  const monthNames = getLastNMonths(12)
+  const monthlyTrend = monthNames.map((monthName) => {
+    const [month, year] = monthName.split(" ")
+    const monthIndex = [
+      "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+      "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+    ].indexOf(month)
+    
+    const count = penduduk.filter((p) => {
+      const createdDate = new Date(p.createdAt)
+      return (
+        createdDate.getMonth() === monthIndex &&
+        createdDate.getFullYear() === parseInt(year)
+      )
+    }).length
+    
+    return { month: monthName, count }
+  })
+
+  // Calculate demographics
+  let productiveAge = 0
+  let children = 0
+  let elderly = 0
+
+  penduduk.forEach(p => {
+    const age = calculateAge(p.tanggalLahir)
+    if (age < 15) children++
+    else if (age >= 15 && age <= 64) productiveAge++
+    else elderly++
+  })
+
+  const data = {
+      totalPopulation,
+      productiveAge,
+      children,
+      elderly,
+      ageDistribution,
+      genderDistribution,
+      educationDistribution,
+      occupationDistribution,
+      religionDistribution,
+      maritalStatusDistribution,
+      rtRwDistribution,
+      monthlyTrend
   }
 
   return (
@@ -95,15 +155,12 @@ export default function StatisticsPage() {
           </p>
         </div>
         <div className="flex gap-2">
-          <button
-            onClick={() => window.print()}
-            className="inline-flex items-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-          >
-            <svg className="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-            </svg>
-            Cetak Laporan
-          </button>
+            {/* Note: window.print() usage in server component is tricky. 
+                Common pattern: Add a client "PrintButton" component or keep a simple button that is ignored or handled via a client wrapper.
+                However, standard buttons with onClick handlers MUST be in Client Components. 
+                I will replace the button with a simple Client Component <PrintButton /> 
+            */}
+            <PrintButton />
         </div>
       </div>
 
@@ -231,4 +288,19 @@ export default function StatisticsPage() {
       </div>
     </div>
   )
+}
+
+function PrintButton() {
+    "use client"
+    return (
+        <button
+            onClick={() => window.print()}
+            className="inline-flex items-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+        >
+            <svg className="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+            </svg>
+            Cetak Laporan
+        </button>
+    )
 }

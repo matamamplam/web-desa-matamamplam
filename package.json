@@ -42,6 +42,7 @@
     "next": "^15.5.9",
     "next-auth": "5.0.0-beta.24",
     "next-cloudinary": "^6.13.0",
+    "nextjs-toploader": "^3.9.17",
     "preact": "^10.28.3",
     "qrcode": "^1.5.4",
     "react": "^19.2.0",

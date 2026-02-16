@@ -5,6 +5,7 @@ import { SidebarProvider } from '@/context/SidebarContext';
 import { ThemeProvider } from '@/context/ThemeContext';
 import { SettingsProvider } from '@/context/SettingsContext';
 import ToastProvider from '@/components/ToastProvider';
+import NextTopLoader from 'nextjs-toploader';
 
 import { prisma } from '@/lib/prisma';
 import type { Metadata } from 'next';
@@ -58,6 +59,7 @@ export default function RootLayout({
         <ThemeProvider>
           <SettingsProvider>
             <SidebarProvider>
+              <NextTopLoader showSpinner={false} color="#2563EB" />
               {children}
               <ToastProvider />
             </SidebarProvider>
