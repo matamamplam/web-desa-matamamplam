@@ -1,119 +1,274 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
+import { FiChevronDown, FiMenu, FiX } from 'react-icons/fi';
 
 interface NavbarProps {
   siteName?: string;
   logo?: string;
 }
 
+interface NavCommandItem {
+  label: string;
+  href: string;
+}
+
+interface NavGroup {
+  label: string;
+  type: 'link' | 'dropdown';
+  href?: string;
+  items?: NavCommandItem[];
+}
+
 export default function PublicNavbar({ siteName = 'Desa Mata Mamplam', logo }: NavbarProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const pathname = usePathname();
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const navItems = [
-    { label: 'Beranda', href: '/' },
-    { label: 'Berita', href: '/berita' },
-    { label: 'UMKM', href: '/umkm' },
-    { label: 'Pembangunan', href: '/pembangunan' },
-    { label: 'Struktur Organisasi', href: '/struktur-organisasi' },
-    { label: 'Galeri', href: '/galeri' },
-    { label: 'Pengaduan', href: '/pengaduan' },
-    { label: 'Tentang', href: '/tentang-kami' },
-    { label: 'Kontak', href: '/kontak' },
-    { label: 'Info Bencana', href: '/bencana' },
-    { label: 'Cek Surat', href: '/cek-surat' },
+  const navStructure: NavGroup[] = [
+    { label: 'Beranda', type: 'link', href: '/' },
+    {
+      label: 'Profil',
+      type: 'dropdown',
+      items: [
+        { label: 'Tentang Kami', href: '/tentang-kami' },
+        { label: 'Struktur Organisasi', href: '/struktur-organisasi' },
+        { label: 'Galeri', href: '/galeri' },
+      ],
+    },
+    {
+      label: 'Informasi',
+      type: 'dropdown',
+      items: [
+        { label: 'Berita', href: '/berita' },
+        { label: 'UMKM', href: '/umkm' },
+        { label: 'Pembangunan', href: '/pembangunan' },
+        { label: 'Info Bencana', href: '/bencana' },
+      ],
+    },
+    {
+      label: 'Layanan',
+      type: 'dropdown',
+      items: [
+        { label: 'Layanan Surat', href: '/layanan-surat' },
+        { label: 'Cek Surat', href: '/cek-surat' },
+        { label: 'Pengaduan', href: '/pengaduan' },
+      ],
+    },
+    { label: 'Kontak', type: 'link', href: '/kontak' },
   ];
 
+  // Close dropdown on outside click
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setActiveDropdown(null);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Close mobile menu on route change
+  useEffect(() => {
+    setIsMenuOpen(false);
+    setActiveDropdown(null);
+  }, [pathname]);
+
+  const toggleDropdown = (label: string) => {
+    if (activeDropdown === label) {
+      setActiveDropdown(null);
+    } else {
+      setActiveDropdown(label);
+    }
+  };
+
+  const isGroupActive = (group: NavGroup) => {
+    if (group.type === 'link') return pathname === group.href;
+    return group.items?.some(item => pathname === item.href);
+  };
+
   return (
-    <nav className="sticky top-0 z-50 bg-white shadow-md">
+    <nav className="sticky top-0 z-50 bg-white shadow-md font-sans" ref={dropdownRef}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+        <div className="flex justify-between items-center h-20">
           {/* Logo & Site Name */}
           <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-            {logo && (
+            {logo ? (
               <img
                 src={logo}
                 alt={siteName}
-                className="h-10 w-10 object-contain"
+                className="h-10 w-auto max-w-[150px] object-contain"
               />
+            ) : (
+                <div className="h-10 w-10 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-xl">
+                    {siteName.charAt(0)}
+                </div>
             )}
-            <span className="font-bold text-xl text-gray-900 hidden sm:block">
-              {siteName}
-            </span>
+            <div className="hidden sm:flex flex-col">
+                 <span className="font-bold text-lg text-gray-900 leading-tight">
+                  {siteName}
+                </span>
+                <span className="text-xs text-gray-500 font-medium">Kabupaten Bireuen</span>
+            </div>
+           
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center gap-1">
-            {navItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
-                  pathname === item.href
-                    ? 'text-blue-600 bg-blue-50 font-semibold'
-                    : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50'
-                }`}
-              >
-                {item.label}
-              </Link>
+          <div className="hidden lg:flex items-center gap-6">
+            {navStructure.map((group) => (
+              <div key={group.label} className="relative group">
+                {group.type === 'link' ? (
+                  <Link
+                    href={group.href!}
+                    className={`nav-link text-sm font-medium transition-colors p-2 rounded-lg flex items-center gap-1 ${
+                       pathname === group.href ? 'text-blue-600 bg-blue-50 font-semibold' : 'text-gray-600 hover:text-blue-600 hover:bg-gray-50'
+                    }`}
+                  >
+                    {group.label}
+                  </Link>
+                ) : (
+                  <div>
+                    <button
+                      onClick={() => toggleDropdown(group.label)}
+                      className={`nav-link text-sm font-medium transition-colors p-2 rounded-lg flex items-center gap-1 ${
+                        isGroupActive(group) ? 'text-blue-600 bg-blue-50 font-semibold' : 'text-gray-600 hover:text-blue-600 hover:bg-gray-50'
+                      }`}
+                    >
+                      {group.label}
+                      <FiChevronDown className={`w-4 h-4 transition-transform duration-200 ${activeDropdown === group.label ? 'rotate-180' : ''}`} />
+                    </button>
+                    
+                    {/* Desktop Dropdown Panel */}
+                    <div 
+                        className={`absolute left-0 mt-2 w-56 bg-white rounded-xl shadow-xl ring-1 ring-black ring-opacity-5 transition-all duration-200 origin-top-left z-50 ${
+                            activeDropdown === group.label ? 'opacity-100 scale-100 translate-y-0 visible' : 'opacity-0 scale-95 -translate-y-2 invisible'
+                        }`}
+                    >
+                      <div className="py-2 p-1">
+                        {group.items?.map((item) => (
+                          <Link
+                            key={item.href}
+                            href={item.href}
+                            onClick={() => setActiveDropdown(null)}
+                            className={`block px-4 py-2.5 text-sm rounded-lg transition-colors ${
+                              pathname === item.href
+                                ? 'bg-blue-50 text-blue-700 font-medium'
+                                : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600'
+                            }`}
+                          >
+                            {item.label}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
             ))}
+            
+            {/* CTA Button */}
             <Link
-              href="/layanan-surat"
-              className="ml-2 px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+                href="/layanan-surat"
+                className="ml-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white text-sm font-semibold rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all shadow-md shadow-blue-200 transform hover:-translate-y-0.5"
             >
-              Layanan Surat
+              Buat Surat
             </Link>
           </div>
 
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="lg:hidden p-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors"
+            className="lg:hidden p-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
             aria-label="Toggle menu"
           >
             {isMenuOpen ? (
-              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
+              <FiX className="w-6 h-6" />
             ) : (
-              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
+              <FiMenu className="w-6 h-6" />
             )}
           </button>
         </div>
+      </div>
 
-        {/* Mobile Menu */}
-        {isMenuOpen && (
-          <div className="lg:hidden py-4 border-t border-gray-200">
-            <div className="flex flex-col gap-2">
-              {navItems.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setIsMenuOpen(false)}
-                  className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
-                    pathname === item.href
-                      ? 'text-blue-600 bg-blue-50 font-semibold'
-                      : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50'
-                  }`}
-                >
-                  {item.label}
-                </Link>
-              ))}
-              <Link
-                href="/layanan-surat"
-                onClick={() => setIsMenuOpen(false)}
-                className="mt-2 px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors text-center"
-              >
-                Layanan Surat
-              </Link>
+      {/* Mobile Menu Overlay */}
+      {isMenuOpen && (
+        <div className="lg:hidden fixed inset-0 z-40 bg-gray-600 bg-opacity-50" onClick={() => setIsMenuOpen(false)}></div>
+      )}
+
+      {/* Mobile Menu Panel */}
+      <div className={`lg:hidden fixed inset-y-0 right-0 z-50 w-72 bg-white shadow-2xl transform transition-transform duration-300 ease-in-out ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+        <div className="flex flex-col h-full">
+            <div className="flex items-center justify-between p-4 border-b">
+                <span className="font-bold text-lg text-gray-800">Menu</span>
+                <button onClick={() => setIsMenuOpen(false)} className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg">
+                    <FiX className="w-5 h-5" />
+                </button>
             </div>
-          </div>
-        )}
+            
+            <div className="flex-1 overflow-y-auto py-4 px-3 space-y-1">
+                {navStructure.map((group) => (
+                  <div key={group.label} className="border-b border-gray-100 last:border-0 pb-1 mb-1">
+                    {group.type === 'link' ? (
+                      <Link
+                        href={group.href!}
+                        className={`flex items-center w-full px-4 py-3 text-base font-medium rounded-lg transition-colors ${
+                          pathname === group.href
+                            ? 'bg-blue-50 text-blue-600'
+                            : 'text-gray-700 hover:bg-gray-50'
+                        }`}
+                      >
+                        {group.label}
+                      </Link>
+                    ) : (
+                      <div className="rounded-lg overflow-hidden">
+                        <button
+                          onClick={() => toggleDropdown(group.label)}
+                          className={`flex items-center justify-between w-full px-4 py-3 text-base font-medium rounded-lg transition-colors ${
+                              isGroupActive(group) ? 'text-blue-600 bg-blue-50/50' : 'text-gray-700 hover:bg-gray-50'
+                          }`}
+                        >
+                          {group.label}
+                          <FiChevronDown className={`w-5 h-5 transition-transform duration-200 ${activeDropdown === group.label ? 'rotate-180' : ''}`} />
+                        </button>
+                        
+                        <div 
+                            className={`bg-gray-50 space-y-1 overflow-hidden transition-all duration-300 ${
+                                activeDropdown === group.label ? 'max-h-96 opacity-100 py-2' : 'max-h-0 opacity-0 py-0'
+                            }`}
+                        >
+                          {group.items?.map((item) => (
+                            <Link
+                              key={item.href}
+                              href={item.href}
+                              className={`block px-8 py-2.5 text-sm font-medium rounded-r-lg border-l-2 ml-4 hover:bg-gray-100 transition-colors ${
+                                pathname === item.href
+                                  ? 'border-blue-500 text-blue-600 bg-white'
+                                  : 'border-transparent text-gray-600'
+                              }`}
+                            >
+                              {item.label}
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+            </div>
+            
+            <div className="p-4 border-t bg-gray-50">
+               <Link
+                href="/layanan-surat"
+                className="flex items-center justify-center w-full px-4 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all"
+               >
+                 Buat Surat Sekarang
+               </Link>
+            </div>
+        </div>
       </div>
     </nav>
   );

@@ -15,6 +15,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     '/pengaduan',
     '/kontak',
     '/bencana',
+    '/bencana/edukasi',
     '/layanan-surat',
     '/cek-surat',
   ].map((route) => ({

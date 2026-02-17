@@ -23,7 +23,7 @@ import {
 } from '@/lib/data-public';
 import { prisma } from '@/lib/prisma';
 
-export const dynamic = "force-dynamic";
+// export const dynamic = "force-dynamic";
 
 // Use ISR (Incremental Static Regeneration) for better performance
 // Page will be cached and revalidated every 60 seconds

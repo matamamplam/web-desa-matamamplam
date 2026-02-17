@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { FiAlertTriangle, FiCheckCircle, FiMapPin, FiPhone, FiInfo } from "react-icons/fi"
+import { FiAlertTriangle, FiCheckCircle, FiMapPin, FiPhone, FiInfo, FiArrowLeft } from "react-icons/fi"
 
 export default function DisasterPage() {
   const [data, setData] = useState<any>(null)
@@ -34,41 +34,137 @@ export default function DisasterPage() {
     )
   }
 
+  const event = data?.event;
+  const stats = data?.stats;
+  const earthquake = data?.earthquake;
+
   // Safe State (No Active Disaster)
-  if (!data || !data.event) {
+  if (!event) {
     return (
-      <div className="min-h-[60vh] flex flex-col items-center justify-center px-4 text-center bg-green-50">
-        <div className="w-24 h-24 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-6">
-          <FiCheckCircle size={40} />
-        </div>
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Aman Terkendali</h1>
-        <p className="text-gray-600 max-w-lg">
-           Saat ini tidak ada laporan bencana aktif di wilayah Desa Mata Mamplam. Tetap waspada dan pantau informasi terkini.
-        </p>
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl w-full">
-            <div className="bg-white p-4 rounded-lg shadow-sm border text-left">
-                <h3 className="font-semibold text-gray-900 mb-1 flex items-center">
-                    <FiPhone className="mr-2" /> Kontak Darurat
-                </h3>
-                <p className="text-gray-600 text-sm">Polisi: 110</p>
-                <p className="text-gray-600 text-sm">Ambulans: 118</p>
-                <p className="text-gray-600 text-sm">Kantor Desa: (0123) 456-7890</p>
+      <div className="min-h-[80vh] bg-gray-50 pb-20 pt-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            {/* Status Header */}
+            <div className="text-center mb-12">
+                <div className="inline-flex items-center justify-center w-20 h-20 bg-green-100 text-green-600 rounded-full mb-6 ring-8 ring-green-50">
+                    <FiCheckCircle size={40} />
+                </div>
+                <h1 className="text-3xl font-bold text-gray-900 mb-2">Aman Terkendali</h1>
+                <p className="text-gray-600 max-w-lg mx-auto">
+                    Saat ini tidak ada laporan bencana aktif di wilayah Desa Mata Mamplam. Tetap waspada dan pantau informasi terkini.
+                </p>
             </div>
-            <div className="bg-white p-4 rounded-lg shadow-sm border text-left">
-                <h3 className="font-semibold text-gray-900 mb-1 flex items-center">
-                    <FiInfo className="mr-2" /> Panduan
-                </h3>
-                <p className="text-gray-600 text-sm">Pelajari panduan keselamatan dan mitigasi bencana melalui halaman Edukasi.</p>
+
+            <div className="grid lg:grid-cols-3 gap-8">
+                {/* Main Content (Left) */}
+                <div className="lg:col-span-2 space-y-8">
+                    
+                    {/* Earthquake Card */}
+                    {earthquake && (
+                        <div className="bg-white rounded-2xl shadow-sm border border-orange-200 overflow-hidden">
+                            <div className="bg-orange-50 px-6 py-4 border-b border-orange-100 flex items-center justify-between">
+                                <h2 className="text-lg font-bold text-gray-900 flex items-center">
+                                    <div className="p-1.5 bg-orange-200 rounded-lg mr-3 text-orange-700">
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                        </svg>
+                                    </div>
+                                    Info Gempa Terkini (Aceh)
+                                </h2>
+                                <span className="text-xs font-semibold text-orange-600 bg-orange-100 px-2 py-1 rounded-full animate-pulse">
+                                    Terbaru
+                                </span>
+                            </div>
+                            <div className="p-6">
+                                <div className="flex flex-col md:flex-row gap-6 items-center">
+                                    <div className="flex-shrink-0 text-center bg-orange-600 text-white p-4 rounded-xl shadow-lg">
+                                        <div className="text-4xl font-bold">{earthquake.magnitude}</div>
+                                        <div className="text-xs uppercase tracking-wider opacity-90 mt-1">Magnitudo</div>
+                                    </div>
+                                    <div className="flex-1 space-y-2 text-center md:text-left">
+                                        <p className="text-lg font-semibold text-gray-900">{earthquake.location}</p>
+                                        <div className="flex flex-col sm:flex-row gap-2 sm:gap-6 text-sm text-gray-600 justify-center md:justify-start">
+                                            <span className="flex items-center"><FiMapPin className="mr-1.5"/> Kedalaman: {earthquake.depth}</span>
+                                            <span className="flex items-center">
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                </svg>
+                                                {earthquake.date} - {earthquake.time}
+                                            </span>
+                                        </div>
+                                        <p className="text-xs text-gray-500 mt-2 italic bg-gray-50 p-2 rounded block">
+                                            {earthquake.potential || "Tidak berpotensi Tsunami"}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                    
+                    {/* Windy Map Card */}
+                    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                        <div className="bg-gray-50 px-6 py-4 border-b border-gray-100">
+                            <h2 className="text-lg font-bold text-gray-900 flex items-center">
+                                <span className="text-xl mr-2">🌬️</span> Prakiraan Angin & Cuaca
+                            </h2>
+                        </div>
+                        <div className="h-[400px] w-full bg-gray-100 relative">
+                             <iframe 
+                                width="100%" 
+                                height="100%" 
+                                src="https://embed.windy.com/embed2.html?lat=5.1667&lon=96.8333&detailLat=5.1667&detailLon=96.8333&width=650&height=450&zoom=8&level=surface&overlay=gustAccu&product=ecmwf&menu=&message=&marker=&calendar=now&pressure=&type=map&location=coordinates&detail=&metricWind=default&metricTemp=default&radarRange=-1" 
+                                frameBorder="0"
+                                className="absolute inset-0"
+                            ></iframe>
+                        </div>
+                    </div>
+
+                </div>
+
+                {/* Sidebar (Right) */}
+                <div className="space-y-6">
+                    {/* Quick Contacts */}
+                    <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                        <h3 className="font-bold text-gray-900 mb-4 flex items-center">
+                            <FiPhone className="mr-2 text-red-600" /> Kontak Darurat
+                        </h3>
+                        <div className="space-y-3">
+                            <div className="flex justify-between items-center py-2 border-b border-gray-50">
+                                <span className="text-gray-600">Polisi</span>
+                                <span className="font-mono font-bold text-gray-900">110</span>
+                            </div>
+                            <div className="flex justify-between items-center py-2 border-b border-gray-50">
+                                <span className="text-gray-600">Ambulans</span>
+                                <span className="font-mono font-bold text-gray-900">118</span>
+                            </div>
+                            <div className="flex justify-between items-center py-2 border-b border-gray-50">
+                                <span className="text-gray-600">Kantor Desa</span>
+                                <span className="font-mono font-bold text-gray-900 text-sm">(0123) 456-7890</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Education Card */}
+                    <div className="bg-blue-600 p-6 rounded-2xl shadow-lg text-white relative overflow-hidden group">
+                        <div className="absolute -right-6 -top-6 bg-white/10 w-32 h-32 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
+                        <h3 className="font-bold text-lg mb-2 flex items-center relative z-10">
+                            <FiInfo className="mr-2" /> Panduan & Edukasi
+                        </h3>
+                        <p className="text-blue-100 text-sm mb-6 relative z-10">
+                            Pelajari langkah-langkah keselamatan dan mitigasi bencana untuk melindungi diri dan keluarga.
+                        </p>
+                         <a href="/bencana/edukasi" className="inline-block w-full text-center bg-white text-blue-600 font-bold py-2.5 rounded-lg hover:bg-blue-50 transition-colors shadow-sm relative z-10">
+                            Pelajari Sekarang
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
       </div>
     )
   }
 
-  const { event, stats } = data
-  
-
-
+  // Active State Render
   return (
     <div className="pb-20">
       {/* Hero / Alert Banner */}
@@ -108,7 +204,7 @@ export default function DisasterPage() {
             ))}
          </div>
          
-         <div className="grid lg:grid-cols-3 gap-8 items-start">
+         <div className="grid lg:grid-cols-3 gap-8 items-start mb-12">
             {/* Command Posts List (Main Content - Left) */}
             <div className="lg:col-span-2 space-y-8">
                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
@@ -214,6 +310,15 @@ export default function DisasterPage() {
             {/* Sidebar Information (Sticky Right) */}
             <div className="space-y-6 lg:sticky lg:top-24 h-fit">
 
+               <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col gap-4">
+                     <a href="/bencana/edukasi" className="flex items-center justify-between p-4 bg-blue-50 rounded-xl text-blue-700 hover:bg-blue-100 transition-colors group">
+                        <div className="flex items-center">
+                           <FiInfo className="mr-3" size={20}/>
+                           <span className="font-bold">Panduan Keselamatan</span>
+                        </div>
+                        <FiArrowLeft className="rotate-180 group-hover:translate-x-1 transition-transform" />
+                     </a>
+               </div>
 
                <div className="bg-gradient-to-br from-blue-600 to-blue-800 text-white rounded-2xl shadow-lg p-6">
                   <h3 className="font-bold text-lg mb-4 flex items-center"><FiPhone className="mr-2"/> Layanan Darurat</h3>
@@ -229,8 +334,8 @@ export default function DisasterPage() {
             </div>
          </div>
 
-         {/* Damage Reports Section (Full Width Bottom) */}
-         <div className="mt-12">
+         {/* Damage Reports Section */}
+         <div className="mt-12 mb-12">
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                 <div className="bg-gray-50 px-6 py-4 border-b border-gray-100 flex justify-between items-center">
                   <h2 className="text-xl font-bold text-red-700 flex items-center">
@@ -281,6 +386,24 @@ export default function DisasterPage() {
                </div>
             </div>
          </div>
+
+         {/* Windy Map Card (Bottom) */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-12">
+            <div className="bg-gray-50 px-6 py-4 border-b border-gray-100">
+                <h2 className="text-lg font-bold text-gray-900 flex items-center">
+                    <span className="text-xl mr-2">🌬️</span> Prakiraan Angin & Cuaca
+                </h2>
+            </div>
+            <div className="h-[400px] w-full bg-gray-100 relative">
+                    <iframe 
+                    width="100%" 
+                    height="100%" 
+                    src="https://embed.windy.com/embed2.html?lat=5.1667&lon=96.8333&detailLat=5.1667&detailLon=96.8333&width=650&height=450&zoom=8&level=surface&overlay=gustAccu&product=ecmwf&menu=&message=&marker=&calendar=now&pressure=&type=map&location=coordinates&detail=&metricWind=default&metricTemp=default&radarRange=-1" 
+                    frameBorder="0"
+                    className="absolute inset-0"
+                ></iframe>
+            </div>
+        </div>
       </div>
     </div>
   )

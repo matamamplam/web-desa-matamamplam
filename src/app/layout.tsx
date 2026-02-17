@@ -29,6 +29,28 @@ export async function generateMetadata(): Promise<Metadata> {
         default: siteName,
       },
       description: rawSettings?.general?.description || 'Website resmi pemerintahan desa',
+      keywords: ['Desa Mata Mamplam', 'Peusangan', 'Bireuen', 'Aceh', 'Pemerintahan Desa', 'Website Desa'],
+      openGraph: {
+        title: siteName,
+        description: rawSettings?.general?.description || 'Website resmi pemerintahan desa',
+        url: 'https://matamamplam.my.id',
+        siteName: siteName,
+        images: [
+          {
+            url: rawSettings?.branding?.logo || '/images/logo.png',
+            width: 800,
+            height: 600,
+          },
+        ],
+        locale: 'id_ID',
+        type: 'website',
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: siteName,
+        description: rawSettings?.general?.description || 'Website resmi pemerintahan desa',
+        images: [rawSettings?.branding?.logo || '/images/logo.png'],
+      },
       icons: {
         icon: favicon,
       },

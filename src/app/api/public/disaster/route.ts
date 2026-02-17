@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic' // Ensure no caching
 
 export async function GET(request: NextRequest) {
   try {
-    // Find the most recent ACTIVE event
+    // 1. Find the most recent ACTIVE event
     const activeEvent = await prisma.disasterEvent.findFirst({
       where: {
         status: "ACTIVE"
@@ -35,24 +35,38 @@ export async function GET(request: NextRequest) {
       }
     })
 
-    if (!activeEvent) {
-      return NextResponse.json({ message: "No active disaster event" }, { status: 404 })
+    // 2. Get statistics for affected residents (only if event exists)
+    let stats = [];
+    if (activeEvent) {
+        stats = await prisma.affectedResident.groupBy({
+            by: ['condition'],
+            where: {
+                eventId: activeEvent.id
+            },
+            _count: {
+                _all: true
+            }
+        }) as any;
     }
 
-    // Get statistics for affected residents by condition
-    const stats = await prisma.affectedResident.groupBy({
-      by: ['condition'],
-      where: {
-        eventId: activeEvent.id
-      },
-      _count: {
-        _all: true
-      }
-    })
+    // 3. Get Latest Earthquake (Filter: Aceh)
+    const earthquake = await prisma.earthquake.findFirst({
+        where: {
+            location: {
+                contains: 'Aceh',
+                mode: 'insensitive'
+            }
+        },
+        orderBy: {
+            datetime: 'desc'
+        }
+    });
 
+    // Return combined data (Event can be null)
     return NextResponse.json({
         event: activeEvent,
-        stats: stats
+        stats: stats,
+        earthquake: earthquake
     })
 
   } catch (error: any) {
