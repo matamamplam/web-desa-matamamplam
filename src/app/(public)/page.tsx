@@ -42,13 +42,28 @@ function getWeatherDesc(code: number) {
   return { label: "Cerah", icon: "☀️" }
 }
 
+export async function generateMetadata() {
+  const settingsData = await getPublicSettings();
+  const rawSettings = settingsData || {};
+  const siteName = rawSettings.general?.siteName || 'Desa Mata Mamplam';
+  const description = rawSettings.general?.description || 'Website resmi pemerintahan desa';
+  
+  return {
+    title: siteName,
+    description: description,
+    openGraph: {
+      title: siteName,
+      description: description,
+      images: [rawSettings.branding?.logo || '/images/logo.png'],
+    },
+  };
+}
+
 async function getData() {
   try {
-    // 1. Fetch Settings FIRST (Critical for UI)
-    const settingsData = await getPublicSettings();
-
-    // 2. Fetch other data in parallel (but separated from settings to reduce initial load)
-    const [stats, newsData, umkmData, projectsData, structureData, disasterData] = await Promise.all([
+    // Fetch all data in parallel including settings
+    const [settingsData, stats, newsData, umkmData, projectsData, structureData, disasterData] = await Promise.all([
+      getPublicSettings(),
       getPublicStats(),
       getPublicNews(),
       getPublicUMKM(),
@@ -59,17 +74,6 @@ async function getData() {
 
     // getPublicSettings now returns the JSON settings content directly
     const rawSettings = settingsData || {};
-    
-    // Debug logging
-    console.log('🔍 Landing Page - Raw Settings:', {
-      hasGeneral: !!rawSettings.general,
-      hasBranding: !!rawSettings.branding,
-      hasContact: !!rawSettings.contact,
-    });
-    console.log('🗺️ Map URL from DB:', rawSettings.contact?.mapUrl);
-    console.log('🖼️ Hero Background from DB:', rawSettings.general?.heroBackground);
-    console.log('🎨 Logo from DB:', rawSettings.branding?.logo);
-    console.log('⭐ Favicon from DB:', rawSettings.branding?.favicon);
     
     // Use settings directly with proper structure
     const settings = {
@@ -84,12 +88,6 @@ async function getData() {
       footer: rawSettings.footer || {},
       faq: rawSettings.faq || [],
     } as any;
-
-    console.log('✅ Transformed settings.general:', settings.general);
-    console.log('✅ Transformed settings.branding:', settings.branding);
-    console.log('✅ Transformed settings.contactInfo:', settings.contactInfo);
-
-
 
     // Transform News (handle null excerpt)
     const news = (newsData?.news || []).map((item: any) => ({

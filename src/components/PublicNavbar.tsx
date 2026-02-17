@@ -201,8 +201,8 @@ export default function PublicNavbar({ siteName = 'Desa Mata Mamplam', logo }: N
       )}
 
       {/* Mobile Menu Panel */}
-      <div className={`lg:hidden fixed inset-y-0 right-0 z-50 w-72 bg-white shadow-2xl transform transition-transform duration-300 ease-in-out ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
-        <div className="flex flex-col h-full">
+      <div className={`lg:hidden fixed inset-y-0 right-0 z-[100] w-72 bg-white shadow-2xl transform transition-transform duration-300 ease-in-out ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+        <div className="flex flex-col h-full bg-white">
             <div className="flex items-center justify-between p-4 border-b">
                 <span className="font-bold text-lg text-gray-800">Menu</span>
                 <button onClick={() => setIsMenuOpen(false)} className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg">

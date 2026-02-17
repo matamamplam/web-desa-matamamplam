@@ -16,13 +16,6 @@ async function getSettings() {
       return null;
     }
     
-    console.log('🔧 Public Layout - Settings received:', {
-      hasGeneral: !!settings.general,
-      hasBranding: !!settings.branding,
-      hasLogo: !!settings.branding?.logo,
-      siteName: settings.general?.siteName,
-    });
-    
     // getPublicSettings now returns the correct structure directly
     return settings;
   } catch (error) {

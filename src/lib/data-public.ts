@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { Prisma } from '@prisma/client';
+import { cache } from 'react';
 
 
 export async function getPublicStats() {
@@ -145,7 +146,7 @@ export async function getPublicProjects(limit: number = 6, status?: 'PLANNING' |
   }
 }
 
-export async function getPublicSettings() {
+export const getPublicSettings = cache(async () => {
   // Comprehensive fallback settings for build/runtime failures
   const defaultSettings = {
     general: { 
@@ -178,6 +179,9 @@ export async function getPublicSettings() {
       copyright: `© ${new Date().getFullYear()} Desa Mata Mamplam. All rights reserved.`,
     },
     navigation: { externalLinks: [] },
+    api: {
+        publicToken: '', // Ensure structure completeness
+    }
   };
 
   // Retry logic for settings (Critical data)
@@ -187,19 +191,11 @@ export async function getPublicSettings() {
       const settingsRecord = await prisma.siteSettings.findFirst();
 
       if (!settingsRecord) {
-        console.warn('⚠️ No settings record found in database, using defaults');
         return defaultSettings;
       }
 
       // IMPORTANT: Return the JSON settings content directly
       const settings = settingsRecord.settings as any;
-      
-      console.log('📤 getPublicSettings returning:', {
-        hasGeneral: !!settings?.general,
-        hasBranding: !!settings?.branding,
-        hasHeroBackground: !!settings?.general?.heroBackground,
-        hasMapUrl: !!settings?.contact?.mapUrl,
-      });
       
       return settings;
     } catch (error) {
@@ -214,7 +210,7 @@ export async function getPublicSettings() {
     }
   }
   return defaultSettings;
-}
+});
 
 export async function getPublicStructure() {
   try {
