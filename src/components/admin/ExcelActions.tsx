@@ -69,7 +69,8 @@ export default function ExcelActions({ type }: ExcelActionsProps) {
         throw new Error("Failed to fetch data")
       }
 
-      const data = await response.json()
+      const responseData = await response.json()
+      const data = responseData.data
       
       // Debug: log data structure
       console.log('PDF Export data:', data)
