@@ -280,33 +280,29 @@ export async function getOrgChartData() {
     });
 
     // Transform into hierarchy
-    const keuchik = positions.find(p => p.positionKey === 'KEUCHIK' || p.level === 1);
-    const legislative = positions.filter(p => p.category === 'ADVISORY' || p.positionKey.includes('TUHA_PEUT')); // Tuha Peut
+    // Strict checks for Level 1
+    const keuchik = positions.find(p => p.positionKey === 'KEUCHIK');
+    const legislative = positions.filter(p => p.category === 'ADVISORY' || p.positionKey.includes('TUHA'));
+    const imum = positions.find(p => p.positionKey === 'IMUM_GAMPONG' || p.category === 'RELIGIOUS');
     
     // Executive logic
     const sekdes = positions.find(p => p.positionKey === 'SEKDES');
-    const kasi = positions.filter(p => p.category === 'LEADERSHIP' && p.level === 2 && p.positionKey !== 'SEKDES' && p.positionKey !== 'KEUCHIK'); // Kasi
-    const kaur = positions.filter(p => p.category === 'SECRETARIAT' || (p.level === 3 && p.positionKey.includes('KAUR')));
+    
+    // Level 3 Subordinates (Kaur + Kasi)
+    // In our new seed, Kasi and Kaur are both Level 3.
+    // We want them all in one list, sorted by sortOrder (which we defined in seed).
+    const subordinates = positions.filter(p => p.level === 3);
     
     const dusun = positions.filter(p => p.category === 'DUSUN');
-
-    // Fallback/Grouping if keys aren't exact
-    const others = positions.filter(p => 
-        !p.positionKey.includes('KEUCHIK') && 
-        !p.positionKey.includes('SEKDES') && 
-        p.category !== 'ADVISORY' && 
-        p.category !== 'DUSUN' &&
-        !kaur.includes(p) &&
-        !kasi.includes(p)
-    );
 
     return {
         keuchik,
         legislative,
+        imum,
         executive: {
             sekdes,
-            direct: kasi.length > 0 ? kasi : others.filter(p => p.level === 2),
-            subSekdes: kaur.length > 0 ? kaur : others.filter(p => p.level > 2)
+            // Combined subordinates for the horizontal row below Sekdes
+            subordinates: subordinates.sort((a, b) => a.sortOrder - b.sortOrder)
         },
         dusun
     };
@@ -316,7 +312,8 @@ export async function getOrgChartData() {
     return { 
         keuchik: null, 
         legislative: [], 
-        executive: { sekdes: null, direct: [], subSekdes: [] }, 
+        imum: null,
+        executive: { sekdes: null, subordinates: [] }, 
         dusun: [] 
     };
   }

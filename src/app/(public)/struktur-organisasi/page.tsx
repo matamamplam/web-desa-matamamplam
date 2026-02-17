@@ -52,133 +52,117 @@ export default async function StructurePage() {
   
   return (
     <div className="min-h-screen bg-slate-50 relative overflow-x-auto">
-        <div className="min-w-[1600px] w-full pt-32 pb-20 flex flex-col items-center">
+        <div className="min-w-[1200px] w-full pt-32 pb-20 flex flex-col items-center">
             
-            {/* --- LEVEL 1: KEUCHIK --- */}
-            <div className="relative flex flex-col items-center mb-16">
-                <OfficialCard
-                name={structure.keuchik?.official?.name || "Belum Terisi"}
-                position="Keuchik Gampong"
-                photo={structure.keuchik?.official?.photo || null}
-                size="large"
-                />
-                {/* Vertical Line DOWN */}
-                <Connector type="vertical" height="40px" bottom="-40px" left="50%" />
-            </div>
+            {/* --- LEVEL 1: TOP ROW (Legislative - Keuchik - Imum) --- */}
+            <div className="relative flex justify-center items-start gap-8 mb-16 px-10">
+                {/* Horizontal Dashed Line (Partnership) */}
+                <div className="absolute top-1/2 left-10 right-10 h-0 border-t-2 border-dashed border-gray-300 -z-0"></div>
 
-            {/* --- LEVEL 2: LEGISLATIF & EKSEKUTIF --- */}
-            <div className="relative w-full max-w-6xl flex justify-between px-10">
-                {/* Bridge Line */}
-                <Connector type="horizontal" top="-24px" left="25%" right="25%" />
-                {/* Connector to Keuchik */}
-                <Connector type="vertical" height="24px" top="-24px" left="50%" />
-
-                {/* LEGISLATIF (Left) */}
-                <div className="flex flex-col items-center w-[40%] relative">
-                    <Connector type="vertical" height="24px" top="-24px" left="50%" />
-                    <div className="mb-8 px-4 py-1 bg-white border border-gray-200 text-gray-500 font-bold text-xs tracking-widest rounded-full uppercase z-20">Legislatif</div>
-                    
-                    <div className="flex flex-wrap justify-center gap-6 relative">
-                        {/* Horizontal Bar for Legislatif Children if multiple */}
-                        {structure.legislative?.length > 1 && (
-                        <Connector type="horizontal" top="-16px" left="40px" right="40px" />
-                        )}
-                        
-                        {structure.legislative?.map((pos: any) => (
-                            <div key={pos.id} className="relative mt-4">
-                                <Connector type="vertical" height="16px" top="-16px" left="50%" />
-                                <OfficialCard
-                                name={pos.official?.name || "Belum Terisi"}
-                                position={pos.positionName}
-                                photo={pos.official?.photo || null}
-                                size="small"
-                                />
-                            </div>
-                        ))}
-                    </div>
-                </div>
-
-                {/* EKSEKUTIF (Right) */}
-                <div className="flex flex-col items-center w-[60%] relative">
-                        <Connector type="vertical" height="24px" top="-24px" left="50%" />
-                        <div className="mb-8 px-4 py-1 bg-white border border-gray-200 text-gray-500 font-bold text-xs tracking-widest rounded-full uppercase z-20">Eksekutif</div>
-
-                        <div className="w-full flex justify-center relative">
-                            {/* Connector Structure for Executive */}
-                            <Connector type="vertical" height="24px" top="-24px" left="50%" />
-                            {/* Bar bridging Kasi & Sekdes */}
-                            <Connector type="horizontal" top="0" left="20%" right="20%" />
-
-                            {/* Kasi Left Branch (40% width) */}
-                            <div className="w-[40%] flex justify-center relative pt-8">
-                                <Connector type="vertical" height="32px" top="0" left="50%" />
-                                <div className="flex flex-col gap-4">
-                                    {structure.executive?.direct?.map((pos: any) => (
-                                        <OfficialCard
-                                            key={pos.id}
-                                            name={pos.official?.name || "Belum Terisi"}
-                                            position={pos.positionName}
-                                            photo={pos.official?.photo || null}
-                                            size="small"
-                                        />
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* Sekdes Branch (60% width) */}
-                            <div className="w-[60%] flex flex-col items-center relative pt-8">
-                                <Connector type="vertical" height="32px" top="0" left="50%" />
-                                <OfficialCard
-                                    name={structure.executive?.sekdes?.official?.name || "Belum Terisi"}
-                                    position="Sekretaris Desa"
-                                    photo={structure.executive?.sekdes?.official?.photo || null}
-                                    size="medium"
-                                />
-                                
-                                {/* KAUR / Subordinates */}
-                                {structure.executive?.subSekdes?.length > 0 && (
-                                    <div className="mt-12 relative w-full flex justify-center gap-4">
-                                        {/* Line Down from Sekdes */}
-                                        <Connector type="vertical" height="32px" top="-48px" left="50%" />
-                                        {/* Horizontal Bar */}
-                                        <Connector type="horizontal" top="-16px" left="40px" right="40px" />
-
-                                        {structure.executive.subSekdes.map((pos: any) => (
-                                            <div key={pos.id} className="relative">
-                                                    <Connector type="vertical" height="16px" top="-16px" left="50%" />
-                                                    <OfficialCard
-                                                    name={pos.official?.name || "Belum Terisi"}
-                                                    position={pos.positionName}
-                                                    photo={pos.official?.photo || null}
-                                                    size="small"
-                                                    />
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                </div>
-            </div>
-
-            {/* --- LEVEL 3: KEWILAYAHAN (DUSUN) --- */}
-            {structure.dusun?.length > 0 && (
-                <div className="mt-24 relative w-full max-w-7xl flex flex-col items-center">
-                    <div className="w-full border-t border-dashed border-gray-300 relative mb-12">
-                        <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-slate-50 px-4 text-gray-400 text-xs font-bold tracking-widest uppercase">Kewilayahan (Kepala Dusun)</span>
-                    </div>
-                    
-                    <div className="flex flex-wrap justify-center gap-8 w-full px-4">
-                        {structure.dusun.map((pos: any) => (
-                            <OfficialCard
-                            key={pos.id}
+                {/* LEGISLATIVE (Tuha Peut/Lapan) */}
+                {structure.legislative?.map((pos: any) => (
+                    <div key={pos.id} className="relative z-10 bg-slate-50 p-2">
+                        <OfficialCard
                             name={pos.official?.name || "Belum Terisi"}
                             position={pos.positionName}
-                            dusun={pos.dusunName}
                             photo={pos.official?.photo || null}
                             size="small"
-                            />
-                        ))}
+                        />
+                    </div>
+                ))}
+
+                {/* KEUCHIK */}
+                <div className="relative z-10 bg-slate-50 p-2 transform scale-110">
+                    <OfficialCard
+                        name={structure.keuchik?.official?.name || "Belum Terisi"}
+                        position="Keuchik Gampong"
+                        photo={structure.keuchik?.official?.photo || null}
+                        size="medium"
+                    />
+                    {/* Line Down from Keuchik */}
+                    <Connector type="vertical" height="40px" bottom="-40px" left="50%" />
+                </div>
+
+                {/* IMUM GAMPONG */}
+                {structure.imum && (
+                    <div className="relative z-10 bg-slate-50 p-2">
+                         <OfficialCard
+                            name={structure.imum?.official?.name || "Belum Terisi"}
+                            position="Imum Gampong"
+                            photo={structure.imum?.official?.photo || null}
+                            size="small"
+                        />
+                    </div>
+                )}
+            </div>
+
+            {/* --- LEVEL 2: SEKRES (Sekdes) --- */}
+            {structure.executive?.sekdes && (
+                <div className="relative flex flex-col items-center mb-16">
+                    <Connector type="vertical" height="24px" top="-24px" left="50%" />
+                    
+                    <OfficialCard
+                        name={structure.executive.sekdes.official?.name || "Belum Terisi"}
+                        position="Sekretaris Desa"
+                        photo={structure.executive.sekdes.official?.photo || null}
+                        size="medium"
+                    />
+
+                    {/* Line Down from Sekdes to Subordinates */}
+                    <Connector type="vertical" height="40px" bottom="-40px" left="50%" />
+                </div>
+             )}
+
+             {/* --- LEVEL 3: SUBORDINATES (Kaur & Kasi) --- */}
+             {structure.executive?.subordinates?.length > 0 && (
+                <div className="relative flex justify-center gap-6 mb-24">
+                     {/* Horizontal Bar */}
+                     <Connector type="horizontal" top="-24px" left="50px" right="50px" />
+                     {/* Connector from Sekdes */}
+                     <Connector type="vertical" height="24px" top="-24px" left="50%" />
+
+                     {structure.executive.subordinates.map((pos: any) => (
+                         <div key={pos.id} className="relative pt-4">
+                             <Connector type="vertical" height="28px" top="-28px" left="50%" />
+                             <OfficialCard
+                                 name={pos.official?.name || "Belum Terisi"}
+                                 position={pos.positionName}
+                                 photo={pos.official?.photo || null}
+                                 size="small"
+                             />
+                         </div>
+                     ))}
+                     
+                     {/* Line Down to Dusun (From Center/Keuchik line technically, but physically here) */}
+                     {/* In the image, the line goes from Keuchik all the way down. 
+                         Here we simulate it flowing through Sekdes for visual hierarchy.*/}
+                     <div className="absolute -bottom-12 left-1/2 w-0.5 h-12 bg-gray-300 -translate-x-1/2"></div>
+                </div>
+             )}
+
+            {/* --- LEVEL 4: DUSUN --- */}
+            {structure.dusun?.length > 0 && (
+                <div className="relative w-full max-w-5xl flex flex-col items-center">
+                    <div className="w-full flex justify-center relative">
+                        {/* Horizontal Bar for Dusun */}
+                        <Connector type="horizontal" top="-24px" left="10%" right="10%" />
+                        {/* Connector from Above */}
+                        <Connector type="vertical" height="24px" top="-24px" left="50%" />
+
+                        <div className="flex justify-between w-full px-10 pt-4">
+                            {structure.dusun.map((pos: any) => (
+                                <div key={pos.id} className="relative flex flex-col items-center">
+                                    <Connector type="vertical" height="28px" top="-28px" left="50%" />
+                                    <OfficialCard
+                                    name={pos.official?.name || "Belum Terisi"}
+                                    position={pos.positionName}
+                                    dusun={pos.dusunName}
+                                    photo={pos.official?.photo || null}
+                                    size="small"
+                                    />
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </div>
             )}
