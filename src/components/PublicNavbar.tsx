@@ -143,20 +143,22 @@ export default function PublicNavbar({ siteName = 'Desa Mata Mamplam', logo }: N
                     
                     {/* Desktop Dropdown Panel */}
                     <div 
-                        className={`absolute left-0 mt-2 w-56 bg-white rounded-xl shadow-xl ring-1 ring-black ring-opacity-5 transition-all duration-200 origin-top-left z-50 ${
-                            activeDropdown === group.label ? 'opacity-100 scale-100 translate-y-0 visible' : 'opacity-0 scale-95 -translate-y-2 invisible'
+                        className={`absolute left-0 mt-3 w-60 bg-white rounded-2xl shadow-xl ring-1 ring-black/5 border border-gray-100 transition-all duration-300 origin-top-left z-50 transform ${
+                            activeDropdown === group.label 
+                            ? 'opacity-100 scale-100 translate-y-0 visible' 
+                            : 'opacity-0 scale-95 -translate-y-2 invisible'
                         }`}
                     >
-                      <div className="py-2 p-1">
+                      <div className="p-2 space-y-1">
                         {group.items?.map((item) => (
                           <Link
                             key={item.href}
                             href={item.href}
                             onClick={() => setActiveDropdown(null)}
-                            className={`block px-4 py-2.5 text-sm rounded-lg transition-colors ${
+                            className={`block px-4 py-3 text-sm font-medium rounded-xl transition-all ${
                               pathname === item.href
-                                ? 'bg-blue-50 text-blue-700 font-medium'
-                                : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600'
+                                ? 'bg-blue-50 text-blue-700'
+                                : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600 hover:translate-x-1'
                             }`}
                           >
                             {item.label}
