@@ -35,21 +35,67 @@ export async function GET(request: NextRequest) {
       }
     })
 
-    // 2. Get statistics for affected residents (only if event exists)
+    // 2. Statistics (unchanged)
     let stats = [];
     if (activeEvent) {
         stats = await prisma.affectedResident.groupBy({
             by: ['condition'],
-            where: {
-                eventId: activeEvent.id
-            },
-            _count: {
-                _all: true
-            }
+            where: { eventId: activeEvent.id },
+            _count: { _all: true }
         }) as any;
     }
 
-    // 3. Get Latest Earthquake (Filter: Aceh)
+    // 3. Fetch & Update Earthquake Data (Real-time BMKG)
+    try {
+        const response = await fetch('https://data.bmkg.go.id/DataMKG/TEWS/gempadirasakan.json', { next: { revalidate: 60 } });
+        if (response.ok) {
+            const data = await response.json();
+            const earthquakes = data?.Infogempa?.gempa || [];
+            
+            // Find latest quake in Aceh
+            const acehQuake = earthquakes.find((q: any) => 
+                (q.Wilayah && q.Wilayah.toLowerCase().includes('aceh')) || 
+                (q.Dirasakan && q.Dirasakan.toLowerCase().includes('aceh'))
+            );
+
+            if (acehQuake) {
+                // Parse BMKG DateTime (ISO format is provided in newer endpoints, or parse manual)
+                // BMKG format: "2026-02-16T19:23:32+00:00" or similar. 
+                // We'll use the DateTime field if available, otherwise construct from Tanggal/Jam if needed.
+                const quakeDate = new Date(acehQuake.DateTime);
+
+                // Upsert logic: Check if this specific quake exists (by time/date)
+                const existing = await prisma.earthquake.findFirst({
+                    where: {
+                        datetime: quakeDate
+                    }
+                });
+
+                if (!existing) {
+                    await prisma.earthquake.create({
+                        data: {
+                            datetime: quakeDate,
+                            date: acehQuake.Tanggal,
+                            time: acehQuake.Jam,
+                            coordinates: acehQuake.Coordinates,
+                            lintang: acehQuake.Lintang,
+                            bujur: acehQuake.Bujur,
+                            magnitude: acehQuake.Magnitude,
+                            depth: acehQuake.Kedalaman,
+                            location: acehQuake.Wilayah,
+                            potential: "Gempa Dirasakan", // Default for this endpoint
+                            shakemap: "https://data.bmkg.go.id/DataMKG/TEWS/" + (acehQuake.Shakemap || "") // Note: Shakemap might need checking
+                        }
+                    });
+                }
+            }
+        }
+    } catch (e) {
+        console.error("Failed to fetch BMKG data:", e);
+        // Continue to serve existing DB data if fetch fails
+    }
+
+    // 4. Get Latest Earthquake from DB (Filter: Aceh)
     const earthquake = await prisma.earthquake.findFirst({
         where: {
             location: {

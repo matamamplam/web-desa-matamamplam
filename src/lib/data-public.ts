@@ -221,17 +221,16 @@ export async function getPublicStructure() {
     const positions = await prisma.villageOfficialPosition.findMany({
       include: {
         official: {
-          select: {
-            id: true,
-            name: true,
-            photo: true,
-            email: true,
-            address: true,
-            startDate: true,
-            endDate: true,
-            isActive: true,
-            // phone is NOT included
-          },
+            select: {
+                id: true,
+                name: true,
+                photo: true,
+                email: true,
+                address: true,
+                startDate: true,
+                endDate: true,
+                isActive: true,
+            },
         },
       },
       orderBy: [
@@ -253,7 +252,73 @@ export async function getPublicStructure() {
     };
   } catch (error) {
     console.error('Error fetching public structure:', error);
-    return { structure: { level1: [], level4: [] } };
+    return { structure: { level1: [], level4: [], all: [] } };
+  }
+}
+
+export async function getOrgChartData() {
+  try {
+    const positions = await prisma.villageOfficialPosition.findMany({
+      include: {
+        official: {
+          select: {
+            id: true,
+            name: true,
+            photo: true,
+            email: true,
+            address: true,
+            startDate: true,
+            endDate: true,
+            isActive: true,
+          },
+        },
+      },
+      orderBy: [
+        { level: 'asc' },
+        { sortOrder: 'asc' },
+      ],
+    });
+
+    // Transform into hierarchy
+    const keuchik = positions.find(p => p.positionKey === 'KEUCHIK' || p.level === 1);
+    const legislative = positions.filter(p => p.category === 'ADVISORY' || p.positionKey.includes('TUHA_PEUT')); // Tuha Peut
+    
+    // Executive logic
+    const sekdes = positions.find(p => p.positionKey === 'SEKDES');
+    const kasi = positions.filter(p => p.category === 'LEADERSHIP' && p.level === 2 && p.positionKey !== 'SEKDES' && p.positionKey !== 'KEUCHIK'); // Kasi
+    const kaur = positions.filter(p => p.category === 'SECRETARIAT' || (p.level === 3 && p.positionKey.includes('KAUR')));
+    
+    const dusun = positions.filter(p => p.category === 'DUSUN');
+
+    // Fallback/Grouping if keys aren't exact
+    const others = positions.filter(p => 
+        !p.positionKey.includes('KEUCHIK') && 
+        !p.positionKey.includes('SEKDES') && 
+        p.category !== 'ADVISORY' && 
+        p.category !== 'DUSUN' &&
+        !kaur.includes(p) &&
+        !kasi.includes(p)
+    );
+
+    return {
+        keuchik,
+        legislative,
+        executive: {
+            sekdes,
+            direct: kasi.length > 0 ? kasi : others.filter(p => p.level === 2),
+            subSekdes: kaur.length > 0 ? kaur : others.filter(p => p.level > 2)
+        },
+        dusun
+    };
+
+  } catch (error) {
+    console.error('Error fetching structure:', error);
+    return { 
+        keuchik: null, 
+        legislative: [], 
+        executive: { sekdes: null, direct: [], subSekdes: [] }, 
+        dusun: [] 
+    };
   }
 }
 
