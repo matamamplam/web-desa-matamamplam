@@ -124,11 +124,11 @@ export default function StructureViewer({ structure }: StructureViewerProps) {
             </button>
           </div>
 
-          <div className="block active:cursor-grabbing cursor-grab h-full w-full">
-            <TransformComponent wrapperClass="!w-full !h-full" contentClass="!min-w-[1600px] !w-full !h-full !flex !items-start !justify-center !pt-20">
+          <div className="block active:cursor-grabbing cursor-grab h-full w-full bg-slate-50">
+            <TransformComponent wrapperClass="!w-full !h-full" contentClass="!w-full !h-full !flex !items-start !justify-center !pt-20">
               
               {/* --- LEVEL 1: KEUCHIK --- */}
-              <div className="relative flex flex-col items-center mb-16 w-full">
+              <div className="relative flex flex-col items-center mb-16 min-w-max">
                   {structure.keuchik ? (
                     <OfficialCard
                       name={structure.keuchik.official?.name || "Belum Terisi"}

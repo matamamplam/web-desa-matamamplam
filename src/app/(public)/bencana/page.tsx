@@ -388,22 +388,71 @@ export default function DisasterPage() {
          </div>
 
          {/* Windy Map Card (Bottom) */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-12">
-            <div className="bg-gray-50 px-6 py-4 border-b border-gray-100">
-                <h2 className="text-lg font-bold text-gray-900 flex items-center">
-                    <span className="text-xl mr-2">🌬️</span> Prakiraan Angin & Cuaca
-                </h2>
+         {/* Earthquake & Windy Maps Section (Bottom) */}
+         <div className="grid lg:grid-cols-2 gap-8 mb-12">
+            
+            {/* Earthquake Card */}
+            {earthquake && (
+                <div className="bg-white rounded-2xl shadow-sm border border-orange-200 overflow-hidden h-fit">
+                    <div className="bg-orange-50 px-6 py-4 border-b border-orange-100 flex items-center justify-between">
+                        <h2 className="text-lg font-bold text-gray-900 flex items-center">
+                            <div className="p-1.5 bg-orange-200 rounded-lg mr-3 text-orange-700">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                </svg>
+                            </div>
+                            Info Gempa Terkini (Aceh)
+                        </h2>
+                        <span className="text-xs font-semibold text-orange-600 bg-orange-100 px-2 py-1 rounded-full animate-pulse">
+                            Terbaru
+                        </span>
+                    </div>
+                    <div className="p-6">
+                        <div className="flex flex-col gap-6 items-center">
+                            <div className="flex w-full items-center gap-4">
+                                <div className="flex-shrink-0 text-center bg-orange-600 text-white p-4 rounded-xl shadow-lg">
+                                    <div className="text-4xl font-bold">{earthquake.magnitude}</div>
+                                    <div className="text-xs uppercase tracking-wider opacity-90 mt-1">Mag</div>
+                                </div>
+                                <div className="flex-1">
+                                    <p className="text-lg font-semibold text-gray-900 leading-tight mb-1">{earthquake.location}</p>
+                                    <div className="text-sm text-gray-600">
+                                        <p className="flex items-center"><FiMapPin className="mr-1.5" size={14}/> {earthquake.depth}</p>
+                                        <p className="flex items-center mt-1">
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                            </svg>
+                                            {earthquake.date} - {earthquake.time}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <p className="w-full text-xs text-gray-500 italic bg-gray-50 p-2 rounded text-center border border-gray-100">
+                                {earthquake.potential || "Tidak berpotensi Tsunami"}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Windy Map Card */}
+            <div className={`bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden ${!earthquake ? 'lg:col-span-2' : ''}`}>
+                <div className="bg-gray-50 px-6 py-4 border-b border-gray-100">
+                    <h2 className="text-lg font-bold text-gray-900 flex items-center">
+                        <span className="text-xl mr-2">🌬️</span> Prakiraan Cuaca
+                    </h2>
+                </div>
+                <div className="h-[300px] w-full bg-gray-100 relative">
+                        <iframe 
+                        width="100%" 
+                        height="100%" 
+                        src="https://embed.windy.com/embed2.html?lat=5.1667&lon=96.8333&detailLat=5.1667&detailLon=96.8333&width=650&height=450&zoom=8&level=surface&overlay=gustAccu&product=ecmwf&menu=&message=&marker=&calendar=now&pressure=&type=map&location=coordinates&detail=&metricWind=default&metricTemp=default&radarRange=-1" 
+                        frameBorder="0"
+                        className="absolute inset-0"
+                    ></iframe>
+                </div>
             </div>
-            <div className="h-[400px] w-full bg-gray-100 relative">
-                    <iframe 
-                    width="100%" 
-                    height="100%" 
-                    src="https://embed.windy.com/embed2.html?lat=5.1667&lon=96.8333&detailLat=5.1667&detailLon=96.8333&width=650&height=450&zoom=8&level=surface&overlay=gustAccu&product=ecmwf&menu=&message=&marker=&calendar=now&pressure=&type=map&location=coordinates&detail=&metricWind=default&metricTemp=default&radarRange=-1" 
-                    frameBorder="0"
-                    className="absolute inset-0"
-                ></iframe>
-            </div>
-        </div>
+         </div>
       </div>
     </div>
   )

@@ -92,27 +92,26 @@ export default function PublicNavbar({ siteName = 'Desa Mata Mamplam', logo }: N
   };
 
   return (
-    <nav className="sticky top-0 z-50 bg-white shadow-md font-sans" ref={dropdownRef}>
+    <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-white/20 shadow-sm font-sans transition-all duration-300" ref={dropdownRef}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-20">
+        <div className="flex justify-between items-center h-16">
           {/* Logo & Site Name */}
-          <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+          <Link href="/" className="flex items-center gap-3 group">
             {logo ? (
               <img
                 src={logo}
                 alt={siteName}
-                className="h-10 w-auto max-w-[150px] object-contain"
+                className="h-9 w-auto max-w-[150px] object-contain group-hover:scale-105 transition-transform duration-300"
               />
             ) : (
-                <div className="h-10 w-10 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-xl">
+                <div className="h-9 w-9 bg-gradient-to-br from-blue-600 to-blue-500 rounded-lg flex items-center justify-center text-white font-bold text-lg shadow-blue-200 shadow-lg group-hover:shadow-blue-300 transition-all">
                     {siteName.charAt(0)}
                 </div>
             )}
             <div className="hidden sm:flex flex-col">
-                 <span className="font-bold text-lg text-gray-900 leading-tight">
+                 <span className="font-bold text-base text-gray-900 leading-tight group-hover:text-blue-700 transition-colors">
                   {siteName}
                 </span>
-                <span className="text-xs text-gray-500 font-medium">Kabupaten Bireuen</span>
             </div>
            
           </Link>
