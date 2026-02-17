@@ -42,7 +42,7 @@ export default function StructurePreview({ structure }: { structure: any }) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold text-gray-900 mb-4">Struktur Organisasi</h2>
-          <p className="text-gray-600">Pejabat pemerintahan desa</p>
+          <p className="text-gray-600">Pejabat Pemerintahan Desa Mata Mamplam</p>
         </div>
 
         <div className="flex flex-col md:flex-row gap-8 justify-center items-center mb-8">

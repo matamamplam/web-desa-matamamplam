@@ -29,7 +29,16 @@ export async function generateMetadata(): Promise<Metadata> {
         default: siteName,
       },
       description: rawSettings?.general?.description || 'Website resmi pemerintahan desa',
-      keywords: ['Desa Mata Mamplam', 'Peusangan', 'Bireuen', 'Aceh', 'Pemerintahan Desa', 'Website Desa'],
+      keywords: [
+        'Desa Mata Mamplam', 
+        'Mata Mamplam', 
+        'Peusangan', 
+        'Bireuen', 
+        'Aceh', 
+        'Pemerintahan Desa', 
+        'Website Desa', 
+        'Gampong Mata Mamplam'
+      ],
       openGraph: {
         title: siteName,
         description: rawSettings?.general?.description || 'Website resmi pemerintahan desa',

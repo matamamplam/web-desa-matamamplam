@@ -46,16 +46,49 @@ export async function generateMetadata() {
   const settingsData = await getPublicSettings();
   const rawSettings = settingsData || {};
   const siteName = rawSettings.general?.siteName || 'Desa Mata Mamplam';
-  const description = rawSettings.general?.description || 'Website resmi pemerintahan desa';
+  // Enhanced description with keywords
+  const description = rawSettings.general?.description || 'Website Resmi Pemerintah Desa Mata Mamplam, Kecamatan Peusangan, Kabupaten Bireuen, Provinsi Aceh. Media informasi transparansi, pelayanan publik, dan pembangunan gampong.';
   
   return {
     title: siteName,
     description: description,
+    keywords: [
+      // 1. Keyword Utama
+      'Desa Mata Mamplam', 'Mata Mamplam', 'Informasi Desa Mata Mamplam', 'Website Desa Mata Mamplam', 
+      'Gampong Mata Mamplam', 'Desa Mata Mamplam Bireuen', 'Desa Mata Mamplam Aceh', 
+      'Profil Desa Mata Mamplam', 'Pemerintahan Desa Mata Mamplam', 'Kantor Desa Mata Mamplam',
+      
+      // 2. Keyword Lokal
+      'Desa Mata Mamplam Kecamatan Peusangan', 'Desa Mata Mamplam Kabupaten Bireuen', 
+      'Desa Mata Mamplam Provinsi Aceh', 'Peta Desa Mata Mamplam', 'Batas Wilayah Desa Mata Mamplam', 
+      'Dusun di Desa Mata Mamplam', 'Peusangan Bireuen',
+      
+      // 3. Keyword Layanan
+      'Pelayanan Desa Mata Mamplam', 'Administrasi Desa Mata Mamplam', 'Surat Keterangan Desa Mata Mamplam', 
+      'Data Penduduk Desa Mata Mamplam', 'APBDes Desa Mata Mamplam', 'Transparansi Anggaran Desa Mata Mamplam',
+      
+      // 4. Long Tail
+      'Cara mengurus surat di Desa Mata Mamplam', 'Daftar perangkat Desa Mata Mamplam terbaru', 
+      'Struktur organisasi Desa Mata Mamplam', 'Sejarah Desa Mata Mamplam Aceh', 'Informasi bantuan Desa Mata Mamplam'
+    ],
     openGraph: {
       title: siteName,
       description: description,
       images: [rawSettings.branding?.logo || '/images/logo.png'],
+      url: 'https://matamamplam.my.id',
+      siteName: siteName,
+      locale: 'id_ID',
+      type: 'website',
     },
+    twitter: {
+        card: 'summary_large_image',
+        title: siteName,
+        description: description,
+        images: [rawSettings.branding?.logo || '/images/logo.png'],
+    },
+    alternates: {
+      canonical: 'https://matamamplam.my.id',
+    }
   };
 }
 

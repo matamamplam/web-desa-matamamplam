@@ -15,8 +15,8 @@ interface Settings {
 
 export default function HeroSection({ settings }: { settings: Settings }) {
   const siteName = settings.general?.siteName || 'Desa Mata Mamplam';
-  const tagline = settings.general?.tagline || 'Kecamatan Peusangan, Kabupaten Bireuen';
-  const description = settings.general?.description || 'Website resmi pemerintahan desa';
+  const tagline = settings.general?.tagline || 'Kecamatan Peusangan, Kabupaten Bireuen, Provinsi Aceh';
+  const description = settings.general?.description || 'Website Resmi Pemerintah Desa Mata Mamplam. Pusat informasi pelayanan publik, transparansi pembangunan, dan potensi gampong.';
   const heroBackground = settings.general?.heroBackground;
 
   return (

@@ -27,13 +27,16 @@ export default function PublicFooter({ settings }: FooterProps) {
   const siteName = settings?.general?.siteName || 'Desa Mata Mamplam';
   const phone = settings?.contact?.phone;
   const email = settings?.contact?.email;
-  const address = settings?.contact?.address;
-  const description = settings?.footer?.description || 'Website resmi Pemerintah Desa';
+  const description = settings?.footer?.description || 'Website Resmi Pemerintah Desa Mata Mamplam, Kecamatan Peusangan, Kabupaten Bireuen, Provinsi Aceh. Pusat informasi pembangunan, transparansi anggaran, dan pelayanan administrasi kependudukan.';
+  
+  // SEO-friendly address fallback
+  const defaultAddress = "Jalan Cot Ijue - Tanoe Anoe, Desa Mata Mamplam, Kec. Peusangan, Kab. Bireuen, Aceh";
+  const address = settings?.contact?.address || defaultAddress;
   const social = settings?.footer?.socialMedia;
   
   // Ensure we use dynamic year
   const currentYear = new Date().getFullYear();
-  let copyright = settings?.footer?.copyright || `© ${currentYear} ${siteName}. All rights reserved.`;
+  let copyright = settings?.footer?.copyright || `© ${currentYear} Pemerintahan Desa Mata Mamplam. All rights reserved.`;
   // If copyright string contains a year like 2024, replace it with current year
   copyright = copyright.replace(/20\d{2}/, currentYear.toString());
 
