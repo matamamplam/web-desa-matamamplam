@@ -94,8 +94,71 @@ export async function generateMetadata() {
 
 async function getData() {
   try {
-    // Fetch all data in parallel including settings
-    const [settingsData, stats, newsData, umkmData, projectsData, structureData, disasterData] = await Promise.all([
+    const OPEN_METEO_URL = "https://api.open-meteo.com/v1/forecast?latitude=5.1667&longitude=96.8333&current=temperature_2m,weather_code,relative_humidity_2m,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=Asia%2FBangkok&forecast_days=7";
+
+    // 1. Prepare Weather Promise
+    const weatherPromise = fetch(OPEN_METEO_URL, { next: { revalidate: 300 } })
+      .then(async (res) => {
+        if (!res.ok) return null;
+        const weatherData = await res.json();
+        const weatherDesc = getWeatherDesc(weatherData.current.weather_code);
+        
+        const dailyForecast = weatherData.daily.time.map((date: string, index: number) => ({
+          date,
+          code: weatherData.daily.weather_code[index],
+          maxTemp: Math.round(weatherData.daily.temperature_2m_max[index]),
+          minTemp: Math.round(weatherData.daily.temperature_2m_min[index]),
+        }));
+
+        return {
+          city: 'Peusangan',
+          temperature: Math.round(weatherData.current.temperature_2m),
+          condition: weatherDesc.label,
+          icon: weatherDesc.icon,
+          humidity: weatherData.current.relative_humidity_2m,
+          windSpeed: weatherData.current.wind_speed_10m,
+          daily: dailyForecast,
+        };
+      })
+      .catch((err) => {
+        console.error('Error fetching weather:', err);
+        return null;
+      });
+
+    // 2. Prepare Earthquake Promise
+    const earthquakePromise = prisma.earthquake.findFirst({
+      orderBy: { datetime: 'desc' }
+    })
+      .then((gempa) => {
+        if (!gempa) return null;
+        return {
+          magnitude: gempa.magnitude,
+          location: gempa.location,
+          date: gempa.date,
+          time: gempa.time,
+          depth: gempa.depth,
+          shakemap: gempa.shakemap || undefined,
+          coordinates: gempa.coordinates,
+          potential: gempa.potential,
+        };
+      })
+      .catch((err) => {
+        console.error('Error fetching earthquake:', err);
+        return null;
+      });
+
+    // 3. Fire all promises in parallel
+    const [
+      settingsData, 
+      stats, 
+      newsData, 
+      umkmData, 
+      projectsData, 
+      structureData, 
+      disasterData,
+      weather,
+      earthquake
+    ] = await Promise.all([
       getPublicSettings(),
       getPublicStats(),
       getPublicNews(),
@@ -103,6 +166,8 @@ async function getData() {
       getPublicProjects(),
       getPublicStructure(),
       getPublicDisaster(),
+      weatherPromise,
+      earthquakePromise
     ]);
 
     // getPublicSettings now returns the JSON settings content directly
@@ -145,62 +210,6 @@ async function getData() {
       photoBefore: item.photoBefore || null,
       photoAfter: item.photoAfter || null
     }));
-
-    // Fetch Weather Data from Open-Meteo with daily forecast
-    const OPEN_METEO_URL = "https://api.open-meteo.com/v1/forecast?latitude=5.1667&longitude=96.8333&current=temperature_2m,weather_code,relative_humidity_2m,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=Asia%2FBangkok&forecast_days=7";
-    let weather = null;
-    try {
-      // Cache weather data for 5 minutes (300 seconds)
-      const weatherRes = await fetch(OPEN_METEO_URL, { 
-        next: { revalidate: 300 }
-      });
-      if (weatherRes.ok) {
-        const weatherData = await weatherRes.json();
-        const weatherDesc = getWeatherDesc(weatherData.current.weather_code);
-        
-        // Transform daily forecast
-        const dailyForecast = weatherData.daily.time.map((date: string, index: number) => ({
-          date,
-          code: weatherData.daily.weather_code[index],
-          maxTemp: Math.round(weatherData.daily.temperature_2m_max[index]),
-          minTemp: Math.round(weatherData.daily.temperature_2m_min[index]),
-        }));
-
-        weather = {
-          city: 'Peusangan',
-          temperature: Math.round(weatherData.current.temperature_2m),
-          condition: weatherDesc.label,
-          icon: weatherDesc.icon,
-          humidity: weatherData.current.relative_humidity_2m,
-          windSpeed: weatherData.current.wind_speed_10m,
-          daily: dailyForecast,
-        };
-      }
-    } catch (error) {
-      console.error('Error fetching weather:', error);
-    }
-
-    // Fetch Latest Earthquake
-    let earthquake = null;
-    try {
-      const gempa = await prisma.earthquake.findFirst({
-        orderBy: { datetime: 'desc' }
-      });
-      if (gempa) {
-        earthquake = {
-          magnitude: gempa.magnitude,
-          location: gempa.location,
-          date: gempa.date,
-          time: gempa.time,
-          depth: gempa.depth,
-          shakemap: gempa.shakemap || undefined,
-          coordinates: gempa.coordinates,
-          potential: gempa.potential,
-        };
-      }
-    } catch (error) {
-      console.error('Error fetching earthquake:', error);
-    }
 
     return {
       stats,
