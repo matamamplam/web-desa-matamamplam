@@ -98,142 +98,137 @@ export default function InfoBar({ weather, earthquake }: InfoBarProps) {
         </div>
       </div>
 
-      {/* Weather Detail Modal (HyperOS Style Refined) */}
+      {/* Weather Detail Modal (HyperOS Inspired - Robust Layout) */}
       {showWeatherModal && weather && (
         <div 
-          className="fixed inset-0 z-[110] flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-md sm:p-4 transition-all duration-300"
+          className="fixed inset-0 z-[110] flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm sm:p-6 transition-opacity"
           onClick={() => setShowWeatherModal(false)}
         >
+          {/* Main Modal Container */}
           <div 
-            className="w-full sm:max-w-md h-[95vh] sm:h-auto sm:max-h-[85vh] sm:rounded-3xl rounded-t-3xl overflow-hidden shadow-2xl bg-[#0f172a] relative transition-transform transform translate-y-0"
+            className="w-full sm:max-w-md h-[92vh] sm:h-auto sm:max-h-[90vh] sm:rounded-3xl rounded-t-3xl overflow-hidden shadow-2xl bg-[#0b1320] text-white flex flex-col relative"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* HyperOS Clouds Background */}
-            <div className="absolute inset-0 bg-gradient-to-b from-[#1e293b] via-[#0f172a] to-[#0b0f19] opacity-80 pointer-events-none"></div>
+            {/* Background effects */}
+            <div className="absolute inset-0 bg-gradient-to-br from-[#1e293b] via-[#0f172a] to-[#0b0f19] opacity-90 pointer-events-none"></div>
             
-            <div className="relative flex flex-col min-h-full overflow-y-auto custom-scrollbar pb-10">
-              
-              {/* Header */}
-              <div className="flex items-center justify-between px-6 pt-8 pb-4 sticky top-0 bg-gradient-to-b from-[#1e293b] to-transparent z-10 transition-colors duration-200 backdrop-blur-[2px]">
-                <h3 className="text-xl sm:text-2xl font-medium text-white tracking-wide">{weather.city}</h3>
-                <div className="flex gap-4">
-                  <button className="text-white/80 hover:text-white" disabled>
-                    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                    </svg>
-                  </button>
-                  <button onClick={() => setShowWeatherModal(false)} className="text-white/80 hover:text-white">
-                    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                  </button>
-                </div>
+            {/* Header (Sticky inside flex column) */}
+            <div className="relative flex items-center justify-between px-6 py-5 bg-[#0f172a]/80 backdrop-blur-md z-20 shrink-0 border-b border-white/5">
+              <h3 className="text-xl sm:text-2xl font-medium tracking-wide">{weather.city}</h3>
+              <div className="flex items-center gap-4">
+                <button className="text-white/50 cursor-default" aria-hidden="true" disabled>
+                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+                </button>
+                <button onClick={() => setShowWeatherModal(false)} className="text-white/80 hover:text-white transition-colors" aria-label="Tutup">
+                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
               </div>
+            </div>
 
-              {/* Main Temp & Condition */}
-              <div className="flex flex-col items-center justify-center mt-6 mb-8 px-6 text-white text-center">
-                 <div className="text-[96px] leading-[1] font-light tracking-tighter ml-6">
+            {/* Scrollable Content Body */}
+            <div className="relative flex-1 overflow-y-auto w-full custom-scrollbar pb-8 pt-4">
+              
+              {/* Temperature Display */}
+              <div className="flex flex-col items-center justify-center mb-8">
+                 <div className="text-[100px] leading-[0.85] font-light tracking-tighter">
                     {weather.temperature}°
                  </div>
-                 <div className="text-base text-gray-300 font-medium mt-1">
+                 <div className="text-lg text-slate-300 font-medium mt-4">
                     {weather.condition}
                  </div>
               </div>
 
-              {/* Stats Cards (HyperOS Style Grid) */}
-              <div className="px-5 mb-8 space-y-4">
-                 <div className="grid grid-cols-2 gap-4">
-                    
-                    {/* Air Quality (Simulative Static Panel) */}
-                    <div className="col-span-2 bg-white/5 border border-white/10 rounded-3xl p-4 flex items-center justify-between backdrop-blur-md cursor-default">
-                        <div className="flex items-center gap-2">
-                           <svg className="w-5 h-5 text-gray-300" viewBox="0 0 24 24" fill="currentColor"><path d="M17 19.22H5V7h7V5H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-2.22h-2V19.22zM21 4.5l-3.5 3.5l-1.41-1.41L18.17 4.5L16.08 2.41L17.5 1h7l-3.5 3.5z"/></svg>
-                           <span className="text-sm font-medium text-white">IKU 66</span>
-                           <span className="text-sm text-gray-400 border-l border-gray-600 pl-2 ml-1">Kualitas Sedang</span>
-                        </div>
-                    </div>
-
-                    {/* Wind Speed Card */}
-                    {weather.windSpeed !== undefined && (
-                      <div className="bg-white/5 border border-white/10 rounded-3xl p-5 backdrop-blur-md relative overflow-hidden flex flex-col justify-between h-36">
-                        <div className="z-10 relative">
-                           <div className="text-sm text-gray-400 mb-1">Angin</div>
-                           <div className="text-xl sm:text-2xl font-medium text-white">{weather.windSpeed} <span className="text-sm font-normal text-gray-300">km/j</span></div>
-                        </div>
-                        {/* Gauge Visualizer - Reduced size and properly anchored */}
-                        <div className="absolute bottom-0 right-0 w-24 h-24 opacity-60 translate-x-2 translate-y-2">
-                            <svg viewBox="0 0 100 100" className="w-full h-full transform -rotate-45">
-                              <circle cx="50" cy="50" r="35" fill="transparent" stroke="#1e293b" strokeWidth="6"/>
-                              <circle cx="50" cy="50" r="35" fill="transparent" stroke="#38bdf8" strokeWidth="6" strokeDasharray="219.9" strokeDashoffset={219.9 - (219.9 * 30 / 100)} strokeLinecap="round"/>
-                              <path d="M 50 15 L 50 25" stroke="white" strokeWidth="2" strokeLinecap="round" className="transform origin-[50px_50px] rotate-[120deg]"/>
-                            </svg>
-                        </div>
+              <div className="px-5 sm:px-6 space-y-4">
+                  {/* AQI Pill - Static Non-Interactive */}
+                  <div className="bg-white/5 border border-white/10 rounded-2xl p-4 flex items-center justify-between backdrop-blur-md cursor-default">
+                      <div className="flex items-center gap-3">
+                         <svg className="w-5 h-5 text-green-400" viewBox="0 0 24 24" fill="currentColor"><path d="M17 19.22H5V7h7V5H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-2.22h-2V19.22zM21 4.5l-3.5 3.5l-1.41-1.41L18.17 4.5L16.08 2.41L17.5 1h7l-3.5 3.5z"/></svg>
+                         <span className="text-sm font-semibold text-white">IKU 66</span>
+                         <span className="text-sm font-medium text-slate-300 border-l border-slate-600 pl-3">Kualitas Sedang</span>
                       </div>
-                    )}
-
-                    {/* Humidity Card */}
-                    {weather.humidity !== undefined && (
-                      <div className="bg-white/5 border border-white/10 rounded-3xl p-5 backdrop-blur-md relative overflow-hidden flex flex-col justify-between h-36">
-                        <div className="z-10 relative">
-                           <div className="text-sm text-gray-400 mb-1">Kelembapan</div>
-                           <div className="text-2xl sm:text-3xl font-medium text-white">{weather.humidity}%</div>
-                        </div>
-                        {/* Gauge Visualizer - Reduced size and properly anchored */}
-                        <div className="absolute bottom-0 right-0 w-24 h-24 opacity-60 translate-x-2 translate-y-2">
-                            <svg viewBox="0 0 100 100" className="w-full h-full transform -rotate-45">
-                              <circle cx="50" cy="50" r="35" fill="transparent" stroke="#1e293b" strokeWidth="6"/>
-                              <circle cx="50" cy="50" r="35" fill="transparent" stroke="#3b82f6" strokeWidth="6" strokeDasharray="219.9" strokeDashoffset={219.9 - (219.9 * weather.humidity / 100)} strokeLinecap="round"/>
-                               {/* Rain Drop in center of gauge */}
-                               <path d="M50 25 C50 25, 40 40, 40 50 A10 10 0 0 0 60 50 C60 40, 50 25, 50 25 Z" fill="#3b82f6" className="transform origin-center rotate-45 scale-[0.35]" />
-                            </svg>
-                        </div>
-                      </div>
-                    )}
-                 </div>
-              </div>
-
-              {/* Horizontal 7-Day Forecast */}
-              {weather.daily && weather.daily.length > 0 && (
-                <div className="px-5 pb-8">
-                  <div className="bg-white/5 border border-white/10 rounded-3xl py-5 px-1 backdrop-blur-md">
-                    <div className="flex overflow-x-auto custom-scrollbar gap-2 px-3 pl-3">
-                      {weather.daily.map((day, index) => {
-                        const dayInfo = getWeatherDesc(day.code);
-                        const date = new Date(day.date);
-                        let dayName = index === 0 ? 'Sekarang' : date.toLocaleDateString('id-ID', { weekday: 'short' });
-                        if(index === 0) {
-                           day.maxTemp = weather.temperature;
-                        }
-
-                        // Determine curve line point positioning
-                        const isHigh = day.maxTemp > 28;
-
-                        return (
-                          <div key={day.date} className="flex flex-col items-center justify-between min-w-[64px] relative pb-2">
-                            <div className="text-sm font-medium text-white mb-2">{day.maxTemp}°</div>
-                            
-                            {/* Temp Curve Simulation (CSS Line) */}
-                            <div className="w-full h-8 relative mb-2">
-                               <div className={`absolute left-0 right-0 h-[2px] bg-yellow-400 ${index !== 0 && index !== weather.daily!.length - 1 ? 'w-[120%] -left-1/4' : 'w-full'} ${isHigh ? 'top-2' : 'top-6'} transition-all`}></div>
-                               <div className={`w-1.5 h-1.5 rounded-full bg-white absolute left-1/2 -translate-x-1/2 ${isHigh ? 'top-[7px]' : 'top-[23px]'} z-10 box-content border-2 border-[#1e293b]`}></div>
-                            </div>
-                            
-                            <div className="text-2xl mb-2 drop-shadow-md">{dayInfo.icon}</div>
-                            <div className="text-[11px] text-gray-400 font-medium">{dayName}</div>
-                          </div>
-                        );
-                      })}
-                    </div>
                   </div>
-                </div>
-              )}
-               
-              <div className="mt-auto pt-4 text-[10px] text-gray-500 text-center px-4 w-full opacity-60 flex justify-center items-center gap-1">
-                 <span>Data disediakan oleh</span>
-                 <span className="font-semibold text-gray-400">Open-Meteo</span>
+
+                  {/* Bento Grid layout */}
+                  <div className="grid grid-cols-2 gap-4">
+                      {/* Wind Card */}
+                      {weather.windSpeed !== undefined && (
+                        <div className="bg-white/5 border border-white/10 rounded-3xl p-5 relative overflow-hidden h-36 flex flex-col justify-between backdrop-blur-md">
+                          <div className="relative z-10 w-full">
+                            <div className="text-sm text-slate-400 font-medium mb-1">Angin</div>
+                            <div className="text-2xl font-semibold text-white">{weather.windSpeed} <span className="text-xs font-normal text-slate-400">km/j</span></div>
+                          </div>
+                          {/* Securely Anchored SVG Gauge */}
+                          <div className="absolute -bottom-4 -right-1 w-24 h-24 opacity-60 pointer-events-none">
+                              <svg viewBox="0 0 100 100" className="w-full h-full transform -rotate-45">
+                                <circle cx="50" cy="50" r="38" fill="transparent" stroke="#1e293b" strokeWidth="8"/>
+                                <circle cx="50" cy="50" r="38" fill="transparent" stroke="#38bdf8" strokeWidth="8" strokeDasharray="239" strokeDashoffset={239 - (239 * 30 / 100)} strokeLinecap="round"/>
+                                <path d="M 50 12 L 50 25" stroke="white" strokeWidth="3" strokeLinecap="round" className="transform origin-[50px_50px] rotate-[130deg]"/>
+                              </svg>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Humidity Card */}
+                      {weather.humidity !== undefined && (
+                        <div className="bg-white/5 border border-white/10 rounded-3xl p-5 relative overflow-hidden h-36 flex flex-col justify-between backdrop-blur-md">
+                          <div className="relative z-10 w-full">
+                            <div className="text-sm text-slate-400 font-medium mb-1">Kelembapan</div>
+                            <div className="text-2xl font-semibold text-white">{weather.humidity}%</div>
+                          </div>
+                          {/* Securely Anchored SVG Gauge */}
+                          <div className="absolute -bottom-4 -right-1 w-24 h-24 opacity-60 pointer-events-none">
+                              <svg viewBox="0 0 100 100" className="w-full h-full transform -rotate-45">
+                                <circle cx="50" cy="50" r="38" fill="transparent" stroke="#1e293b" strokeWidth="8"/>
+                                <circle cx="50" cy="50" r="38" fill="transparent" stroke="#3b82f6" strokeWidth="8" strokeDasharray="239" strokeDashoffset={239 - (239 * weather.humidity / 100)} strokeLinecap="round"/>
+                                <path d="M50 25 C50 25, 40 40, 40 50 A10 10 0 0 0 60 50 C60 40, 50 25, 50 25 Z" fill="#3b82f6" className="transform origin-center rotate-45 scale-[0.4]" />
+                              </svg>
+                          </div>
+                        </div>
+                      )}
+                  </div>
+
+                  {/* Horizontal 7-Day Forecast */}
+                  {weather.daily && weather.daily.length > 0 && (
+                    <div className="bg-white/5 border border-white/10 rounded-3xl pt-5 pb-3 overflow-hidden backdrop-blur-md">
+                       <div className="w-full overflow-x-auto custom-scrollbar px-4 pb-2">
+                          <div className="flex gap-2 min-w-max items-end">
+                            {weather.daily.map((day, index) => {
+                              const dayInfo = getWeatherDesc(day.code);
+                              const date = new Date(day.date);
+                              const dayName = index === 0 ? 'Sekarang' : date.toLocaleDateString('id-ID', { weekday: 'short' });
+                              if(index === 0) day.maxTemp = weather.temperature;
+                              const isHigh = day.maxTemp > 28;
+
+                              return (
+                                <div key={day.date} className="flex flex-col items-center justify-end w-[64px] relative">
+                                  <span className="text-sm font-semibold text-white z-10">{day.maxTemp}°</span>
+                                  
+                                  {/* Curve line simulation using simple robust CSS */}
+                                  <div className="h-8 w-full relative flex items-center justify-center pointer-events-none overflow-visible my-1 px-3">
+                                    {index !== weather.daily!.length - 1 && (
+                                      <div className={`absolute top-1/2 left-1/2 w-full h-[2px] bg-yellow-400 rotate-0 origin-left`}></div>
+                                    )}
+                                    <div className={`w-1.5 h-1.5 rounded-full bg-white z-10 border-2 border-[#1e293b] box-content ${isHigh ? 'mb-4' : 'mt-4'}`}></div>
+                                  </div>
+
+                                  <span className="text-2xl mt-1 mb-2 drop-shadow-md">{dayInfo.icon}</span>
+                                  <span className="text-[11px] font-medium text-slate-400">{dayName}</span>
+                                </div>
+                              );
+                            })}
+                          </div>
+                       </div>
+                    </div>
+                  )}
+
+                  <div className="text-center pt-2 pb-2 text-[10px] text-slate-500 font-medium">
+                    Data disediakan oleh <span className="font-semibold text-slate-400 whitespace-nowrap">Open-Meteo</span>
+                  </div>
               </div>
             </div>
+
           </div>
         </div>
       )}
