@@ -111,13 +111,13 @@ export default function InfoBar({ weather, earthquake }: InfoBarProps) {
             {/* HyperOS Clouds Background */}
             <div className="absolute inset-0 bg-gradient-to-b from-[#1e293b] via-[#0f172a] to-[#0b0f19] opacity-80 pointer-events-none"></div>
             
-            <div className="relative h-full flex flex-col overflow-y-auto custom-scrollbar">
+            <div className="relative flex flex-col min-h-full overflow-y-auto custom-scrollbar pb-10">
               
               {/* Header */}
-              <div className="flex items-center justify-between px-6 pt-8 pb-4 sticky top-0 bg-gradient-to-b from-[#1e293b] to-transparent z-10">
+              <div className="flex items-center justify-between px-6 pt-8 pb-4 sticky top-0 bg-gradient-to-b from-[#1e293b] to-transparent z-10 transition-colors duration-200 backdrop-blur-[2px]">
                 <h3 className="text-xl sm:text-2xl font-medium text-white tracking-wide">{weather.city}</h3>
                 <div className="flex gap-4">
-                  <button className="text-white/80 hover:text-white">
+                  <button className="text-white/80 hover:text-white" disabled>
                     <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                     </svg>
@@ -145,30 +145,27 @@ export default function InfoBar({ weather, earthquake }: InfoBarProps) {
               <div className="px-5 mb-8 space-y-4">
                  <div className="grid grid-cols-2 gap-4">
                     
-                    {/* Air Quality (Simulated) */}
-                    <div className="col-span-2 bg-white/5 border border-white/10 rounded-3xl p-4 flex items-center justify-between backdrop-blur-md">
+                    {/* Air Quality (Simulative Static Panel) */}
+                    <div className="col-span-2 bg-white/5 border border-white/10 rounded-3xl p-4 flex items-center justify-between backdrop-blur-md cursor-default">
                         <div className="flex items-center gap-2">
                            <svg className="w-5 h-5 text-gray-300" viewBox="0 0 24 24" fill="currentColor"><path d="M17 19.22H5V7h7V5H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-2.22h-2V19.22zM21 4.5l-3.5 3.5l-1.41-1.41L18.17 4.5L16.08 2.41L17.5 1h7l-3.5 3.5z"/></svg>
                            <span className="text-sm font-medium text-white">IKU 66</span>
                            <span className="text-sm text-gray-400 border-l border-gray-600 pl-2 ml-1">Kualitas Sedang</span>
                         </div>
-                        <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
                     </div>
 
                     {/* Wind Speed Card */}
                     {weather.windSpeed !== undefined && (
-                      <div className="bg-white/5 border border-white/10 rounded-3xl p-5 backdrop-blur-md relative overflow-hidden flex flex-col justify-between aspect-square">
-                        <div>
+                      <div className="bg-white/5 border border-white/10 rounded-3xl p-5 backdrop-blur-md relative overflow-hidden flex flex-col justify-between h-36">
+                        <div className="z-10 relative">
                            <div className="text-sm text-gray-400 mb-1">Angin</div>
-                           <div className="text-2xl font-medium text-white">{weather.windSpeed} km/j</div>
+                           <div className="text-xl sm:text-2xl font-medium text-white">{weather.windSpeed} <span className="text-sm font-normal text-gray-300">km/j</span></div>
                         </div>
-                        {/* Gauge Visualizer */}
-                        <div className="absolute -bottom-6 -right-6 w-32 h-32 opacity-70">
+                        {/* Gauge Visualizer - Reduced size and properly anchored */}
+                        <div className="absolute bottom-0 right-0 w-24 h-24 opacity-60 translate-x-2 translate-y-2">
                             <svg viewBox="0 0 100 100" className="w-full h-full transform -rotate-45">
-                              <circle cx="50" cy="50" r="40" fill="transparent" stroke="#1e293b" strokeWidth="8"/>
-                              <circle cx="50" cy="50" r="40" fill="transparent" stroke="#38bdf8" strokeWidth="8" strokeDasharray="251.2" strokeDashoffset={251.2 - (251.2 * 30 / 100)} strokeLinecap="round"/>
+                              <circle cx="50" cy="50" r="35" fill="transparent" stroke="#1e293b" strokeWidth="6"/>
+                              <circle cx="50" cy="50" r="35" fill="transparent" stroke="#38bdf8" strokeWidth="6" strokeDasharray="219.9" strokeDashoffset={219.9 - (219.9 * 30 / 100)} strokeLinecap="round"/>
                               <path d="M 50 15 L 50 25" stroke="white" strokeWidth="2" strokeLinecap="round" className="transform origin-[50px_50px] rotate-[120deg]"/>
                             </svg>
                         </div>
@@ -177,18 +174,18 @@ export default function InfoBar({ weather, earthquake }: InfoBarProps) {
 
                     {/* Humidity Card */}
                     {weather.humidity !== undefined && (
-                      <div className="bg-white/5 border border-white/10 rounded-3xl p-5 backdrop-blur-md relative overflow-hidden flex flex-col justify-between aspect-square">
-                        <div>
+                      <div className="bg-white/5 border border-white/10 rounded-3xl p-5 backdrop-blur-md relative overflow-hidden flex flex-col justify-between h-36">
+                        <div className="z-10 relative">
                            <div className="text-sm text-gray-400 mb-1">Kelembapan</div>
-                           <div className="text-3xl font-medium text-white">{weather.humidity}%</div>
+                           <div className="text-2xl sm:text-3xl font-medium text-white">{weather.humidity}%</div>
                         </div>
-                        {/* Gauge Visualizer */}
-                        <div className="absolute -bottom-6 -right-6 w-32 h-32 opacity-70">
+                        {/* Gauge Visualizer - Reduced size and properly anchored */}
+                        <div className="absolute bottom-0 right-0 w-24 h-24 opacity-60 translate-x-2 translate-y-2">
                             <svg viewBox="0 0 100 100" className="w-full h-full transform -rotate-45">
-                              <circle cx="50" cy="50" r="40" fill="transparent" stroke="#1e293b" strokeWidth="8"/>
-                              <circle cx="50" cy="50" r="40" fill="transparent" stroke="#3b82f6" strokeWidth="8" strokeDasharray="251.2" strokeDashoffset={251.2 - (251.2 * weather.humidity / 100)} strokeLinecap="round"/>
+                              <circle cx="50" cy="50" r="35" fill="transparent" stroke="#1e293b" strokeWidth="6"/>
+                              <circle cx="50" cy="50" r="35" fill="transparent" stroke="#3b82f6" strokeWidth="6" strokeDasharray="219.9" strokeDashoffset={219.9 - (219.9 * weather.humidity / 100)} strokeLinecap="round"/>
                                {/* Rain Drop in center of gauge */}
-                               <path d="M50 25 C50 25, 40 40, 40 50 A10 10 0 0 0 60 50 C60 40, 50 25, 50 25 Z" fill="#3b82f6" className="transform origin-center rotate-45 scale-50" />
+                               <path d="M50 25 C50 25, 40 40, 40 50 A10 10 0 0 0 60 50 C60 40, 50 25, 50 25 Z" fill="#3b82f6" className="transform origin-center rotate-45 scale-[0.35]" />
                             </svg>
                         </div>
                       </div>
@@ -200,7 +197,7 @@ export default function InfoBar({ weather, earthquake }: InfoBarProps) {
               {weather.daily && weather.daily.length > 0 && (
                 <div className="px-5 pb-8">
                   <div className="bg-white/5 border border-white/10 rounded-3xl py-5 px-1 backdrop-blur-md">
-                    <div className="flex overflow-x-auto no-scrollbar gap-2 px-3 pl-3">
+                    <div className="flex overflow-x-auto custom-scrollbar gap-2 px-3 pl-3">
                       {weather.daily.map((day, index) => {
                         const dayInfo = getWeatherDesc(day.code);
                         const date = new Date(day.date);
@@ -213,7 +210,7 @@ export default function InfoBar({ weather, earthquake }: InfoBarProps) {
                         const isHigh = day.maxTemp > 28;
 
                         return (
-                          <div key={day.date} className="flex flex-col items-center justify-between min-w-[64px] relative">
+                          <div key={day.date} className="flex flex-col items-center justify-between min-w-[64px] relative pb-2">
                             <div className="text-sm font-medium text-white mb-2">{day.maxTemp}°</div>
                             
                             {/* Temp Curve Simulation (CSS Line) */}
@@ -232,7 +229,7 @@ export default function InfoBar({ weather, earthquake }: InfoBarProps) {
                 </div>
               )}
                
-              <div className="mt-auto mb-6 text-[10px] text-gray-500 text-center px-4 w-full opacity-60 flex justify-center items-center gap-1">
+              <div className="mt-auto pt-4 text-[10px] text-gray-500 text-center px-4 w-full opacity-60 flex justify-center items-center gap-1">
                  <span>Data disediakan oleh</span>
                  <span className="font-semibold text-gray-400">Open-Meteo</span>
               </div>
