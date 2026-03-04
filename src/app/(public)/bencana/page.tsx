@@ -67,48 +67,92 @@ export default function DisasterPage() {
                             <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
                         </div>
                     ) : earthquake && (
-                        <div className={`bg-white rounded-2xl shadow-sm border overflow-hidden ${earthquake.isWarning ? 'border-red-500 shadow-[0_0_15px_rgba(239,68,68,0.3)]' : 'border-orange-200'}`}>
-                            <div className={`${earthquake.isWarning ? 'bg-red-700 animate-pulse text-white' : 'bg-orange-50 text-gray-900'} px-6 py-4 border-b flex items-center justify-between`}>
-                                <h2 className="text-lg font-bold flex items-center">
-                                    <div className={`p-1.5 rounded-lg mr-3 ${earthquake.isWarning ? 'bg-red-800 text-white' : 'bg-orange-200 text-orange-700'}`}>
-                                        {earthquake.isWarning ? '🚨' : (
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                                        </svg>
-                                        )}
-                                    </div>
-                                    {earthquake.isWarning ? 'Peringatan Gempa!' : 'Info Gempa Terkini'}
-                                </h2>
-                                <span className={`text-xs font-semibold px-2 py-1 rounded-full animate-pulse ${earthquake.isWarning ? 'bg-red-600 text-white' : 'text-orange-600 bg-orange-100'}`}>
-                                    Terbaru
-                                </span>
+                        <div className={`bg-white rounded-2xl shadow-sm border overflow-hidden flex flex-col md:flex-row gap-6 p-6 ${earthquake.isWarning ? 'border-red-500 shadow-[0_0_15px_rgba(239,68,68,0.3)]' : 'border-gray-100'}`}>
+                            {/* Left: Shakemap */}
+                            <div className="flex-shrink-0 w-full md:w-1/3 bg-gray-50 rounded-xl overflow-hidden border border-gray-200">
+                                {earthquake.shakemap ? (
+                                    <img src={`https://data.bmkg.go.id/DataMKG/TEWS/${earthquake.shakemap}`} alt="Shakemap Gempa" className="w-full h-auto object-cover" />
+                                ) : (
+                                    <div className="h-full w-full min-h-[200px] flex items-center justify-center p-8 text-gray-400">Peta tidak tersedia</div>
+                                )}
                             </div>
-                            <div className="p-6">
-                                <div className="flex flex-col md:flex-row gap-6 items-center">
-                                    <div className={`flex-shrink-0 text-center text-white p-4 rounded-xl shadow-lg ${earthquake.isWarning ? 'bg-red-600' : 'bg-orange-600'}`}>
-                                        <div className="text-4xl font-bold">{earthquake.magnitude}</div>
-                                        <div className="text-xs uppercase tracking-wider opacity-90 mt-1">Magnitudo</div>
-                                    </div>
-                                    <div className="flex-1 space-y-2 text-center md:text-left">
-                                        <p className="text-lg font-semibold text-gray-900">{earthquake.location}</p>
-                                        <div className="flex flex-col sm:flex-row gap-2 sm:gap-6 text-sm text-gray-600 justify-center md:justify-start">
-                                            <span className="flex items-center"><FiMapPin className="mr-1.5"/> Kedalaman: {earthquake.depth}</span>
-                                            <span className="flex items-center">
-                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                                </svg>
-                                                {earthquake.date} - {earthquake.time}
-                                            </span>
+                        
+                            {/* Right: Info */}
+                            <div className="flex-1 flex flex-col justify-center space-y-4">
+                                <div>
+                                    <h2 className="text-3xl font-bold text-gray-900 mb-2">Gempa Bumi Terkini</h2>
+                                    <p className="text-gray-500 text-sm">{earthquake.date}, {earthquake.time}</p>
+                                </div>
+                        
+                                <div>
+                                    <span className="inline-block px-4 py-1.5 bg-orange-100 text-orange-600 font-semibold text-sm rounded-full">
+                                        {earthquake.potential || "Gempa Dirasakan"}
+                                    </span>
+                                </div>
+                        
+                                <h3 className="text-xl font-bold text-gray-900 leading-snug">
+                                    {earthquake.location.toLowerCase().startsWith("pusat gempa") ? earthquake.location : `Pusat gempa berada di ${earthquake.location.replace(/pusat gempa berada di /i, '')}`}
+                                </h3>
+                        
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                    {/* Magnitudo */}
+                                    <div className="border border-gray-200 rounded-xl p-3 flex flex-col items-start bg-white">
+                                        <span className="text-gray-500 text-xs mb-1">Magnitudo:</span>
+                                        <div className="flex items-center text-gray-900 font-bold text-lg">
+                                            <span className="text-red-500 mr-2">
+                                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                                            </span> 
+                                            {earthquake.magnitude}
                                         </div>
-                                        <div className={`text-sm mt-3 p-3 rounded-lg border-l-4 ${earthquake.isWarning ? 'bg-red-50 border-red-500 text-red-700 font-bold' : 'bg-gray-50 border-gray-300 text-gray-600'}`}>
-                                            {earthquake.potential || "Tidak berpotensi Tsunami"}
-                                        </div>
-                                        {earthquake.distance !== null && (
-                                            <div className="text-sm mt-2 p-3 rounded-lg border-l-4 bg-blue-50 border-blue-500 text-blue-900 font-medium">
-                                                Jarak ke Bireuen: ±{Math.round(earthquake.distance)} KM
-                                            </div>
-                                        )}
                                     </div>
+                                    {/* Kedalaman */}
+                                    <div className="border border-gray-200 rounded-xl p-3 flex flex-col items-start bg-white">
+                                        <span className="text-gray-500 text-xs mb-1">Kedalaman:</span>
+                                        <div className="flex items-center text-gray-900 font-bold text-lg">
+                                            <span className="text-green-500 mr-2">
+                                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                            </span> 
+                                            {earthquake.depth}
+                                        </div>
+                                    </div>
+                                    {/* Koordinat Lokasi */}
+                                    <div className="border border-gray-200 rounded-xl p-3 flex flex-col items-start bg-white">
+                                        <span className="text-gray-500 text-xs mb-1">Koordinat Lokasi:</span>
+                                        <div className="flex items-center text-gray-900 font-bold text-sm">
+                                            <span className="text-orange-500 mr-2">
+                                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                                            </span> 
+                                            {earthquake.lintang} - {earthquake.bujur}
+                                        </div>
+                                    </div>
+                                </div>
+                        
+                                <p className="text-sm text-gray-600 mt-2">
+                                    <span className="font-semibold text-blue-600">Saran BMKG:</span> Hati-hati terhadap gempabumi susulan yang mungkin terjadi
+                                </p>
+                                
+                                {earthquake.dirasakan && earthquake.dirasakan !== "-" && (
+                                    <p className="text-sm text-gray-600">
+                                        <span className="font-semibold text-orange-600">Dirasakan:</span> {earthquake.dirasakan}
+                                    </p>
+                                )}
+                        
+                                {/* Bireuen Warning Overrides */}
+                                {earthquake.isWarning && (
+                                    <div className="text-sm mt-3 p-3 rounded-lg bg-red-50 border border-red-500 text-red-700 font-bold flex items-center shadow-sm animate-pulse">
+                                        <span className="mr-2 text-xl">🚨</span> PERINGATAN: Gempa Signifikan / Potensi Tsunami dekat Bireuen!
+                                    </div>
+                                )}
+                                {earthquake.distance !== null && (
+                                    <div className="text-sm mt-2 p-3 rounded-lg bg-blue-50 border border-blue-500 text-blue-900 font-medium inline-block w-fit">
+                                        Jarak pusaran ke Bireuen: ±{Math.round(earthquake.distance)} KM
+                                    </div>
+                                )}
+                        
+                                <div className="mt-4">
+                                    <a href="https://warning.bmkg.go.id/" target="_blank" rel="noopener noreferrer" className="text-blue-600 font-semibold hover:text-blue-800 flex items-center transition-colors">
+                                        Lihat Semuanya <span className="ml-1">→</span>
+                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -411,52 +455,92 @@ export default function DisasterPage() {
                     <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
                 </div>
             ) : earthquake && (
-                <div className={`bg-white rounded-2xl shadow-sm border overflow-hidden h-fit ${earthquake.isWarning ? 'border-red-500 shadow-[0_0_15px_rgba(239,68,68,0.3)]' : 'border-orange-200'}`}>
-                    <div className={`${earthquake.isWarning ? 'bg-red-700 animate-pulse text-white' : 'bg-orange-50 text-gray-900'} px-6 py-4 border-b flex items-center justify-between`}>
-                        <h2 className="text-lg font-bold flex items-center">
-                            <div className={`p-1.5 rounded-lg mr-3 ${earthquake.isWarning ? 'bg-red-800 text-white' : 'bg-orange-200 text-orange-700'}`}>
-                                {earthquake.isWarning ? '🚨' : (
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                                </svg>
-                                )}
-                            </div>
-                            {earthquake.isWarning ? 'Peringatan Gempa!' : 'Info Gempa Terkini'}
-                        </h2>
-                        <span className={`text-xs font-semibold px-2 py-1 rounded-full animate-pulse ${earthquake.isWarning ? 'bg-red-600 text-white' : 'text-orange-600 bg-orange-100'}`}>
-                            Terbaru
-                        </span>
+                <div className={`bg-white rounded-2xl shadow-sm border overflow-hidden flex flex-col md:flex-row gap-6 p-6 lg:col-span-2 ${earthquake.isWarning ? 'border-red-500 shadow-[0_0_15px_rgba(239,68,68,0.3)]' : 'border-gray-100'}`}>
+                    {/* Left: Shakemap */}
+                    <div className="flex-shrink-0 w-full md:w-1/3 bg-gray-50 rounded-xl overflow-hidden border border-gray-200">
+                        {earthquake.shakemap ? (
+                            <img src={`https://data.bmkg.go.id/DataMKG/TEWS/${earthquake.shakemap}`} alt="Shakemap Gempa" className="w-full h-auto object-cover" />
+                        ) : (
+                            <div className="h-full w-full min-h-[200px] flex items-center justify-center p-8 text-gray-400">Peta tidak tersedia</div>
+                        )}
                     </div>
-                    <div className="p-6">
-                        <div className="flex flex-col gap-6 items-center">
-                            <div className="flex w-full items-center gap-4">
-                                <div className={`flex-shrink-0 text-center text-white p-4 rounded-xl shadow-lg ${earthquake.isWarning ? 'bg-red-600' : 'bg-orange-600'}`}>
-                                    <div className="text-4xl font-bold">{earthquake.magnitude}</div>
-                                    <div className="text-xs uppercase tracking-wider opacity-90 mt-1">Mag</div>
-                                </div>
-                                <div className="flex-1">
-                                    <p className="text-lg font-semibold text-gray-900 leading-tight mb-1">{earthquake.location}</p>
-                                    <div className="text-sm text-gray-600">
-                                        <p className="flex items-center"><FiMapPin className="mr-1.5" size={14}/> {earthquake.depth}</p>
-                                        <p className="flex items-center mt-1">
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                            </svg>
-                                            {earthquake.date} - {earthquake.time}
-                                        </p>
-                                    </div>
+                
+                    {/* Right: Info */}
+                    <div className="flex-1 flex flex-col justify-center space-y-4">
+                        <div>
+                            <h2 className="text-3xl font-bold text-gray-900 mb-2">Gempa Bumi Terkini</h2>
+                            <p className="text-gray-500 text-sm">{earthquake.date}, {earthquake.time}</p>
+                        </div>
+                
+                        <div>
+                            <span className="inline-block px-4 py-1.5 bg-orange-100 text-orange-600 font-semibold text-sm rounded-full">
+                                {earthquake.potential || "Gempa Dirasakan"}
+                            </span>
+                        </div>
+                
+                        <h3 className="text-xl font-bold text-gray-900 leading-snug">
+                            {earthquake.location.toLowerCase().startsWith("pusat gempa") ? earthquake.location : `Pusat gempa berada di ${earthquake.location.replace(/pusat gempa berada di /i, '')}`}
+                        </h3>
+                
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            {/* Magnitudo */}
+                            <div className="border border-gray-200 rounded-xl p-3 flex flex-col items-start bg-white">
+                                <span className="text-gray-500 text-xs mb-1">Magnitudo:</span>
+                                <div className="flex items-center text-gray-900 font-bold text-lg">
+                                    <span className="text-red-500 mr-2">
+                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                                    </span> 
+                                    {earthquake.magnitude}
                                 </div>
                             </div>
-                            <div className="w-full flex flex-col gap-2">
-                                <div className={`text-sm p-3 rounded-lg border-l-4 ${earthquake.isWarning ? 'bg-red-50 border-red-500 text-red-700 font-bold' : 'bg-gray-50 border-gray-300 text-gray-600'}`}>
-                                    {earthquake.potential || "Tidak berpotensi Tsunami"}
+                            {/* Kedalaman */}
+                            <div className="border border-gray-200 rounded-xl p-3 flex flex-col items-start bg-white">
+                                <span className="text-gray-500 text-xs mb-1">Kedalaman:</span>
+                                <div className="flex items-center text-gray-900 font-bold text-lg">
+                                    <span className="text-green-500 mr-2">
+                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                    </span> 
+                                    {earthquake.depth}
                                 </div>
-                                {earthquake.distance !== null && (
-                                    <div className="text-sm p-3 rounded-lg border-l-4 bg-blue-50 border-blue-500 text-blue-900 font-medium">
-                                        Jarak ke Bireuen: ±{Math.round(earthquake.distance)} KM
-                                    </div>
-                                )}
                             </div>
+                            {/* Koordinat Lokasi */}
+                            <div className="border border-gray-200 rounded-xl p-3 flex flex-col items-start bg-white">
+                                <span className="text-gray-500 text-xs mb-1">Koordinat Lokasi:</span>
+                                <div className="flex items-center text-gray-900 font-bold text-sm">
+                                    <span className="text-orange-500 mr-2">
+                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                                    </span> 
+                                    {earthquake.lintang} - {earthquake.bujur}
+                                </div>
+                            </div>
+                        </div>
+                
+                        <p className="text-sm text-gray-600 mt-2">
+                            <span className="font-semibold text-blue-600">Saran BMKG:</span> Hati-hati terhadap gempabumi susulan yang mungkin terjadi
+                        </p>
+                        
+                        {earthquake.dirasakan && earthquake.dirasakan !== "-" && (
+                            <p className="text-sm text-gray-600">
+                                <span className="font-semibold text-orange-600">Dirasakan:</span> {earthquake.dirasakan}
+                            </p>
+                        )}
+                
+                        {/* Bireuen Warning Overrides */}
+                        {earthquake.isWarning && (
+                            <div className="text-sm mt-3 p-3 rounded-lg bg-red-50 border border-red-500 text-red-700 font-bold flex items-center shadow-sm animate-pulse">
+                                <span className="mr-2 text-xl">🚨</span> PERINGATAN: Gempa Signifikan / Potensi Tsunami dekat Bireuen!
+                            </div>
+                        )}
+                        {earthquake.distance !== null && (
+                            <div className="text-sm mt-2 p-3 rounded-lg bg-blue-50 border border-blue-500 text-blue-900 font-medium inline-block w-fit">
+                                Jarak pusaran ke Bireuen: ±{Math.round(earthquake.distance)} KM
+                            </div>
+                        )}
+                
+                        <div className="mt-4">
+                            <a href="https://warning.bmkg.go.id/" target="_blank" rel="noopener noreferrer" className="text-blue-600 font-semibold hover:text-blue-800 flex items-center transition-colors">
+                                Lihat Semuanya <span className="ml-1">→</span>
+                            </a>
                         </div>
                     </div>
                 </div>
