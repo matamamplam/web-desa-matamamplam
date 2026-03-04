@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useLiveEarthquake } from '@/hooks/useLiveEarthquake';
 
 interface InfoBarProps {
   weather: {
@@ -17,16 +18,6 @@ interface InfoBarProps {
       minTemp: number;
     }>;
   } | null;
-  earthquake: {
-    magnitude: string;
-    location: string;
-    date: string;
-    time: string;
-    depth: string;
-    shakemap?: string;
-    coordinates: string;
-    potential: string;
-  } | null;
 }
 
 // Helper to get weather description
@@ -41,9 +32,10 @@ function getWeatherDesc(code: number) {
   return { label: "Cerah", icon: "☀️" }
 }
 
-export default function InfoBar({ weather, earthquake }: InfoBarProps) {
+export default function InfoBar({ weather }: InfoBarProps) {
   const [showWeatherModal, setShowWeatherModal] = useState(false);
   const [showEarthquakeModal, setShowEarthquakeModal] = useState(false);
+  const { earthquake, loading } = useLiveEarthquake();
 
   return (
     <>
@@ -76,20 +68,28 @@ export default function InfoBar({ weather, earthquake }: InfoBarProps) {
             </div>
 
             {/* Earthquake Info - Right */}
-            {earthquake && (
+            {loading ? (
+              <div className="animate-pulse flex items-center gap-3 px-4 py-2">
+                <div className="h-4 w-24 bg-white/20 rounded"></div>
+              </div>
+            ) : earthquake && (
               <button
                 onClick={() => setShowEarthquakeModal(true)}
-                className="flex items-center gap-3 text-white hover:bg-white/10 px-4 py-2 rounded-lg transition-all group"
+                className={`flex items-center gap-3 text-white px-4 py-2 rounded-lg transition-all group ${
+                  earthquake.isWarning ? 'bg-red-600/80 hover:bg-red-600 border border-red-500 shadow-[0_0_15px_rgba(239,68,68,0.5)] animate-pulse' : 'hover:bg-white/10'
+                }`}
               >
                 <div className="text-left hidden sm:block">
                   <div className="font-bold text-sm">M{earthquake.magnitude} Gempa Terkini</div>
-                  <div className="text-xs text-red-200 truncate max-w-[200px]">{earthquake.location}</div>
+                  <div className={`text-xs truncate max-w-[200px] ${earthquake.isWarning ? 'text-white font-medium tracking-wide' : 'text-red-200'}`}>
+                    {earthquake.isWarning ? '⚠️ WARNING! GEMPA DEKAT' : earthquake.location}
+                  </div>
                 </div>
                 <div className="relative">
-                  <span className="text-2xl">🌍</span>
-                  <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-ping"></span>
+                  <span className="text-2xl">{earthquake.isWarning ? '🚨' : '🌍'}</span>
+                  {!earthquake.isWarning && <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-ping"></span>}
                 </div>
-                <svg className="w-4 h-4 text-red-300 opacity-0 group-hover:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className={`w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity ${earthquake.isWarning ? 'text-white' : 'text-red-300'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </button>
@@ -237,10 +237,10 @@ export default function InfoBar({ weather, earthquake }: InfoBarProps) {
       {showEarthquakeModal && earthquake && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4" onClick={() => setShowEarthquakeModal(false)}>
           <div className="bg-white dark:bg-gray-900 rounded-2xl p-6 max-w-2xl w-full shadow-2xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-6 border-b border-gray-200 dark:border-gray-700 pb-4">
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                <span className="text-3xl">🌍</span>
-                Info Gempa Terkini
+            <div className={`flex items-center justify-between mb-6 border-b pb-4 ${earthquake.isWarning ? 'border-red-200 dark:border-red-800' : 'border-gray-200 dark:border-gray-700'}`}>
+              <h3 className={`text-2xl font-bold flex items-center gap-2 ${earthquake.isWarning ? 'text-red-600 dark:text-red-400' : 'text-gray-900 dark:text-white'}`}>
+                <span className="text-3xl">{earthquake.isWarning ? '🚨' : '🌍'}</span>
+                {earthquake.isWarning ? 'Peringatan Gempa!' : 'Info Gempa Terkini'}
               </h3>
               <button onClick={() => setShowEarthquakeModal(false)} className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
                 <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -283,10 +283,19 @@ export default function InfoBar({ weather, earthquake }: InfoBarProps) {
                 <div className="text-lg font-semibold text-gray-900 dark:text-white">{earthquake.location}</div>
                 <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">Koordinat: {earthquake.coordinates}</div>
               </div>
-              <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded-xl p-4 border border-yellow-200 dark:border-yellow-800">
-                <div className="text-sm text-yellow-700 dark:text-yellow-400 font-medium mb-1">Potensi</div>
-                <div className="text-base font-semibold text-yellow-900 dark:text-yellow-300">{earthquake.potential}</div>
+              <div className={`${earthquake.isWarning ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800' : 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800'} rounded-xl p-4 border`}>
+                <div className={`text-sm font-medium mb-1 ${earthquake.isWarning ? 'text-red-700 dark:text-red-400' : 'text-yellow-700 dark:text-yellow-400'}`}>Potensi</div>
+                <div className={`text-base font-semibold ${earthquake.isWarning ? 'text-red-900 dark:text-red-300' : 'text-yellow-900 dark:text-yellow-300'}`}>{earthquake.potential}</div>
               </div>
+              
+              {earthquake.distance !== null && (
+                 <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 border border-blue-200 dark:border-blue-800 mt-4">
+                    <div className="text-sm text-blue-700 dark:text-blue-400 font-medium mb-1">Jarak Lokasi Gempa</div>
+                    <div className="text-base font-semibold text-blue-900 dark:text-blue-300">
+                      ~{Math.round(earthquake.distance)} KM dari Bireuen
+                    </div>
+                 </div>
+              )}
             </div>
 
             <div className="mt-6 text-xs text-gray-500 dark:text-gray-400 text-center">

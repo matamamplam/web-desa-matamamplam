@@ -125,27 +125,7 @@ async function getData() {
         return null;
       });
 
-    // 2. Prepare Earthquake Promise
-    const earthquakePromise = prisma.earthquake.findFirst({
-      orderBy: { datetime: 'desc' }
-    })
-      .then((gempa) => {
-        if (!gempa) return null;
-        return {
-          magnitude: gempa.magnitude,
-          location: gempa.location,
-          date: gempa.date,
-          time: gempa.time,
-          depth: gempa.depth,
-          shakemap: gempa.shakemap || undefined,
-          coordinates: gempa.coordinates,
-          potential: gempa.potential,
-        };
-      })
-      .catch((err) => {
-        console.error('Error fetching earthquake:', err);
-        return null;
-      });
+    // Earthquake fetch is now handled directly by InfoBar as a Client Component
 
     // 3. Fire all promises in parallel
     const [
@@ -156,8 +136,7 @@ async function getData() {
       projectsData, 
       structureData, 
       disasterData,
-      weather,
-      earthquake
+      weather
     ] = await Promise.all([
       getPublicSettings(),
       getPublicStats(),
@@ -166,8 +145,7 @@ async function getData() {
       getPublicProjects(),
       getPublicStructure(),
       getPublicDisaster(),
-      weatherPromise,
-      earthquakePromise
+      weatherPromise
     ]);
 
     // getPublicSettings now returns the JSON settings content directly
@@ -220,7 +198,6 @@ async function getData() {
       structure: structureData?.structure || { level1: [], level4: [] },
       disaster: disasterData,
       weather,
-      earthquake,
     };
   } catch (error) {
     console.error('❌ Error fetching landing page data:', error);
@@ -256,18 +233,17 @@ async function getData() {
       structure: { level1: [], level4: [] },
       disaster: null,
       weather: null,
-      earthquake: null,
     };
   }
 }
 
 export default async function LandingPage() {
-  const { stats, news, umkm, projects, settings, structure, disaster, weather, earthquake } = await getData();
+  const { stats, news, umkm, projects, settings, structure, disaster, weather } = await getData();
 
   return (
     <div className="min-h-screen">
       <DisasterAlert disaster={disaster} />
-      <InfoBar weather={weather} earthquake={earthquake} />
+      <InfoBar weather={weather} />
       <HeroSection settings={settings} />
       {stats && <QuickStats stats={stats} />}
       {news.length > 0 && <LatestNews news={news} />}

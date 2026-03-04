@@ -659,24 +659,6 @@ enum LogLevel {
 // EXTERNAL DATA (BMKG)
 // ============================================
 
-model Earthquake {
-  id          String   @id @default(cuid())
-  datetime    DateTime // Waktu gempa (ISO)
-  date        String // Tanggal textual (e.g. "04 Feb 2026")
-  time        String // Jam textual (e.g. "12:00:00 WIB")
-  coordinates String // "-7.12,110.34"
-  lintang     String
-  bujur       String
-  magnitude   String
-  depth       String
-  location    String
-  potential   String
-  shakemap    String // URL to BMKG shakemap image
-  createdAt   DateTime @default(now())
-
-  @@map("earthquakes")
-}
-
 // ============================================
 // DISASTER MANAGEMENT (TANGGAP BENCANA)
 // ============================================

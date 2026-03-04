@@ -2,10 +2,12 @@
 
 import { useState, useEffect } from "react"
 import { FiAlertTriangle, FiCheckCircle, FiMapPin, FiPhone, FiInfo, FiArrowLeft } from "react-icons/fi"
+import { useLiveEarthquake } from "@/hooks/useLiveEarthquake"
 
 export default function DisasterPage() {
   const [data, setData] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+  const { earthquake, loading: earthquakeLoading } = useLiveEarthquake()
 
   useEffect(() => {
     const fetchData = async () => {
@@ -36,7 +38,6 @@ export default function DisasterPage() {
 
   const event = data?.event;
   const stats = data?.stats;
-  const earthquake = data?.earthquake;
 
   // Safe State (No Active Disaster)
   if (!event) {
@@ -60,24 +61,31 @@ export default function DisasterPage() {
                 <div className="lg:col-span-2 space-y-8">
                     
                     {/* Earthquake Card */}
-                    {earthquake && (
-                        <div className="bg-white rounded-2xl shadow-sm border border-orange-200 overflow-hidden">
-                            <div className="bg-orange-50 px-6 py-4 border-b border-orange-100 flex items-center justify-between">
-                                <h2 className="text-lg font-bold text-gray-900 flex items-center">
-                                    <div className="p-1.5 bg-orange-200 rounded-lg mr-3 text-orange-700">
+                    {earthquakeLoading ? (
+                        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 animate-pulse">
+                            <div className="h-6 bg-gray-200 rounded w-1/3 mb-4"></div>
+                            <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
+                        </div>
+                    ) : earthquake && (
+                        <div className={`bg-white rounded-2xl shadow-sm border overflow-hidden ${earthquake.isWarning ? 'border-red-500 shadow-[0_0_15px_rgba(239,68,68,0.3)]' : 'border-orange-200'}`}>
+                            <div className={`${earthquake.isWarning ? 'bg-red-700 animate-pulse text-white' : 'bg-orange-50 text-gray-900'} px-6 py-4 border-b flex items-center justify-between`}>
+                                <h2 className="text-lg font-bold flex items-center">
+                                    <div className={`p-1.5 rounded-lg mr-3 ${earthquake.isWarning ? 'bg-red-800 text-white' : 'bg-orange-200 text-orange-700'}`}>
+                                        {earthquake.isWarning ? '🚨' : (
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                                         </svg>
+                                        )}
                                     </div>
-                                    Info Gempa Terkini (Aceh)
+                                    {earthquake.isWarning ? 'Peringatan Gempa!' : 'Info Gempa Terkini'}
                                 </h2>
-                                <span className="text-xs font-semibold text-orange-600 bg-orange-100 px-2 py-1 rounded-full animate-pulse">
+                                <span className={`text-xs font-semibold px-2 py-1 rounded-full animate-pulse ${earthquake.isWarning ? 'bg-red-600 text-white' : 'text-orange-600 bg-orange-100'}`}>
                                     Terbaru
                                 </span>
                             </div>
                             <div className="p-6">
                                 <div className="flex flex-col md:flex-row gap-6 items-center">
-                                    <div className="flex-shrink-0 text-center bg-orange-600 text-white p-4 rounded-xl shadow-lg">
+                                    <div className={`flex-shrink-0 text-center text-white p-4 rounded-xl shadow-lg ${earthquake.isWarning ? 'bg-red-600' : 'bg-orange-600'}`}>
                                         <div className="text-4xl font-bold">{earthquake.magnitude}</div>
                                         <div className="text-xs uppercase tracking-wider opacity-90 mt-1">Magnitudo</div>
                                     </div>
@@ -92,9 +100,14 @@ export default function DisasterPage() {
                                                 {earthquake.date} - {earthquake.time}
                                             </span>
                                         </div>
-                                        <p className="text-xs text-gray-500 mt-2 italic bg-gray-50 p-2 rounded block">
+                                        <div className={`text-sm mt-3 p-3 rounded-lg border-l-4 ${earthquake.isWarning ? 'bg-red-50 border-red-500 text-red-700 font-bold' : 'bg-gray-50 border-gray-300 text-gray-600'}`}>
                                             {earthquake.potential || "Tidak berpotensi Tsunami"}
-                                        </p>
+                                        </div>
+                                        {earthquake.distance !== null && (
+                                            <div className="text-sm mt-2 p-3 rounded-lg border-l-4 bg-blue-50 border-blue-500 text-blue-900 font-medium">
+                                                Jarak ke Bireuen: ±{Math.round(earthquake.distance)} KM
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -392,25 +405,32 @@ export default function DisasterPage() {
          <div className="grid lg:grid-cols-2 gap-8 mb-12">
             
             {/* Earthquake Card */}
-            {earthquake && (
-                <div className="bg-white rounded-2xl shadow-sm border border-orange-200 overflow-hidden h-fit">
-                    <div className="bg-orange-50 px-6 py-4 border-b border-orange-100 flex items-center justify-between">
-                        <h2 className="text-lg font-bold text-gray-900 flex items-center">
-                            <div className="p-1.5 bg-orange-200 rounded-lg mr-3 text-orange-700">
+            {earthquakeLoading ? (
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 animate-pulse h-fit">
+                    <div className="h-6 bg-gray-200 rounded w-1/3 mb-4"></div>
+                    <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
+                </div>
+            ) : earthquake && (
+                <div className={`bg-white rounded-2xl shadow-sm border overflow-hidden h-fit ${earthquake.isWarning ? 'border-red-500 shadow-[0_0_15px_rgba(239,68,68,0.3)]' : 'border-orange-200'}`}>
+                    <div className={`${earthquake.isWarning ? 'bg-red-700 animate-pulse text-white' : 'bg-orange-50 text-gray-900'} px-6 py-4 border-b flex items-center justify-between`}>
+                        <h2 className="text-lg font-bold flex items-center">
+                            <div className={`p-1.5 rounded-lg mr-3 ${earthquake.isWarning ? 'bg-red-800 text-white' : 'bg-orange-200 text-orange-700'}`}>
+                                {earthquake.isWarning ? '🚨' : (
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                                 </svg>
+                                )}
                             </div>
-                            Info Gempa Terkini (Aceh)
+                            {earthquake.isWarning ? 'Peringatan Gempa!' : 'Info Gempa Terkini'}
                         </h2>
-                        <span className="text-xs font-semibold text-orange-600 bg-orange-100 px-2 py-1 rounded-full animate-pulse">
+                        <span className={`text-xs font-semibold px-2 py-1 rounded-full animate-pulse ${earthquake.isWarning ? 'bg-red-600 text-white' : 'text-orange-600 bg-orange-100'}`}>
                             Terbaru
                         </span>
                     </div>
                     <div className="p-6">
                         <div className="flex flex-col gap-6 items-center">
                             <div className="flex w-full items-center gap-4">
-                                <div className="flex-shrink-0 text-center bg-orange-600 text-white p-4 rounded-xl shadow-lg">
+                                <div className={`flex-shrink-0 text-center text-white p-4 rounded-xl shadow-lg ${earthquake.isWarning ? 'bg-red-600' : 'bg-orange-600'}`}>
                                     <div className="text-4xl font-bold">{earthquake.magnitude}</div>
                                     <div className="text-xs uppercase tracking-wider opacity-90 mt-1">Mag</div>
                                 </div>
@@ -427,9 +447,16 @@ export default function DisasterPage() {
                                     </div>
                                 </div>
                             </div>
-                            <p className="w-full text-xs text-gray-500 italic bg-gray-50 p-2 rounded text-center border border-gray-100">
-                                {earthquake.potential || "Tidak berpotensi Tsunami"}
-                            </p>
+                            <div className="w-full flex flex-col gap-2">
+                                <div className={`text-sm p-3 rounded-lg border-l-4 ${earthquake.isWarning ? 'bg-red-50 border-red-500 text-red-700 font-bold' : 'bg-gray-50 border-gray-300 text-gray-600'}`}>
+                                    {earthquake.potential || "Tidak berpotensi Tsunami"}
+                                </div>
+                                {earthquake.distance !== null && (
+                                    <div className="text-sm p-3 rounded-lg border-l-4 bg-blue-50 border-blue-500 text-blue-900 font-medium">
+                                        Jarak ke Bireuen: ±{Math.round(earthquake.distance)} KM
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>
